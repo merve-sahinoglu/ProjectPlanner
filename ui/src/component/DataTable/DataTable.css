@@ -1,0 +1,58 @@
+.ag-header-cell-label {
+  justify-content: center !important;
+}
+
+.ag-checkbox-input {
+  width: 18px;
+  height: 18px;
+  vertical-align: center;
+  justify-content: center;
+}
+
+/* Optional: Adjust the font size and letter spacing */
+.ag-header-cell-text {
+  font-size: 12px;
+  font-family: "Inter", sans-serif !important;
+  /* Adjust the font size */
+  letter-spacing: 0.5px;
+  /* Optional: Adjust letter spacing */
+}
+
+.ag-cell-value {
+  line-height: 25px !important;
+  word-break: normal;
+  /* prevent words from breaking */
+  padding-top: 3px;
+  /* space top */
+  padding-bottom: 3px;
+  /* space bottom */
+  align-content: center;
+}
+
+.ag-theme-quartz-dark {
+  --ag-foreground-color: #b3b3b7;
+  --ag-background-color: #25262b;
+  --ag-header-foreground-color: #b3b3b7;
+  --ag-header-background-color: #34353a;
+  --ag-odd-row-background-color: #1a1b1e;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+  --ag-header-column-resize-handle-color: #25262b;
+
+  --ag-font-size: 12px !important;
+  --ag-font-family: "Inter", sans-serif !important;
+}
+
+.ag-theme-quartz {
+  --ag-font-size: 12px !important;
+  --ag-font-family: "Inter", sans-serif !important;
+  box-shadow: rgba(0, 0, 0, 0.1) 0 4px 12px;
+}
+
+.ag-theme-quartz .ag-cell {
+  border: 0.5px solid rgba(222, 226, 230, 0.3);
+  box-sizing: border-box;
+}
+
+.ag-theme-quartz .ag-paging-panel {
+  font-family: "Inter", sans-serif !important;
+}
