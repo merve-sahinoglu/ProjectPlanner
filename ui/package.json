@@ -11,10 +11,14 @@
   },
   "dependencies": {
     "@mantine/core": "^7.16.2",
+    "@mantine/dates": "^7.16.2",
     "@mantine/hooks": "^7.16.2",
+    "@mantine/modals": "^7.16.2",
     "@tabler/icons-react": "^3.29.0",
     "ag-grid-community": "^33.0.4",
+    "date-fns": "^4.1.0",
     "react": "^18.3.1",
+    "react-big-calendar": "^1.17.1",
     "react-dom": "^18.3.1",
     "react-router-dom": "^7.1.5"
   },
