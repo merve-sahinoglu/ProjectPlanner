@@ -1,0 +1,11 @@
+/* calendar.module.css */
+.calendar .mantine-Calendar-calendarHeader {
+    display: grid;
+    grid-template-columns: 1fr max-content max-content;
+}
+
+.calendar .mantine-Calendar-calendarHeaderLevel {
+    order: -1;
+    justify-self: flex-start;
+    padding-inline: var(--mantine-spacing-md);
+}
