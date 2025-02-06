@@ -9,8 +9,6 @@ import {
   RowClickedEvent,
 } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
-import "@ag-grid-community/styles/ag-grid.css";
-import "@ag-grid-community/styles/ag-theme-quartz.css";
 import { useEffect, useRef, useState } from "react";
 import "./DataTable.css";
 import {
@@ -19,6 +17,8 @@ import {
 } from "@ag-grid-community/locale";
 import Language from "../../enum/language.ts";
 import useUserPreferences from "../../hooks/useUserPreferenceStore.tsx";
+import "ag-grid-community/styles/ag-grid.css";
+import "ag-grid-community/styles/ag-theme-alpine.css";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -38,7 +38,7 @@ interface DataTableProps<T extends TableEntity> {
 function DataTable<T extends TableEntity>({
   records,
   columns,
-  h = 300,
+  h = 400,
   isFetching,
   onRowClicked,
   hasPagination = true,

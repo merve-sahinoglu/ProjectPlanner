@@ -3,6 +3,7 @@ import routes from "./constants/routes";
 import Main from "./layout/Main";
 import { ContactUs } from "./page/contact/ContactUs";
 import CalendarComponent from "./page/appointment/CalendarComponent";
+import Instructor from "./page/instructor/Instructor";
 
 const AppRouter = () => {
   return (
@@ -23,6 +24,14 @@ const AppRouter = () => {
           element={
             <Main>
               <ContactUs />
+            </Main>
+          }
+        />
+        <Route
+          path={routes.instructor}
+          element={
+            <Main>
+              <Instructor />
             </Main>
           }
         />

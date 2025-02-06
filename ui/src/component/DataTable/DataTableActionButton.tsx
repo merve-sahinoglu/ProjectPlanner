@@ -1,4 +1,3 @@
-/* eslint-disable react/no-unused-prop-types */
 import { ICellRendererParams } from "@ag-grid-community/core";
 import { ActionIcon } from "@mantine/core";
 
@@ -9,8 +8,7 @@ interface DataTableDeleteButtonProps<T> {
 }
 
 function DataTableActionButton<T>({ colDef, node }: ICellRendererParams<T>) {
-  // eslint-disable-next-line react/destructuring-assignment
-  const {
+const {
     handleClick,
     icon,
     color = "red",

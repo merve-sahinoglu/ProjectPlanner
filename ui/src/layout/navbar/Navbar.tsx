@@ -35,7 +35,7 @@ const collections = [
   { emoji: "💰", label: "Profits" },
   { emoji: "✨", label: "Reports" },
   { emoji: "📅", label: "Appointment", root: routes.appointment },
-  { emoji: "🙈", label: "Debts" },
+  { emoji: "🙈", label: "Instructor", root: routes.instructor },
   { emoji: "💁‍♀️", label: "Customers" },
 ];
 
