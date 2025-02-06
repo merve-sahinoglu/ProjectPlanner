@@ -1,4 +1,3 @@
-import "@mantine/core/styles.css";
 import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
 import { StrictMode } from "react";
