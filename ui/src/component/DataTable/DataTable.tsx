@@ -18,7 +18,7 @@ import {
 import Language from "../../enum/language.ts";
 import useUserPreferences from "../../hooks/useUserPreferenceStore.tsx";
 import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-alpine.css";
+import "ag-grid-community/styles/ag-theme-quartz.css";
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 

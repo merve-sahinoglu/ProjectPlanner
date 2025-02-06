@@ -1,15 +1,16 @@
 import { useState } from "react";
-import { Button, Modal } from "@mantine/core";
+import { Modal } from "@mantine/core";
 import AppointmentModal from "./AppointmentModal";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import enUS from "date-fns/locale/en-US";
+import enUsLocale from "date-fns/locale/en-US";
 import tr from "date-fns/locale/tr"; // Türkçe dili desteği
 import { useDisclosure } from "@mantine/hooks";
+import { Appointment } from "./types/Appointment";
 
 const locales = {
-  "en-US": enUS,
+  "en-US": enUsLocale,
   tr: tr,
 };
 
@@ -20,13 +21,6 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 });
-
-interface Appointment {
-  title: string;
-  start: Date;
-  end: Date;
-  allDay: boolean;
-}
 
 const CalendarComponent = () => {
   const [appointments, setAppointments] = useState([] as Appointment[]);
@@ -39,15 +33,6 @@ const CalendarComponent = () => {
     setAppointments([...appointments, appointment]);
   };
 
-  const handleAddAppointments = (name: string) => {
-    // const workout = workouts.find((x) => x.name == name);
-
-    // if (!workout) return;
-
-    // setSelectedWorkout(workout);
-    open();
-  };
-
   const handleEditSlot = (event: {
     id: number;
     title: string;
@@ -55,8 +40,9 @@ const CalendarComponent = () => {
     end: Date;
     allDay: boolean;
   }) => {
-    debugger;
     const model: Appointment = {
+      id: Math.random(),
+      appointmenId: crypto.randomUUID(),
       title: event.title,
       start: event.start,
       end: event.end,
@@ -67,8 +53,9 @@ const CalendarComponent = () => {
   };
 
   const handleSelectSlot = (event: { start: Date; end: Date }) => {
-    debugger;
     const model: Appointment = {
+      id: Math.random(),
+      appointmenId: crypto.randomUUID(),
       title: "",
       start: event.start,
       end: event.end,

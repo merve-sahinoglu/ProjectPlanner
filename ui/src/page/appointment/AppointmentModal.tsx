@@ -2,18 +2,12 @@ import { useState } from "react";
 import { TextInput, Button } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { addDays, isSameMinute, differenceInDays } from "date-fns";
+import { Appointment } from "./types/Appointment";
 
 interface AppointmentFormProps {
   model: Appointment;
   closeOnSave: () => void;
   handleAppointments: (appointments: Appointment[]) => void;
-}
-
-interface Appointment {
-  title: string;
-  start: Date;
-  end: Date;
-  allDay: boolean;
 }
 
 const AppointmentModal: React.FC<AppointmentFormProps> = ({
@@ -72,11 +66,11 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
       ).map(({ start, end }) => ({
         title: title,
         start,
+        id: Math.random(),
+        appointmenId: crypto.randomUUID(),
         end: addDays(end, 1), // Takvim bitiş gününü de dahil etsin
         allDay: true,
       }));
-
-      debugger;
 
       handleAppointments([...groupedEvents]);
     }

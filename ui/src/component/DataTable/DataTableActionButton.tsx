@@ -20,7 +20,10 @@ const {
     <ActionIcon
       ml={10}
       color={color}
-      onClick={(e) => handleClick(e, node.data!)}
+      onClick={(e) => {
+        e.stopPropagation();
+        handleClick(e, node.data!)
+      }}
     >
       {icon}
     </ActionIcon>

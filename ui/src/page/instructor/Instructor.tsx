@@ -1,6 +1,8 @@
 import { useReducer } from "react";
 import InstructorTable from "./component/InstructorTable";
 import InstructorEdit from "./component/InstructerEdit";
+import { Modal } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 
 interface Instructor {
   id: string;
@@ -65,7 +67,7 @@ function reducer(state: State, action: Action): State {
       };
     case "DELETE_INSTRUCTOR":
       return {
-        ...state,
+        selectedInstructor: null,
         instructors: state.instructors.filter(
           (inst) => inst.id !== action.payload
         ),
@@ -80,31 +82,50 @@ function Instructor() {
     instructors: sampleInstructors,
     selectedInstructor: null,
   });
+  const [opened, { open, close }] = useDisclosure(false);
 
   return (
     <div>
       {state.selectedInstructor ? (
-        <InstructorEdit
-          instructor={state.selectedInstructor}
-          onClose={() => dispatch({ type: "CLOSE_FORM" })}
-          onSave={(instructor) =>
-            instructor.id
-              ? dispatch({ type: "EDIT_INSTRUCTOR", payload: instructor })
-              : dispatch({ type: "CREATE_INSTRUCTOR", payload: instructor })
-          }
-        />
-      ) : (
-        <InstructorTable
-          records={state.instructors}
-          isFetching={false}
-          onRowClicked={(instructor) =>
-            dispatch({ type: "SELECT_INSTRUCTOR", payload: instructor })
-          }
-          onDelete={(id) =>
-            dispatch({ type: "DELETE_INSTRUCTOR", payload: id })
-          }
-        />
-      )}
+        <Modal
+          size={"xl"}
+          opened={opened}
+          onClose={close}
+          title="Yeni Randevu"
+          centered
+        >
+          <InstructorEdit
+            instructor={state.selectedInstructor}
+            onClose={() => {
+              close();
+              dispatch({ type: "CLOSE_FORM" });
+            }}
+            onSave={(instructor) => {
+              close();
+              return instructor.id
+                ? dispatch({
+                    type: "EDIT_INSTRUCTOR",
+                    payload: instructor,
+                  })
+                : dispatch({
+                    type: "CREATE_INSTRUCTOR",
+                    payload: instructor,
+                  });
+            }}
+            onDelete={(id) =>
+              dispatch({ type: "DELETE_INSTRUCTOR", payload: id })
+            }
+          />
+        </Modal>
+      ) : null}
+      <InstructorTable
+        records={state.instructors}
+        isFetching={false}
+        onRowClicked={(instructor) => {
+          dispatch({ type: "SELECT_INSTRUCTOR", payload: instructor });
+          open();
+        }}
+      />
     </div>
   );
 }

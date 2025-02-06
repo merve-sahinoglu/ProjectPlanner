@@ -1,6 +1,7 @@
 import { useForm, zodResolver } from "@mantine/form";
-import { TextInput, Select, Button, Box } from "@mantine/core";
+import { TextInput, Select, Button, Box, Group } from "@mantine/core";
 import { z } from "zod";
+import { BsFillSaveFill, BsSave, BsTrash } from "react-icons/bs";
 
 const InstructorSchema = z.object({
   id: z.string().uuid(),
@@ -21,6 +22,7 @@ interface InstructorFormProps {
   onClose: () => void;
 
   onSave: (instructor: Instructor) => void;
+  onDelete: (id: string) => void;
 }
 
 interface Instructor {
@@ -36,6 +38,7 @@ export default function InstructorEdit({
   instructor,
   onClose,
   onSave,
+  onDelete,
 }: InstructorFormProps) {
   const form = useForm({
     initialValues: {
@@ -54,15 +57,15 @@ export default function InstructorEdit({
     onClose();
   }
 
+  function deleteInstructor(event: React.MouseEvent) {
+    debugger;
+    onDelete(form.values.id);
+    onClose();
+  }
+
   return (
     <Box mx="auto" maw={400}>
       <form onSubmit={form.onSubmit((values) => saveInstructor(values))}>
-        <TextInput
-          label="ID"
-          placeholder="UUID"
-          {...form.getInputProps("id")}
-          required
-        />
         <TextInput
           label="Ad"
           placeholder="Adınızı girin"
@@ -90,9 +93,20 @@ export default function InstructorEdit({
           {...form.getInputProps("type")}
           required
         />
-        <Button type="submit" mt="md">
-          Kaydet
-        </Button>
+        <Group justify="space-between">
+          <Button type="submit" mt="md">
+            <BsSave />
+          </Button>
+          <Button
+            type="button"
+            onClick={(e) => {
+              deleteInstructor(e);
+            }}
+            mt="md"
+          >
+            <BsTrash />
+          </Button>
+        </Group>
       </form>
     </Box>
   );
