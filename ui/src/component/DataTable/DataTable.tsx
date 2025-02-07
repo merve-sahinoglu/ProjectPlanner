@@ -43,6 +43,7 @@ function DataTable<T extends TableEntity>({
   onRowClicked,
   hasPagination = true,
 }: DataTableProps<T>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gridRef = useRef<GridApi<any> | null>(null);
 
   const [isReady, setIsReady] = useState(true);

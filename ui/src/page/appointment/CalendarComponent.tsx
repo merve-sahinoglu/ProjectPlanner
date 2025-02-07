@@ -84,7 +84,7 @@ const CalendarComponent = () => {
           size={"xl"}
           opened={opened}
           onClose={close}
-          title="Yeni Randevu"
+          title="New Instructor"
           centered
         >
           <AppointmentModal
