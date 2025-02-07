@@ -11,6 +11,7 @@ const InstructorSchema = z.object({
     z.literal("müzik terapisi"),
     z.literal("özel eğitim"),
   ]),
+  profilePicture: z.instanceof(File).nullable().optional(),
 });
 
 type Instructor = z.infer<typeof InstructorSchema>;

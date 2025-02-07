@@ -2,8 +2,20 @@ import { Navigate, useLocation } from "react-router-dom";
 import {
   AuthenticatedUser,
   AuthenticationRequest,
-} from "./context/types/authentication-types";
+  AuthenticationResponse,
+  ThirdPartyAuthenticationRequest,
+} from "./types/authentication-types";
 import { createContext, useContext } from "react";
+import RequestType from "../enum/request-type";
+import { jwtDecode } from "jwt-decode";
+import routes from "../constants/routes";
+import {
+  useCredentialActions,
+  useCurrentUser,
+} from "./store/useCredentialsStore";
+import { useTokenActions } from "./store/useTokensStore";
+import useRequestHandler from "../hooks/useRequestHandler";
+
 interface AuthenticationProps {
   currentUser: AuthenticatedUser | null;
   authenticateUser(user: AuthenticationRequest): Promise<boolean>;

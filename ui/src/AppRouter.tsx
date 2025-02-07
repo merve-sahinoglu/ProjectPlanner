@@ -3,7 +3,7 @@ import routes from "./constants/routes";
 import Main from "./layout/Main";
 import { ContactUs } from "./page/contact/ContactUs";
 import CalendarComponent from "./page/appointment/CalendarComponent";
-import Instructor from "./page/instructor/Instructor";
+import InstructorOverview from "./page/instructor/InstructorOverview";
 
 const AppRouter = () => {
   return (
@@ -31,7 +31,7 @@ const AppRouter = () => {
           path={routes.instructor}
           element={
             <Main>
-              <Instructor />
+              <InstructorOverview />
             </Main>
           }
         />

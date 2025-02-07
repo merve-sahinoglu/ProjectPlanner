@@ -3,15 +3,7 @@ import InstructorTable from "./component/InstructorTable";
 import InstructorEdit from "./component/InstructerEdit";
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-
-interface Instructor {
-  id: string;
-  name?: string;
-  surname?: string;
-  email?: string;
-  phone?: string;
-  type: "dil terapisi" | "müzik terapisi" | "özel eğitim";
-}
+import { Instructor } from "./types/instructer-types";
 
 const sampleInstructors: Instructor[] = [
   {
@@ -77,7 +69,7 @@ function reducer(state: State, action: Action): State {
   }
 }
 
-function Instructor() {
+function InstructorOverview() {
   const [state, dispatch] = useReducer(reducer, {
     instructors: sampleInstructors,
     selectedInstructor: null,
@@ -130,4 +122,4 @@ function Instructor() {
   );
 }
 
-export default Instructor;
+export default InstructorOverview;

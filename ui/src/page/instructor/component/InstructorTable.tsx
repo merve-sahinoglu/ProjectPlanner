@@ -1,13 +1,6 @@
 import DataTable from "../../../component/DataTable/DataTable";
 import { ColDef } from "@ag-grid-community/core";
-interface Instructor {
-  id: string;
-  name?: string;
-  surname?: string;
-  email?: string;
-  phone?: string;
-  type: "dil terapisi" | "müzik terapisi" | "özel eğitim";
-}
+import { Instructor } from "../types/instructer-types";
 
 interface InstructorTableProps {
   records: Instructor[];
@@ -24,7 +17,7 @@ function InstructorTable({
   onRowClicked,
   hasPagination = true,
 }: InstructorTableProps) {
-  const columns: ColDef<any>[] = [
+  const columns: ColDef<Instructor>[] = [
     { field: "name", headerName: "Ad" },
     { field: "surname", headerName: "Soyad" },
     { field: "email", headerName: "E-posta" },

@@ -1,7 +1,17 @@
 import { useForm, zodResolver } from "@mantine/form";
-import { TextInput, Select, Button, Box, Group } from "@mantine/core";
+import {
+  TextInput,
+  Select,
+  Button,
+  Box,
+  Group,
+  FileInput,
+  Image,
+} from "@mantine/core";
 import { z } from "zod";
-import { BsFillSaveFill, BsSave, BsTrash } from "react-icons/bs";
+import { BsSave, BsTrash } from "react-icons/bs";
+import { Instructor } from "../types/instructer-types";
+import { useState } from "react";
 
 const InstructorSchema = z.object({
   id: z.string().uuid(),
@@ -14,6 +24,7 @@ const InstructorSchema = z.object({
     z.literal("müzik terapisi"),
     z.literal("özel eğitim"),
   ]),
+  profilePicture: z.instanceof(File).nullable().optional(),
 });
 
 interface InstructorFormProps {
@@ -25,21 +36,18 @@ interface InstructorFormProps {
   onDelete: (id: string) => void;
 }
 
-interface Instructor {
-  id: string;
-  name?: string;
-  surname?: string;
-  email?: string;
-  phone?: string;
-  type: "dil terapisi" | "müzik terapisi" | "özel eğitim";
-}
-
 export default function InstructorEdit({
   instructor,
   onClose,
   onSave,
   onDelete,
 }: InstructorFormProps) {
+  const [preview, setPreview] = useState<string | null>(
+    instructor.profilePicture
+      ? URL.createObjectURL(instructor.profilePicture)
+      : null
+  );
+
   const form = useForm({
     initialValues: {
       id: instructor.id ?? "",
@@ -48,6 +56,7 @@ export default function InstructorEdit({
       email: instructor.email ?? "",
       phone: instructor.phone ?? "",
       type: instructor.type ?? "",
+      profilePicture: instructor.profilePicture ?? null,
     },
     validate: zodResolver(InstructorSchema),
   });
@@ -57,8 +66,7 @@ export default function InstructorEdit({
     onClose();
   }
 
-  function deleteInstructor(event: React.MouseEvent) {
-    debugger;
+  function deleteInstructor() {
     onDelete(form.values.id);
     onClose();
   }
@@ -66,6 +74,32 @@ export default function InstructorEdit({
   return (
     <Box mx="auto" maw={400}>
       <form onSubmit={form.onSubmit((values) => saveInstructor(values))}>
+        <FileInput
+          accept="image/png,image/jpeg"
+          label="Upload picture"
+          placeholder="Upload picture"
+          onChange={(file) => {
+            form.setFieldValue("profilePicture", file);
+            if (file) {
+              const reader = new FileReader();
+              reader.onload = () => setPreview(reader.result as string);
+              reader.readAsDataURL(file);
+            } else {
+              setPreview(null);
+            }
+          }}
+        />
+
+        {preview && (
+          <Image
+            src={preview}
+            alt="Profile Preview"
+            width={100}
+            height={100}
+            radius="md"
+            mt="sm"
+          />
+        )}
         <TextInput
           label="Ad"
           placeholder="Adınızı girin"
@@ -99,8 +133,8 @@ export default function InstructorEdit({
           </Button>
           <Button
             type="button"
-            onClick={(e) => {
-              deleteInstructor(e);
+            onClick={() => {
+              deleteInstructor();
             }}
             mt="md"
           >
