@@ -1,9 +1,10 @@
-import { useReducer } from "react";
+import { useReducer, useState } from "react";
 import InstructorTable from "./component/InstructorTable";
 import InstructorEdit from "./component/InstructerEdit";
 import { Modal } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { Instructor } from "./types/instructer-types";
+import PaymentForm from "./component/PaymentForm";
 
 const sampleInstructors: Instructor[] = [
   {
@@ -24,9 +25,17 @@ const sampleInstructors: Instructor[] = [
   },
 ];
 
+interface Payment {
+  id: string;
+  instructorId: string;
+  amount: number;
+  date: string;
+}
+
 interface State {
   instructors: Instructor[];
   selectedInstructor: Instructor | null;
+  payments: Payment[];
 }
 
 type Action =
@@ -34,7 +43,9 @@ type Action =
   | { type: "CLOSE_FORM" }
   | { type: "CREATE_INSTRUCTOR"; payload: Instructor }
   | { type: "EDIT_INSTRUCTOR"; payload: Instructor }
-  | { type: "DELETE_INSTRUCTOR"; payload: string };
+  | { type: "DELETE_INSTRUCTOR"; payload: string }
+  | { type: "MAKE_PAYMENT"; payload: Payment }
+  | { type: "CANCEL_PAYMENT"; payload: string };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
@@ -64,6 +75,18 @@ function reducer(state: State, action: Action): State {
           (inst) => inst.id !== action.payload
         ),
       };
+    case "MAKE_PAYMENT":
+      return {
+        ...state,
+        payments: [...state.payments, action.payload],
+      };
+    case "CANCEL_PAYMENT":
+      return {
+        ...state,
+        payments: state.payments.filter(
+          (payment) => payment.id !== action.payload
+        ),
+      };
     default:
       return state;
   }
@@ -73,8 +96,10 @@ function InstructorOverview() {
   const [state, dispatch] = useReducer(reducer, {
     instructors: sampleInstructors,
     selectedInstructor: null,
+    payments: [],
   });
   const [opened, { open, close }] = useDisclosure(false);
+  const [paymentFormOpen, setPaymentFormOpen] = useState(false);
 
   return (
     <div>
@@ -110,6 +135,16 @@ function InstructorOverview() {
           />
         </Modal>
       ) : null}
+      {paymentFormOpen && state.selectedInstructor ? (
+        <PaymentForm
+          instructorId={state.selectedInstructor.id}
+          onSave={(payment) => {
+            dispatch({ type: "MAKE_PAYMENT", payload: payment });
+            setPaymentFormOpen(false);
+          }}
+          onCancel={() => setPaymentFormOpen(false)}
+        />
+      ) : null}
       <InstructorTable
         records={state.instructors}
         isFetching={false}
@@ -118,6 +153,7 @@ function InstructorOverview() {
           open();
         }}
       />
+      <button onClick={() => setPaymentFormOpen(true)}>Make Payment</button>
     </div>
   );
 }
