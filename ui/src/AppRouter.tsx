@@ -4,6 +4,7 @@ import Main from "./layout/Main";
 import { ContactUs } from "./page/contact/ContactUs";
 import CalendarComponent from "./page/appointment/CalendarComponent";
 import InstructorOverview from "./page/instructor/InstructorOverview";
+import UserOverview from "./page/user/UserOverwiew";
 
 const AppRouter = () => {
   return (
@@ -24,6 +25,14 @@ const AppRouter = () => {
           element={
             <Main>
               <ContactUs />
+            </Main>
+          }
+        />
+        <Route
+          path={routes.user}
+          element={
+            <Main>
+              <UserOverview />
             </Main>
           }
         />

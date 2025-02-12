@@ -36,7 +36,7 @@ const collections = [
   { emoji: "✨", label: "Reports" },
   { emoji: "📅", label: "Appointment", root: routes.appointment },
   { emoji: "🙈", label: "Instructor", root: routes.instructor },
-  { emoji: "💁‍♀️", label: "Customers" },
+  { emoji: "💁‍♀️", label: "User", root: routes.user },
 ];
 
 export function Navbar() {

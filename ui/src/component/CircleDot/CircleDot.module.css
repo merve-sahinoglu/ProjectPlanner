@@ -1,0 +1,16 @@
+.dot {
+  height: 0.7rem;
+  width: 0.7rem;
+  border-radius: 50%;
+  background-color: gray;
+  float: left;
+  /* margin: 1em 1em 0 0; */
+  margin: 5px 6px 0 0;
+}
+
+.dotActive {
+  composes: dot; 
+  background-color: #22C55E;
+}
+
+

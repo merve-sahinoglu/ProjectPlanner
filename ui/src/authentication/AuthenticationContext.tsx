@@ -58,11 +58,7 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
     const response = await sendData<
       AuthenticationRequest,
       AuthenticationResponseDto
-    >(
-      `https://magnetouat.acibadem.com.tr/anicetus-service/api/authenticate`,
-      RequestType.Post,
-      user
-    );
+    >(`https://localhost:5001/api/authenticate`, RequestType.Post, user);
 
     if (!response.isSuccess) {
       return false;
@@ -75,7 +71,7 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
     };
 
     const auths = await fetchData<AuthorizationResponseDto>(
-      `https://magnetouat.acibadem.com.tr/anicetus-service/api/authorizations`,
+      `https://localhost:5001/api/authorizations`,
       { userId: decodedToken.UserId },
       headers
     );

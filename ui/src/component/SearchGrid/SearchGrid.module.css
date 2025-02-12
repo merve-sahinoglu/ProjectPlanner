@@ -1,0 +1,19 @@
+.header {
+  background-color: #f1f3f5;
+  box-shadow: rgba(9, 30, 66, 0.25) 0px 4px 8px -2px, rgba(9, 30, 66, 0.08) 0px 0px 0px 1px;
+  padding: 10px 20px 10px 20px;
+  border-radius: 10px;
+  width: 100%;
+  margin: 15px 50px 0 40px;
+  height: 9.5%;
+}
+
+.clearButton {
+  /* box-shadow: 0px 5px 10px 0px rgba(0, 0, 0, 0.23); */
+  border-radius: 10px;
+  border-color: gray;
+}
+
+.mantine-Select-dropdown {
+  border-radius: 50vh !important;
+}

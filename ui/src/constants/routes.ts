@@ -4,6 +4,7 @@ const routes = {
   appointment: "/appointment",
   contact: "/contact",
   instructor: "/instructor",
+  user: "/user",
 } as const;
 
 export default routes;
