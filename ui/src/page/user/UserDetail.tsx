@@ -9,9 +9,7 @@ import {
   Text,
   TextInput,
 } from "@mantine/core";
-import { container } from "tsyringe";
-import { Dispatch, SetStateAction, useEffect, useRef } from "react";
-import RequestHandler from "../../services/request-handler/request-handler";
+import { Dispatch, SetStateAction, useRef } from "react";
 import styles from "./UserDetail.module.css";
 import { UserRowProps } from "./props/UserRowProps";
 import { useTranslation } from "react-i18next";
@@ -22,19 +20,16 @@ import toast from "react-hot-toast";
 import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enum/request-type";
-import { ResponseBase } from "../../services/request-handler/response-base";
 import { nameof } from "../../helpers/name-of";
-import CircleDot from "../../component/CircleDot/CircleDot";
 import { RiInformationLine } from "react-icons/ri";
 import { BsBoxes } from "react-icons/bs";
 import { DatePickerInput } from "@mantine/dates";
-import OperationButtons from "../../component/OperationButtons/OperationButtons";
 import useUserPreferences from "../../hooks/useUserPreferenceStore";
 import globalStyles from "../../assets/global.module.css";
+import useRequestHandler from "../../hooks/useRequestHandler";
 
-const requestHandler = container.resolve(RequestHandler);
 interface ItemDetailProps {
-  selectedUser: UserRowProps | null;
+  selectedUser: UserRowProps;
   handleDeleteItem(itemId: string): void;
   handleUpdateItem(item: UserRowProps): void;
   canAddItem: boolean;
@@ -79,14 +74,10 @@ function UserDetail({
   handleUpdateItemWithId,
   changeSelectedItem,
 }: ItemDetailProps) {
-  if (!selectedUser) {
-    return <></>;
-  }
+  const { fetchData, sendData } = useRequestHandler();
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const { t } = useTranslation();
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const language = useUserPreferences((state) => state.language);
 
   const schema = z.object({
@@ -100,64 +91,40 @@ function UserDetail({
       .max(128, { message: `${t(Dictionary.Item.Validation.NAME_MAX)}` }),
   });
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const form = useForm<UserRowProps>({
-    initialValues: {
-      birthDate: selectedUser.birthDate,
-      cardNumber: selectedUser.cardNumber,
-      email: selectedUser.email,
-      gender: selectedUser.gender.toString(),
-      id: selectedUser.id,
-      isActive: selectedUser.isActive,
-      name: selectedUser.name,
-      surname: selectedUser.surname,
-      title: selectedUser.title,
-      userName: selectedUser.userName,
-      searchText: selectedUser.searchText,
-    },
+    initialValues: { ...selectedUser, gender: selectedUser.gender.toString() },
     validate: zodResolver(schema),
   });
 
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const componentMounted = useRef<boolean>(false);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
   const initialValues = useRef<UserRowProps>(form.values);
 
   const sendPostRequestForCreatedItem = async () => {
-    const response = (await requestHandler.sendRequest(
+    const response = await sendData<UserRowProps, UserRowProps>(
       createRequestUrl(apiUrl.userUrl),
       RequestType.Post,
       form.values
-    )) as ResponseBase<UserRowProps>;
+    );
+
+    if (!response.isSuccess) return;
+
     if (response.isSuccess) {
       setDisabled(true);
 
-      const createdItem = (await requestHandler.getRequest(
-        createRequestUrl(apiUrl.userUrl, response.data.id)
-      )) as ResponseBase<UserRowProps>;
+      initialValues.current = response.value;
 
-      if (createdItem.isSuccess) {
-        createdItem.data = {
-          ...createdItem.data,
-        };
+      form.setValues(response.value);
 
-        initialValues.current = createdItem.data;
+      form.resetDirty();
 
-        form.setValues(createdItem.data);
+      setCanAddItem(!canAddItem);
 
-        form.resetDirty();
+      handleUpdateItemWithId(response.value, createdItemGuid);
 
-        setCanAddItem(!canAddItem);
+      changeSelectedItem(response.value);
 
-        handleUpdateItemWithId(createdItem.data, createdItemGuid);
+      changeCreatedItemGuid("");
 
-        changeSelectedItem(createdItem.data);
-
-        changeCreatedItemGuid("");
-
-        toast.success(`${t(Dictionary.Success.POSITIVE)}`);
-      }
+      toast.success(`${t(Dictionary.Success.POSITIVE)}`);
     }
   };
 
@@ -167,11 +134,11 @@ function UserDetail({
       form.values
     );
 
-    const response = (await requestHandler.sendRequest(
+    const response = await sendData(
       createRequestUrl(apiUrl.userUrl, form.values.id),
       RequestType.Patch,
       patchDocument
-    )) as ResponseBase<UserRowProps>;
+    );
 
     if (response.isSuccess) {
       setDisabled(true);
@@ -206,13 +173,6 @@ function UserDetail({
   };
 
   const handleEdit = (event: React.MouseEvent) => {
-    // const retVal = checkIfUserHasAuthorization(Authorization.Item.CAN_EDIT);
-
-    // if (!retVal) {
-    //   toast.error(t(Dictionary.Authorization.CANT_ACCESS));
-    //   return;
-    // }
-
     event.preventDefault();
     setDisabled(false);
   };
@@ -233,15 +193,6 @@ function UserDetail({
     form.setValues(initialValues.current);
     setDisabled(true);
   };
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  useEffect(() => {
-    if (!componentMounted.current) {
-      componentMounted.current = true;
-      return;
-    }
-    form.resetDirty();
-  }, [form.values.id]);
 
   return (
     <>

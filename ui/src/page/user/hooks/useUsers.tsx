@@ -1,5 +1,5 @@
 import { container } from "tsyringe";
-import RequestHandler from "../../../services/request-handler/request-handler";
+import RequestHandler from "../../../hooks/useRequestHandler";
 import { useEffect, useReducer, useState } from "react";
 import customReducer from "../../../services/custom-reducer/customReducer";
 import { UserRowProps } from "../props/UserRowProps";

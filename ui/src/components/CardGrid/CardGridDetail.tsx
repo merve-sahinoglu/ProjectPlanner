@@ -1,6 +1,7 @@
-import { Card, createStyles } from '@mantine/core';
-import { useViewportSize } from '@mantine/hooks';
-import CardDetailScrollArea from './CardDetailScrollArea';
+import { Card } from "@mantine/core";
+import { createStyles } from "@mantine/emotion";
+import { useViewportSize } from "@mantine/hooks";
+import CardDetailScrollArea from "./CardDetailScrollArea";
 
 interface GridDetailProps {
   children: React.ReactNode | React.ReactNode[] | null;
@@ -9,12 +10,12 @@ interface GridDetailProps {
 function CardGridDetail({ children }: GridDetailProps) {
   const { height, width } = useViewportSize();
 
-  const useStyles = createStyles(theme => ({
+  const useStyles = createStyles((theme) => ({
     card: {
       height: height - 130,
-      overflowWrap: 'break-word',
-      wordWrap: 'break-word',
-      wordBreak: 'break-word',
+      overflowWrap: "break-word",
+      wordWrap: "break-word",
+      wordBreak: "break-word",
     },
   }));
 

@@ -38,8 +38,8 @@ function CardGridFooter({
   }, []);
 
   return (
-    <Group position="apart">
-      <Text size="sm" color="dimmed">
+    <Group justify="apart">
+      <Text size="sm" c="dimmed">
         {`${t(Dictionary.DataGrid.PAGINATION, {
           pageSize: currentItemCount,
           totalPageSize: totalItemCount,

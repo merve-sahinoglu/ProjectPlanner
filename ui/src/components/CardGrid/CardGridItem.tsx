@@ -41,11 +41,11 @@ function CardGridItem<T extends MinimumCardGridItemProps>({
       withBorder
     >
       <Grid align="center">
-        <Grid.Col xs={10}>
+        <Grid.Col span={10}>
           {entity.isActive && <CircleDot isActive={entity.isActive} />}
           {children}
         </Grid.Col>
-        <Grid.Col xs={2}>
+        <Grid.Col span={2}>
           {showEditButton ? (
             <ActionIcon
               onClick={(e) =>

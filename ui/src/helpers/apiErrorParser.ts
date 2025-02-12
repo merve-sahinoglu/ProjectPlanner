@@ -1,6 +1,4 @@
-import { ResponseErrorArrayDto } from "../services/request-handler/response-base";
-
-const parseResponseErrors = (errors: ResponseErrorArrayDto) => {
+const parseResponseErrors = (errors: { [key: string]: Array<string> }) => {
   let validationError = Object.values(errors).toString();
   validationError = validationError.replace(",", "\n");
 

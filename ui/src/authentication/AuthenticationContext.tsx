@@ -47,12 +47,13 @@ interface AuthenticationProviderProps {
 }
 
 function AuthenticationProvider({ children }: AuthenticationProviderProps) {
+  const { fetchData, sendData } = useRequestHandler();
+
   const currentUser = useCurrentUser();
+
   const { setCurrentUser } = useCredentialActions();
 
   const { setAccessToken } = useTokenActions();
-
-  const { sendData, fetchData } = useRequestHandler();
 
   const authenticateUser = async (user: AuthenticationRequest) => {
     const response = await sendData<

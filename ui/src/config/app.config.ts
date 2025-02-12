@@ -26,9 +26,8 @@ export const endpoints: Endpoints = {
 } as const;
 
 export const services: ServiceAddress = {
-  coreService: `https://localhost:5005/api/`,
-
-  userService: `${import.meta.env.VITE_BACKEND_URL}/user-service/api/`,
+  coreService: `https://localhost:5001/api/`,
+  userService: `https://localhost:5002/api/`,
 } as const;
 
 export const apiUrl: ServiceUrls = {

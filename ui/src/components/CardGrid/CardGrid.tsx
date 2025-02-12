@@ -1,5 +1,3 @@
-/* eslint-disable no-unsafe-optional-chaining */
-/* eslint-disable react/require-default-props */
 import {
   Card,
   Group,
@@ -9,8 +7,8 @@ import {
   Text,
   TextInput,
   UnstyledButton,
-  createStyles,
 } from "@mantine/core";
+import { createStyles } from "@mantine/emotion";
 import { useViewportSize } from "@mantine/hooks";
 import {
   Dispatch,
@@ -30,14 +28,14 @@ import Dictionary from "../../constants/dictionary";
 const useStyles = createStyles((theme) => ({
   card: {
     backgroundColor:
-      theme.colorScheme === "dark"
+      theme.primaryColor === "dark"
         ? theme.colors.dark[6]
         : theme.colors.gray[1],
   },
 
   headerCardSection: {
     backgroundColor:
-      theme.colorScheme === "dark"
+      theme.primaryColor === "dark"
         ? theme.colors.dark[6]
         : theme.colors.gray[0],
   },
@@ -170,7 +168,7 @@ function CardGrid({
 
   return (
     <Card
-      sx={{ height: height - 130 }}
+      style={{ height: height - 130 }}
       className={classes.card}
       shadow="sm"
       radius="md"
@@ -182,8 +180,8 @@ function CardGrid({
         inheritPadding
         py="xs"
       >
-        <Group position="apart">
-          <Text weight={500} size={17}>
+        <Group justify="apart">
+          <Text fw={500} fz={17}>
             {title}
           </Text>
           {addButton}
@@ -196,12 +194,12 @@ function CardGrid({
           placeholder={`${t(searchPlaceHolder)}`}
           rightSection={isSearching && <Loader size="xs" />}
           radius="lg"
-          icon={<BsSearch size="0.8rem" />}
+          leftSection={<BsSearch size="0.8rem" />}
         />
         {additionalSearchChildren}
       </Card.Section>
       <Card.Section withBorder inheritPadding py="xs">
-        <Group position="apart">
+        <Group justify="apart">
           <Text fz="sm" color="dimmed">
             {t(Dictionary.CardGrid.RESULTS)}
           </Text>
@@ -232,7 +230,7 @@ function CardGrid({
 
       <Card.Section
         color="dimmed"
-        sx={{ color: "gray" }}
+        style={{ color: "gray" }}
         inheritPadding
         py="xs"
       >
