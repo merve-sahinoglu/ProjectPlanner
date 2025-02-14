@@ -1,28 +1,29 @@
-import { container } from "tsyringe";
-import RequestHandler from "../../../hooks/useRequestHandler";
 import { useEffect, useReducer, useState } from "react";
 import customReducer from "../../../services/custom-reducer/customReducer";
 import { UserRowProps } from "../props/UserRowProps";
 import { useDebouncedValue } from "@mantine/hooks";
 import ReducerActions from "../../../enum/reducer-action.enum";
 import { apiUrl, createRequestUrl } from "../../../config/app.config";
-import { ResponseBase } from "../../../services/request-handler/response-base";
-import parseResponseErrors from "../../../helpers/apiErrorParser";
 import { useInfiniteQuery } from "@tanstack/react-query";
-
-const requestHandler = container.resolve(RequestHandler);
+import useRequestHandler, {
+  SuccessResponse,
+} from "../../../hooks/useRequestHandler";
+import PaginationMetadata from "../../../types/pagination-metadata";
 
 interface UseUserProps {
   searchQuery: string;
   isActive: boolean;
+  changeMetadata: (value: PaginationMetadata | null) => void;
 }
 
-const useItems = ({ searchQuery, isActive }: UseUserProps) => {
+const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
+  const { fetchData, sendData } = useRequestHandler();
+
   const [items, dispatch] = useReducer(customReducer<UserRowProps>, []);
 
   const [selectedItems, setSelectedItems] = useState<UserRowProps[]>([]);
 
-  const [totalItemCount, setTotalItemCount] = useState<number>(0);
+  const [totalRecordCount, setTotalRecords] = useState(0);
 
   const [debouncedQuery] = useDebouncedValue(searchQuery, 500);
 
@@ -55,37 +56,24 @@ const useItems = ({ searchQuery, isActive }: UseUserProps) => {
     });
   }
 
-  const fetchItems = async ({ pageParam = 0 }) => {
-    const response = (await requestHandler.getRequest(
+  const fetchItems = async ({ pageParam = 1 }) => {
+    const request: { [key: string]: any } = {
+      page: pageParam,
+      searchText: searchQuery,
+    };
+
+    const response = await fetchData<UserRowProps[]>(
       createRequestUrl(apiUrl.userUrl),
-      pageParam,
-      debouncedQuery
-        .toLocaleLowerCase()
-        .trim()
-        .replace("-", "")
-        .replace(/\s/g, "")
-        .replace(/ğ/g, "g")
-        .replace(/ü/g, "u")
-        .replace(/ş/g, "s")
-        .replace(/ı/g, "i")
-        .replace(/ç/g, "c")
-        .replace(/ö/g, "o")
-        .toLocaleUpperCase("en-US"),
-      undefined
-    )) as ResponseBase<UserRowProps>;
+      request
+    );
 
     if (response.isSuccess) {
-      setTotalItemCount(response.metadata.TotalItemCount);
+      setTotalRecords(response.metadata?.TotalItemCount || 0);
+      changeMetadata(response.metadata ? response.metadata : null);
       return response;
     }
 
-    return Promise.reject(
-      new Error(
-        response.errors === undefined
-          ? response.detail
-          : parseResponseErrors(response.errors)
-      )
-    );
+    return Promise.reject(new Error(response.error));
   };
 
   function handleUpdateItemWithId(item: UserRowProps, id: string) {
@@ -96,7 +84,9 @@ const useItems = ({ searchQuery, isActive }: UseUserProps) => {
     });
   }
 
-  const getNextPageParam = (lastPage: ResponseBase<UserRowProps>) => {
+  const getNextPageParam = (lastPage: SuccessResponse<UserRowProps[]>) => {
+    if (!lastPage.metadata) return undefined;
+
     if (lastPage.metadata?.TotalPageCount > lastPage.metadata?.CurrentPage) {
       return lastPage.metadata.CurrentPage + 1;
     }
@@ -105,21 +95,21 @@ const useItems = ({ searchQuery, isActive }: UseUserProps) => {
 
   const { data, fetchNextPage, isFetching, refetch, hasNextPage } =
     useInfiniteQuery({
-      queryKey: ["items", debouncedQuery, isActive],
+      queryKey: ["users"],
       queryFn: fetchItems,
-      keepPreviousData: true,
-      getNextPageParam: (lastPage) => getNextPageParam(lastPage),
+      initialPageParam: 1,
+      getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
       refetchOnWindowFocus: false,
       staleTime: 0,
     });
 
   useEffect(() => {
-    const queryData = data?.pages?.flatMap((page) => page.dataList) ?? [];
+    const queryData = data?.pages?.flatMap((page) => page.value) ?? [];
     handleReplaceItems(queryData);
   }, [data]);
 
   return {
-    totalItemCount,
+    setTotalRecords,
     items,
     selectedItems,
     setSelectedItems,

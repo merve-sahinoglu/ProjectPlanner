@@ -1,4 +1,4 @@
-import { ActionIcon, Grid, Select, SelectItem } from "@mantine/core";
+import { ActionIcon, Grid, Select } from "@mantine/core";
 import { VscClearAll } from "react-icons/vsc";
 import styles from "./SearchGrid.module.css";
 
@@ -26,7 +26,7 @@ function SearchGrid({
   return (
     <Grid className={styles.header}>
       {showFilterSelect && (
-        <Grid.Col md={2.7}>
+        <Grid.Col span={2.7}>
           <Select
             disabled={isDisabled}
             dropdownPosition="bottom"

@@ -1,0 +1,179 @@
+{
+  "user": {
+    "cardTitle": "Kullanıcı Listesi",
+    "modalsTitle": "Kullanıcı Tanımlama",
+    "userName": "Kullanıcı Adı",
+    "name": "Adı",
+    "surname": "Soyadı",
+    "title": "Ünvan",
+    "birthDate": "Doğum Tarihi",
+    "gender": "Cinsiyet",
+    "email": "E-mail",
+    "cardNumber": "Kart Numarası",
+    "isActive": "Aktif",
+    "permissions": "Yetkiler",
+    "userWarehouseRelation": "Kullanıcı Depo Yetkileri",
+    "app": "Uygulama",
+    "module": "Modül",
+    "function": "Fonksiyon",
+    "userPermissions": "Kullanıcı Yetkileri",
+    "permissionTime": "Yetki Süresi",
+    "account": "Hesap",
+    "profile": "Profil",
+    "language": "Dil",
+    "logout": "Çıkış Yap",
+    "userList": "Kullanıcı Listesi",
+    "genderUnknown": "Bilinmeyen",
+    "genderMale": "Erkek",
+    "genderFemale": "Kadın",
+    "genderOther": "Diğer",
+    "createOneTimePassword": "Tek Kullanımlık Parola Oluştur",
+    "oneTimePasswordModalText": "Kullanıcı için tek kullanımlık parola oluşturmak istediğinize emin misiniz? İşlem sonrası kullanıcının parolası değiştirilecek ve yeni parolası ekranda gösterilecektir. Kullanıcı bu parola ile giriş yaptıktan sonra yeni parola belirleme ekranına yönlendirilecektir.",
+    "oneTimePasswordModalTitle": "Tek Kullanımlık Parola Oluştur",
+    "password": "Parola:",
+    "34horization": "Kullanıcı Yetki",
+    "deleteFingerprint": "Parmak İzi Sil",
+    "deleteFingerprintModalText": "Kullanıcının parmak izini silmek istediğinize emin misiniz?",
+    "hisUserId": "HIS Kullanıcı ID",
+    "changePassword": "Parola Değiştir",
+    "bio": "Hakkında",
+    "manageInformation": "Kişisel bilgilerini kontrol et ve yönet",
+    "passwordRegex": "Şifreniz en az 6 karakter, bir büyük harf, bir küçük harf, bir numara ve bir özel karakter içermelidir.",
+    "currentPassword": "Geçerli parola",
+    "userAuthorization": "Kullanıcı Profil Grupları",
+    "userFacility": "Kullanıcı Şubeleri"
+  },
+  "actionBar": {
+    "define": "Tanımla",
+    "delete": "Sil",
+    "filter": "Filtre",
+    "report": "Rapor",
+    "refresh": "Yenile"
+  },
+  "dataGrid": {
+    "lastRefreshed": "Son Güncelleme: {{date}}",
+    "pagination": "{{totalPageSize}} kayıttan {{pageSize}} adet gösteriliyor.",
+    "actions": "İşlemler",
+    "noRecords": "Kayıt yok"
+  },
+  "popup": {
+    "notSaved": {
+      "title": "Tanımlama kaydedilmedi!",
+      "description": "Tanımlama kaydedilmedi. Devam etmek istediğinize emin misiniz?"
+    },
+    "modificationNotSaved": {
+      "title": "Değişiklikler kaydedilmedi!",
+      "description": "Değişiklikler kaydedilmedi. Devam etmek istediğinize emin misiniz?"
+    },
+    "delete": {
+      "title": "Silmek istediğinize emin misiniz?",
+      "description": "{{entity}} silinecek. Devam etmek istediğinize emin misiniz?"
+    }
+  },
+  "validation": {
+    "inputValidation": {
+      "min": "Bu alan zorunludur.",
+      "max": "Bu alan {{maxCharacter}} karakterden fazla olamaz.",
+      "maxNumber": "Bu alan {{maxDigit}} haneden büyük olamaz"
+    },
+    "listValidation": {
+      "alreadyInList": "Eklemeye çalıştığınız {{entity}} listede mevcuttur.",
+      "invalidItem": "Lütfen bir {{entity}} seçiniz.",
+      "select": "Lütfen silinecek {{entity}} seçiniz."
+    },
+    "login": {
+      "nameMinimum": "Kullanıcı adı boş bırakılamaz.",
+      "nameMaximum": "Kullanıcı adı 64 karakterden fazla olamaz.",
+      "passwordMinimum": "Parola boş bırakılamaz.",
+      "passwordMaximum": "Parola 64 karakterden fazla olamaz."
+    },
+    "user": {
+      "nameMinimum": "Ad boş bırakılamaz.",
+      "nameMaximum": "Ad 64 karakterden fazla olamaz.",
+      "userNameMinimum": "Kullanıcı adı boş bırakılamaz.",
+      "userNameMaximum": "Kullanıcı adı 128 karakterden fazla olamaz.",
+      "surnameMinimum": "Soyad boş bırakılamaz.",
+      "surnameMaximum": "Soyadı 128 karakterden fazla olamaz.",
+      "email": "Geçerli bir eposta adresi giriniz.",
+      "emailMax": "Eposta 128 karakterden fazla olamaz.",
+      "titleMinimum": "Ünvan boş bırakılamaz.",
+      "titleMaximum": "Ünvan 128 karakterden fazla olamaz.",
+      "cardMinimum": "Kart numarası boş bırakılamaz.",
+      "cardMaximum": "Kart numarası 8 karakterden fazla olamaz.",
+      "passMinimum": "Parola boş bırakılamaz.",
+      "passMaximum": "Parola 128 karakterden fazla olamaz.",
+      "passwordsDontMatch": "Parola uyuşmamakta."
+    }
+  },
+  "button": {
+    "cancel": "Vazgeç",
+    "define": "Tanımla",
+    "edit": "Düzenle",
+    "save": "Kaydet",
+    "add": "Ekle",
+    "yes": "Evet",
+    "no": "Hayır",
+    "close": "Kapat",
+    "generate": "Oluştur",
+    "print": "Yazdır",
+    "delete": "Sil",
+    "clear": "Temizle"
+  },
+  "stepper": {
+    "firstStep": "İlk adım",
+    "secondStep": "İkinci adım",
+    "warehouseDefinition": "Depo tanımlayın",
+    "warehouseLocationMatch": "Depo ile konum eşleyin"
+  },
+  "header": {
+    "searchLabel": "Ara.."
+  },
+  "error": {
+    "notFound": {
+      "title": "Aradığınız sayfa bulunamadı.",
+      "description": "Adresi yanlış girdiniz veya sayfa başka bir adrese taşındı.",
+      "buttonLabel": "Ana sayfaya geri dön."
+    },
+    "underConstruction": {
+      "title": "Aradığınız sayfa şu an yapım aşamasındadır.",
+      "description": "Lütfen daha sonra tekrar deneyiniz."
+    },
+    "forbidden": {
+      "title": "Aradığınız sayfaya ulaşma yetkiniz yoktur.",
+      "description": "Bunun bir hata olduğunu düşünüyorsanız yöneticinizle iletişime geçiniz.",
+      "buttonLabel": "Ana sayfaya geri dön"
+    }
+  },
+  "login": {
+    "userName": "Kullanıcı Adı",
+    "password": "Parola",
+    "facility": "Şube",
+    "login": "Giriş"
+  },
+  "success": {
+    "positive": "İşlem başarıyla tamamlandı.",
+    "negative": "İşlem başarısız.",
+    "itemRelationExists": "Eklemeye çalıştığınız ürün listede mevcut."
+  },
+  "general": {
+    "status": "Durum",
+    "dateOfBirth": "Doğum Tarihi",
+    "all": "Hepsi",
+    "passive": "Pasif",
+    "active": "Aktif"
+  },
+  "authorization": {
+    "cantAccess": "Bu işlemi yapmak için yetkiniz yoktur."
+  },
+  "exception": {
+    "sessionExpired": "Oturumunuzun süresi doldu, lütfen tekrar giriş yapınız."
+  },
+  "cardGrid": {
+    "pagination": "{{totalPageSize}} kayıttan {{pageSize}} adet gösteriliyor.",
+    "results": "Sonuçlar",
+    "filter": "Filtre",
+    "searchInput": "İsim veya kod ile aratın...",
+    "showActives": "Sadece aktif olanları göster",
+    "showAll": "Hepsini göster"
+  }
+}

@@ -1,6 +1,6 @@
-import DataTable from "../../../component/DataTable/DataTable";
 import { ColDef } from "@ag-grid-community/core";
 import { Instructor } from "../types/instructer-types";
+import DataTable from "../../../components/DataTable/DataTable";
 
 interface InstructorTableProps {
   records: Instructor[];

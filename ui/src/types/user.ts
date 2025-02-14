@@ -1,5 +1,5 @@
-import Gender from 'src/enum/gender.enum';
-import { z } from 'zod';
+import Gender from "src/enum/gender.enum";
+import { z } from "zod";
 
 const UserSchema = z.object({
   id: z.string().uuid(),
@@ -19,6 +19,7 @@ const UserSchema = z.object({
   updateDate: z.date().optional().nullable(),
   updateUser: z.string().uuid().optional().nullable(),
   hasOneTimePw: z.boolean().optional().nullable(),
+  profilePicture: z.instanceof(File).nullable().optional(),
 });
 
 const UsersSchema = z.array(UserSchema);

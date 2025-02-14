@@ -17,10 +17,10 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import classes from "./navbar.module.css";
-import { UserInfoIcons } from "../../component/UserInfoIcons/UserInfoIcons";
 import routes from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { UserInfoIcons } from "../../components/UserInfoIcons/UserInfoIcons";
 
 const links = [
   { icon: IconBulb, label: "Activity", notifications: 3 },

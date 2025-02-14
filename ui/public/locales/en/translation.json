@@ -1,0 +1,277 @@
+{
+  "user": {
+    "cardTitle": "User List",
+    "modalsTitle": "User Definition",
+    "userName": "User Name",
+    "name": "Name",
+    "surname": "Surname",
+    "title": "Title",
+    "birthDate": "Birth Date",
+    "gender": "Gender",
+    "email": "E-mail",
+    "cardNumber": "Card Number",
+    "isActive": "Active",
+    "permissions": "Permissions",
+    "userWarehouseRelation": "User Warehouse Relations",
+    "app": "Application",
+    "module": "Module",
+    "function": "Function",
+    "userPermissions": "User Permissions",
+    "permissionTime": "Permission Time",
+    "account": "Account",
+    "profile": "Profile",
+    "language": "Language",
+    "logout": "Logout",
+    "userList": "User List",
+    "genderUnknown": "Unknown",
+    "genderMale": "Male",
+    "genderFemale": "Female",
+    "genderOther": "Other",
+    "createOneTimePassword": "Create One-Time Password",
+    "oneTimePasswordModalText": "Are you sure you want to create a one-time password for the user? After the process, the user's password will be changed and the new password will be displayed on the screen. After logging in with this password, the user will be directed to the new password setting screen.",
+    "oneTimePasswordModalTitle": "Create One-Time Password",
+    "password": "Password:",
+    "userAuthorization": "User Profile Groups",
+    "userFacility": "User Facilities",
+    "deleteFingerprint": "Delete Fingerprint",
+    "deleteFingerprintModalText": "Are you sure you want to delete selected users fingerpint?",
+    "hisUserId": "HIS User ID",
+    "changePassword": "Change Password",
+    "bio": "About You",
+    "manageInformation": "Manage and control your personal information",
+    "passwordRegex": "Your password must have minimum six characters, at least one uppercase letter, one lowercase letter, one number and one special character.",
+    "currentPassword": "Current Password"
+  },
+  "dataGrid": {
+    "lastRefreshed": "Last refreshed: {{date}}",
+    "pagination": "Showing {{pageSize}} record of {{totalPageSize}}",
+    "actions": "Actions",
+    "noRecords": "No records"
+  },
+  "cardGrid": {
+    "pagination": "Showing {{pageSize}} record of {{totalPageSize}}",
+    "results": "Results",
+    "filter": "Filter",
+    "searchInput": "Search with name or code...",
+    "showActives": "Show only actives",
+    "showAll": "Show all"
+  },
+  "entity": {
+    "item": "Item",
+    "location": "Location",
+    "facility": "Facility",
+    "itemClass": "Item class",
+    "itemGroup": "Item group",
+    "itemPrescription": "Prescription type",
+    "subGroupCode": "sub group code",
+    "subGroupName": "sub group name",
+    "kit": "Quick item dispense list",
+    "override": "Override list",
+    "reason": "Reason",
+    "station": "Station",
+    "user": "User",
+    "warehouse": "Warehouse",
+    "equivalentItem": "Equivalent Item"
+  },
+  "popup": {
+    "notSaved": {
+      "title": "Definition is not saved!",
+      "description": "Definition is not saved. Do you want to continue?"
+    },
+    "modificationNotSaved": {
+      "title": "Changes are not saved!",
+      "description": "Changes are not saved. Do you want to continue?"
+    },
+    "delete": {
+      "title": "Are you sure you want to delete?",
+      "description": "{{entity}} will be deleted. Do you want to continue?"
+    }
+  },
+  "validation": {
+    "warehouse": {
+      "nameMinimum": "Warehouse name is required.",
+      "nameMaximum": "Warehouse name must be less than or equal to 64.",
+      "codeMinimum": "Warehouse code is required.",
+      "codeMaximum": "Warehouse code must be less than or equal to 8.",
+      "itemGroupNull": "Item group must be selected."
+    },
+    "login": {
+      "nameMinimum": "Username is required.",
+      "nameMaximum": "Username must be less than or equal to 64.",
+      "passwordMinimum": "Password cannot be empty.",
+      "passwordMaximum": "Password must be less than or equal to 128."
+    },
+    "user": {
+      "nameMinimum": "Name is required.",
+      "nameMaximum": "Name must be less than or equal to 128.",
+      "userNameMinimum": "Username is required.",
+      "userNameMaximum": "Username must be less than or equal to 64.",
+      "surnameMinimum": "Surname is required.",
+      "surnameMaximum": "Surname must be less than or equal to 128.",
+      "email": "Please enter a valid email address.",
+      "emailMax": "Email must be less than or equal to 128.",
+      "titleMinimum": "Title is required.",
+      "titleMaximum": "Title must be less than or equal to 128.",
+      "cardMinimum": "Card number is required.",
+      "cardMaximum": "Card number must be less than or equal to 8.",
+      "passMinimum": "Password is required.",
+      "passMaximum": "Password must be less than or equal to 128.",
+      "passwordsDontMatch": "Passwords don't match"
+    },
+    "inputValidation": {
+      "min": "This field is required.",
+      "max": "This field must be less than or equal to {{maxCharacter}}",
+      "maxNumber": "This field cannot be exceed {{maxDigit}} digits"
+    },
+    "listValidation": {
+      "alreadyInList": "This {{entity}} is already in the list.",
+      "invalidItem": "Please select an {{entity}}",
+      "select": "Please select {{entity}} to delete."
+    },
+    "station": {
+      "nameMinimum": "Station name is required.",
+      "nameMaximum": "Station name must be less than or equal to 64.",
+      "ip": "Please enter a valid IPv4 address."
+    },
+    "consumable": {
+      "nameMinimum": "Consumable name is required.",
+      "nameMaximum": "Consumable name must be less than or equal to 128.",
+      "codeMinimum": "Consumable code is required.",
+      "codeMaximum": "Consumable code must be less than or equal to 16.",
+      "mainItemGroupNull": "Main item group must be selected.",
+      "itemGroupNull": "Sub item group must be selected."
+    },
+    "drug": {
+      "nameMinimum": "Drug name is required.",
+      "nameMaximum": "Drug name must be less than or equal to 128.",
+      "codeMinimum": "Drug code is required.",
+      "codeMaximum": "Drug code must be less than or equal to 16.",
+      "itemGroupNull": "Sub item group must be selected.",
+      "prescriptionTypeId": "Prescription type must be selected.",
+      "efficientMaterialId": "Efficient material must be selected.",
+      "isMedicineNull": "Item Group must be selected",
+      "mainItemGroupId": "Main item group must be selected."
+    },
+    "itemGroup": {
+      "mainItemGroupCodeMinimum": "Main item group code is required.",
+      "mainItemGroupCodeMaximum": "Main item group code must be less than or equal to 16.",
+      "itemGroupCodeMinimum": "Sub item group code is required.",
+      "itemGroupCodeMaximum": "Sub item group code must be less than or equal to 16.",
+      "mainItemGroupNameMinimum": "Main item group name is required.",
+      "mainItemGroupNameMaximum": "Main item group name must be less than or equal to 128.",
+      "itemGroupNameMinimum": "Sub item group name is required.",
+      "itemGroupNameMaximum": "Sub item group name must be less than or equal to 128."
+    },
+    "itemPrescription": {
+      "prescriptionCodeMinimum": "Prescription code is required.",
+      "prescriptionCodeMaximum": "Prescription code must be less than or equal to 16.",
+      "prescriptionNameMinimum": "Prescription name is required.",
+      "prescriptionNameMaximum": "Prescription name must be less than or equal to 128."
+    },
+    "overrideItem": {
+      "overrideNameMinimum": "Override list name is required.",
+      "overrideNameMaximum": "Override list name must be less than or equal to 128.",
+      "selectDrug": "Select drug.",
+      "reasonRequired": "Reason field cannot be empty."
+    },
+    "kit": {
+      "kitCodeMinimum": "Kit code is required.",
+      "kitCodeMaximum": "Kit code must be less than or equal to 16.",
+      "kitNameMinimum": "Kit name is required.",
+      "kitNameMaximum": "Kit name must be less than or equal to 128.",
+      "kitItemQuantityMinimum": "Item quantity must be more than 0.",
+      "kitItemRelationExists": "Item kit relation exists."
+    },
+    "itemClassification": {
+      "itemClassificationNameMinimum": "Item classification name is required."
+    },
+    "location": {
+      "locationCodeMinimum": "Location code is required",
+      "locationCodeMaximum": "Location code must be less than or equal to 16.",
+      "locationNameMinimum": "Location name is required.",
+      "locationNameMaximum": "Location name must be less than or equal to 128."
+    },
+    "profileGroup": {
+      "nameMin": "Profile group name is required.",
+      "nameMax": "ProfileGroupName must be less than or equal to 128.",
+      "applicationSelected": "Application must be selected."
+    }
+  },
+  "button": {
+    "cancel": "Cancel",
+    "define": "Define",
+    "edit": "Edit",
+    "save": "Save",
+    "add": "Add",
+    "yes": "Yes",
+    "no": "No",
+    "close": "Close",
+    "generate": "Generate",
+    "print": "Print",
+    "delete": "Delete",
+    "clear": "Clear"
+  },
+  "stepper": {
+    "firstStep": "First step",
+    "secondStep": "Second step",
+    "warehouseDefinition": "Define a warehouse",
+    "warehouseLocationMatch": "Match a warehouse with location"
+  },
+  "header": {
+    "searchLabel": "Search.."
+  },
+  "error": {
+    "notFound": {
+      "title": "The page you were looking for was not found.",
+      "description": "Unfortunately, this is only a 404 page. You may have mistyped the address, or the page has been moved to another URL.",
+      "buttonLabel": "Take me back to home page"
+    },
+    "underConstruction": {
+      "title": "The page you were looking for is under construction.",
+      "description": "Please try again."
+    },
+    "forbidden": {
+      "title": "The page you were looking for is not authorized for you.",
+      "description": "If you think this is a mistake, contact your administrator.",
+      "buttonLabel": "Take me back to home page."
+    }
+  },
+  "login": {
+    "userName": "Username",
+    "password": "Password",
+    "facility": "Facility",
+    "login": "Login"
+  },
+  "override": {
+    "cardTitle": "Override Lists",
+    "name": "Override List Name",
+    "title": "Define Override List",
+    "active": "Active",
+    "drugList": "Item List",
+    "drugSearch": "Search with item code or name",
+    "addDrug": "Add Drug",
+    "overrideReasons": "Override Reasons",
+    "reason": "Reason",
+    "overrideReason": "Override reason",
+    "itemsWillBeDeleted": "The items below will be deleted on list",
+    "itemsWillBeAdded": "The items below will be added to list"
+  },
+  "success": {
+    "positive": "Process successfully completed.",
+    "negative": "Process fail.",
+    "itemRelationExists": "Item relation exists."
+  },
+  "general": {
+    "status": "Status",
+    "dateOfBirth": "Date of Birth",
+    "all": "All",
+    "passive": "Passive",
+    "active": "Active"
+  },
+  "authorization": {
+    "cantAccess": "You do not have permission to do this action."
+  },
+  "exception": {
+    "sessionExpired": "Your session has expired, please login again."
+  }
+}

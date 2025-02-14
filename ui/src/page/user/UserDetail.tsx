@@ -1,6 +1,7 @@
 import {
   Card,
   Checkbox,
+  FileInput,
   Grid,
   Group,
   PasswordInput,
@@ -8,8 +9,10 @@ import {
   Tabs,
   Text,
   TextInput,
+  Image,
+  Avatar,
 } from "@mantine/core";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useRef, useState } from "react";
 import styles from "./UserDetail.module.css";
 import { UserRowProps } from "./props/UserRowProps";
 import { useTranslation } from "react-i18next";
@@ -27,6 +30,8 @@ import { DatePickerInput } from "@mantine/dates";
 import useUserPreferences from "../../hooks/useUserPreferenceStore";
 import globalStyles from "../../assets/global.module.css";
 import useRequestHandler from "../../hooks/useRequestHandler";
+import CircleDot from "../../components/CircleDot/CircleDot";
+import OperationButtons from "../../components/OperationButtons/OperationButtons";
 
 interface ItemDetailProps {
   selectedUser: UserRowProps;
@@ -79,6 +84,12 @@ function UserDetail({
   const { t } = useTranslation();
 
   const language = useUserPreferences((state) => state.language);
+
+  const [preview, setPreview] = useState<string | null>(
+    selectedUser.profilePicture
+      ? URL.createObjectURL(selectedUser.profilePicture)
+      : null
+  );
 
   const schema = z.object({
     userName: z
@@ -202,8 +213,8 @@ function UserDetail({
         inheritPadding
       >
         <CircleDot isActive={form.values.isActive} />
-        <Text lineClamp={1} fw={500} fz={20}>
-          ({form.values.name}) - {form.values.surname}
+        <Text lineClamp={1} fw={400} fz={20}>
+          ({form.values.userName}) - {form.values.name} {form.values.surname}
         </Text>
       </Card.Section>
       <Tabs
@@ -214,25 +225,46 @@ function UserDetail({
         defaultValue="item"
       >
         <Card.Section pb={0}>
-          <Tabs.List pl={15}>
+          <Tabs.List pl={20}>
             <Tabs.Tab
               leftSection={<RiInformationLine size="1rem" />}
               value="item"
             >
-              {t(Dictionary.Item.TITLE)}
+              {t(Dictionary.User.TITLE)}
             </Tabs.Tab>
-            <Tabs.Tab
+            {/* <Tabs.Tab
               disabled={!canAddItem}
               leftSection={<BsBoxes size="1rem" />}
               value="itemProperty"
             >
               {t(Dictionary.Item.ITEM_FACILITY_PROPERTIES)}
-            </Tabs.Tab>
+            </Tabs.Tab> */}
           </Tabs.List>
         </Card.Section>
         <Tabs.Panel value="item">
           <Grid grow>
-            <Grid.Col span={6}>
+            <Grid.Col span={5}>
+              <Group>
+                <Avatar src={preview} size={90} />
+                <FileInput
+                  clearable
+                  disabled={disabled}
+                  accept="image/png,image/jpeg"
+                  label="Attach your picture"
+                  placeholder="Your picture"
+                  onChange={(file) => {
+                    form.setFieldValue("profilePicture", file);
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = () => setPreview(reader.result as string);
+                      reader.readAsDataURL(file);
+                    } else {
+                      setPreview(null);
+                    }
+                  }}
+                />
+              </Group>
+
               <TextInput
                 className={styles.input}
                 disabled={disabled}
@@ -266,14 +298,14 @@ function UserDetail({
                   label={t(Dictionary.User.USER_TITLE)}
                   {...form.getInputProps(nameof<UserRowProps>("title"))}
                 />
-                <DatePickerInput
+                {/* <DatePickerInput
                   mt={15}
                   locale={language}
                   disabled={disabled}
                   label={t(Dictionary.User.BIRTH_DATE)}
                   mx="auto"
                   {...form.getInputProps(nameof<UserRowProps>("birthDate"))}
-                />
+                /> */}
               </Group>
               <Group grow>
                 <Select

@@ -1,11 +1,11 @@
-import { UseFormReturnType } from '@mantine/form';
+import { UseFormReturnType } from "@mantine/form";
 
 enum JsonPatchOperationType {
-  Add = 'add',
-  Replace = 'replace',
-  Move = 'move',
-  Test = 'test',
-  Remove = 'remove',
+  Add = "add",
+  Replace = "replace",
+  Move = "move",
+  Test = "test",
+  Remove = "remove",
 }
 
 type JsonPatchOperation = {
@@ -19,9 +19,11 @@ export interface JsonPatchKeyValuePair {
   value: string;
 }
 
-function addOperations(patchList: JsonPatchKeyValuePair[]): JsonPatchOperation[] {
+function addOperations(
+  patchList: JsonPatchKeyValuePair[]
+): JsonPatchOperation[] {
   const operationList: JsonPatchOperation[] = [];
-  patchList.forEach(x => {
+  patchList.forEach((x) => {
     operationList.push({
       op: JsonPatchOperationType.Replace,
       path: `/${x.path}`,
@@ -77,14 +79,17 @@ export function createJsonPatchDocumentFromDirtyForm<T>(
   const jsonPatchList: JsonPatchKeyValuePair[] = [];
 
   let property: keyof typeof obj;
+  debugger;
 
   // TODO: Use of Object.keys & Object.values for generic objects
   // eslint-disable-next-line no-restricted-syntax
   for (property in obj) {
     if (form.isDirty(property)) {
+      console.log(obj[property]);
       jsonPatchList.push({ path: property, value: String(obj[property]) });
     }
   }
+  console.log(jsonPatchList);
 
   return createJsonPatchDocument(jsonPatchList);
 }
@@ -110,7 +115,10 @@ export function createJsonPatchDocumentFromDirtyFormWithDates<T>(
       const propertyValue = obj[property];
 
       if (propertyValue instanceof Date) {
-        jsonPatchList.push({ path: property, value: propertyValue.toISOString() });
+        jsonPatchList.push({
+          path: property,
+          value: propertyValue.toISOString(),
+        });
         // eslint-disable-next-line no-continue
         continue;
       }
