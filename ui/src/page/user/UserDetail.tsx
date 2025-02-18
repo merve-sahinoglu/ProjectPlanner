@@ -11,6 +11,7 @@ import {
   TextInput,
   Image,
   Avatar,
+  rem,
 } from "@mantine/core";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import styles from "./UserDetail.module.css";
@@ -32,6 +33,7 @@ import globalStyles from "../../assets/global.module.css";
 import useRequestHandler from "../../hooks/useRequestHandler";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
+import { IconUpload } from "@tabler/icons-react";
 
 interface ItemDetailProps {
   selectedUser: UserRowProps;
@@ -83,8 +85,6 @@ function UserDetail({
 
   const { t } = useTranslation();
 
-  const language = useUserPreferences((state) => state.language);
-
   const [preview, setPreview] = useState<string | null>(
     selectedUser.profilePicture
       ? URL.createObjectURL(selectedUser.profilePicture)
@@ -109,7 +109,42 @@ function UserDetail({
 
   const initialValues = useRef<UserRowProps>(form.values);
 
+  function fileToByteArray(file: File): Promise<Uint8Array> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = () => {
+        if (reader.result instanceof ArrayBuffer) {
+          resolve(new Uint8Array(reader.result));
+        } else {
+          reject(new Error("Dosya okunamadı."));
+        }
+      };
+
+      reader.onerror = (error) => reject(error);
+
+      reader.readAsArrayBuffer(file);
+    });
+  }
+
+  // Kullanım
+  const handleFileUpload = async (event: Event) => {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const file = input.files[0];
+      const byteArray = await fileToByteArray(file);
+    }
+  };
+
   const sendPostRequestForCreatedItem = async () => {
+    if (
+      form.values["profilePicture"] !== null &&
+      form.values["profilePicture"] !== undefined
+    ) {
+      const xlsx = await import("xlsx");
+      const buffer = await form.values["profilePicture"].arrayBuffer();
+    }
+
     const response = await sendData<UserRowProps, UserRowProps>(
       createRequestUrl(apiUrl.userUrl),
       RequestType.Post,
@@ -251,7 +286,7 @@ function UserDetail({
                   disabled={disabled}
                   accept="image/png,image/jpeg"
                   label="Attach your picture"
-                  placeholder="Your picture"
+                  placeholder={`${t(Dictionary.ExcelImport.SELECT_FILE)}`}
                   onChange={(file) => {
                     form.setFieldValue("profilePicture", file);
                     if (file) {
