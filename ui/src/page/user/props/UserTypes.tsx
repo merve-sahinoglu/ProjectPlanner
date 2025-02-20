@@ -11,7 +11,7 @@ interface UserRowProps {
   birthDate?: Date | null;
   gender: string;
   isActive: boolean;
-  profilePicture?: File | null;
+  profilePicture?: File | null | string;
 }
 
 export type { UserRowProps };

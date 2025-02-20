@@ -5,7 +5,7 @@ import Dictionary from "../../constants/dictionary";
 import { useTranslation } from "react-i18next";
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
 import { useCredentialActions } from "../../authentication/store/useCredentialsStore";
-import { UserRowProps } from "./props/UserRowProps";
+import { UserRowProps } from "./props/UserTypes";
 import { BsExclamationDiamondFill } from "react-icons/bs";
 import { motion } from "framer-motion";
 import useUsers from "./hooks/useUsers";

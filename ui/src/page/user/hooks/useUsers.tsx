@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from "react";
 import customReducer from "../../../services/custom-reducer/customReducer";
-import { UserRowProps } from "../props/UserRowProps";
+import { UserRowProps } from "../props/UserTypes";
 import { useDebouncedValue } from "@mantine/hooks";
 import ReducerActions from "../../../enum/reducer-action.enum";
 import { apiUrl, createRequestUrl } from "../../../config/app.config";

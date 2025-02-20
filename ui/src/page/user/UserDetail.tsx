@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import styles from "./UserDetail.module.css";
-import { UserRowProps } from "./props/UserRowProps";
+import { UserRowProps } from "./props/UserTypes";
 import { useTranslation } from "react-i18next";
 import Dictionary from "../../constants/dictionary";
 import { z } from "zod";
@@ -87,7 +87,7 @@ function UserDetail({
 
   const [preview, setPreview] = useState<string | null>(
     selectedUser.profilePicture
-      ? URL.createObjectURL(selectedUser.profilePicture)
+      ? URL.createObjectURL(selectedUser.profilePicture as File)
       : null
   );
 
@@ -141,8 +141,16 @@ function UserDetail({
       form.values["profilePicture"] !== null &&
       form.values["profilePicture"] !== undefined
     ) {
-      const xlsx = await import("xlsx");
-      const buffer = await form.values["profilePicture"].arrayBuffer();
+      const reader = new FileReader();
+      reader.readAsDataURL(form.values["profilePicture"] as File);
+
+      reader.onloadend = () => {
+        const data = reader.result as string;
+        const parsedData = data.split(",");
+        if (!data) return;
+        const base64 = parsedData[1];
+        form.setFieldValue("profilePicture", base64);
+      };
     }
 
     const response = await sendData<UserRowProps, UserRowProps>(
@@ -286,6 +294,9 @@ function UserDetail({
                   disabled={disabled}
                   accept="image/png,image/jpeg"
                   label="Attach your picture"
+                  {...form.getInputProps(
+                    nameof<UserRowProps>("profilePicture")
+                  )}
                   placeholder={`${t(Dictionary.ExcelImport.SELECT_FILE)}`}
                   onChange={(file) => {
                     form.setFieldValue("profilePicture", file);
