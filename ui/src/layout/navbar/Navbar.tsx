@@ -21,6 +21,9 @@ import routes from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { UserInfoIcons } from "../../components/UserInfoIcons/UserInfoIcons";
+import { MdMeetingRoom } from "react-icons/md";
+import { PiUserCircleDashedFill } from "react-icons/pi";
+import { GiTeacher } from "react-icons/gi";
 
 const links = [
   { icon: IconBulb, label: "Activity", notifications: 3 },
@@ -33,10 +36,10 @@ const collections = [
   { emoji: "🚚", label: "Deliveries" },
   { emoji: "💸", label: "Discounts" },
   { emoji: "💰", label: "Profits" },
-  { emoji: "✨", label: "Reports" },
+  { emoji: <MdMeetingRoom />, label: "Room", root: routes.room },
   { emoji: "📅", label: "Appointment", root: routes.appointment },
-  { emoji: "🙈", label: "Instructor", root: routes.instructor },
-  { emoji: "💁‍♀️", label: "User", root: routes.user },
+  { emoji: <GiTeacher />, label: "Instructor", root: routes.instructor },
+  { emoji: <PiUserCircleDashedFill />, label: "User", root: routes.user },
 ];
 
 export function Navbar() {

@@ -127,74 +127,6 @@
       "alreadyInList": "This {{entity}} is already in the list.",
       "invalidItem": "Please select an {{entity}}",
       "select": "Please select {{entity}} to delete."
-    },
-    "station": {
-      "nameMinimum": "Station name is required.",
-      "nameMaximum": "Station name must be less than or equal to 64.",
-      "ip": "Please enter a valid IPv4 address."
-    },
-    "consumable": {
-      "nameMinimum": "Consumable name is required.",
-      "nameMaximum": "Consumable name must be less than or equal to 128.",
-      "codeMinimum": "Consumable code is required.",
-      "codeMaximum": "Consumable code must be less than or equal to 16.",
-      "mainItemGroupNull": "Main item group must be selected.",
-      "itemGroupNull": "Sub item group must be selected."
-    },
-    "drug": {
-      "nameMinimum": "Drug name is required.",
-      "nameMaximum": "Drug name must be less than or equal to 128.",
-      "codeMinimum": "Drug code is required.",
-      "codeMaximum": "Drug code must be less than or equal to 16.",
-      "itemGroupNull": "Sub item group must be selected.",
-      "prescriptionTypeId": "Prescription type must be selected.",
-      "efficientMaterialId": "Efficient material must be selected.",
-      "isMedicineNull": "Item Group must be selected",
-      "mainItemGroupId": "Main item group must be selected."
-    },
-    "itemGroup": {
-      "mainItemGroupCodeMinimum": "Main item group code is required.",
-      "mainItemGroupCodeMaximum": "Main item group code must be less than or equal to 16.",
-      "itemGroupCodeMinimum": "Sub item group code is required.",
-      "itemGroupCodeMaximum": "Sub item group code must be less than or equal to 16.",
-      "mainItemGroupNameMinimum": "Main item group name is required.",
-      "mainItemGroupNameMaximum": "Main item group name must be less than or equal to 128.",
-      "itemGroupNameMinimum": "Sub item group name is required.",
-      "itemGroupNameMaximum": "Sub item group name must be less than or equal to 128."
-    },
-    "itemPrescription": {
-      "prescriptionCodeMinimum": "Prescription code is required.",
-      "prescriptionCodeMaximum": "Prescription code must be less than or equal to 16.",
-      "prescriptionNameMinimum": "Prescription name is required.",
-      "prescriptionNameMaximum": "Prescription name must be less than or equal to 128."
-    },
-    "overrideItem": {
-      "overrideNameMinimum": "Override list name is required.",
-      "overrideNameMaximum": "Override list name must be less than or equal to 128.",
-      "selectDrug": "Select drug.",
-      "reasonRequired": "Reason field cannot be empty."
-    },
-    "kit": {
-      "kitCodeMinimum": "Kit code is required.",
-      "kitCodeMaximum": "Kit code must be less than or equal to 16.",
-      "kitNameMinimum": "Kit name is required.",
-      "kitNameMaximum": "Kit name must be less than or equal to 128.",
-      "kitItemQuantityMinimum": "Item quantity must be more than 0.",
-      "kitItemRelationExists": "Item kit relation exists."
-    },
-    "itemClassification": {
-      "itemClassificationNameMinimum": "Item classification name is required."
-    },
-    "location": {
-      "locationCodeMinimum": "Location code is required",
-      "locationCodeMaximum": "Location code must be less than or equal to 16.",
-      "locationNameMinimum": "Location name is required.",
-      "locationNameMaximum": "Location name must be less than or equal to 128."
-    },
-    "profileGroup": {
-      "nameMin": "Profile group name is required.",
-      "nameMax": "ProfileGroupName must be less than or equal to 128.",
-      "applicationSelected": "Application must be selected."
     }
   },
   "button": {
@@ -242,20 +174,6 @@
     "facility": "Facility",
     "login": "Login"
   },
-  "override": {
-    "cardTitle": "Override Lists",
-    "name": "Override List Name",
-    "title": "Define Override List",
-    "active": "Active",
-    "drugList": "Item List",
-    "drugSearch": "Search with item code or name",
-    "addDrug": "Add Drug",
-    "overrideReasons": "Override Reasons",
-    "reason": "Reason",
-    "overrideReason": "Override reason",
-    "itemsWillBeDeleted": "The items below will be deleted on list",
-    "itemsWillBeAdded": "The items below will be added to list"
-  },
   "success": {
     "positive": "Process successfully completed.",
     "negative": "Process fail.",
@@ -273,5 +191,26 @@
   },
   "exception": {
     "sessionExpired": "Your session has expired, please login again."
+  },
+  "room": {
+    "title": "Room Definition",
+    "cardTitle": "Room List",
+    "name": "Name",
+    "description": "Description",
+    "maxCapacity": "Max Capacity",
+    "isAvailable": "Is Available",
+    "roomTypeId": "Room Type ID",
+    "roomType": "Room Type",
+    "amenities": "Amenities",
+    "roomValidation": {
+      "nameMinimum": "Name is required.",
+      "nameMaximum": "Name must be less than or equal to 128.",
+      "descriptionMinimum": "Description is required.",
+      "descriptionMaximum": "Description must be less than or equal to 256.",
+      "maxCapacityMinimum": "Max capacity is required.",
+      "maxCapacityMaximum": "Max capacity must be less than or equal to 100.",
+      "roomTypeIdRequired": "Room type ID is required.",
+      "amenitiesRequired": "At least one amenity is required."
+    }
   }
 }

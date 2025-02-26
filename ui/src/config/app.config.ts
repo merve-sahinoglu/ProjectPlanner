@@ -2,6 +2,8 @@ export interface ServiceUrls {
   coreUrl: string;
   coreRefreshUrl: string;
   userUrl: string;
+  appointmentUrl: string;
+  appointmentRoomsUrl: string;
 }
 
 interface Endpoints {
@@ -11,11 +13,14 @@ interface Endpoints {
 
   // User Service
   user: string;
+  appointment: string;
+  room: string;
 }
 
 interface ServiceAddress {
   coreService: string;
   userService: string;
+  appointmentService: string;
 }
 
 export const endpoints: Endpoints = {
@@ -23,11 +28,14 @@ export const endpoints: Endpoints = {
   authenticate: "authenticate",
   refreshAuthentication: "refresh-authentication",
   user: "user",
+  appointment: "appointment",
+  room: "room",
 } as const;
 
 export const services: ServiceAddress = {
   coreService: `https://localhost:5001/api`,
   userService: `https://localhost:5002/api`,
+  appointmentService: `https://localhost:5003/api`,
 } as const;
 
 export const apiUrl: ServiceUrls = {
@@ -35,6 +43,8 @@ export const apiUrl: ServiceUrls = {
   coreUrl: `${services.coreService}${endpoints.authenticate}`,
   coreRefreshUrl: `${services.coreService}${endpoints.refreshAuthentication}`,
   userUrl: `${services.userService}/${endpoints.user}`,
+  appointmentUrl: `${services.appointmentService}/${endpoints.appointment}`,
+  appointmentRoomsUrl: `${services.appointmentService}/${endpoints.room}`,
 };
 
 export function createRequestUrl(

@@ -175,5 +175,16 @@
     "searchInput": "İsim veya kod ile aratın...",
     "showActives": "Sadece aktif olanları göster",
     "showAll": "Hepsini göster"
+  },
+  "room": {
+    "title": "Oda Tanimlama",
+    "cardTitle": "Oda Listesi",
+    "name": "Ad",
+    "description": "Açiklama",
+    "maxCapacity": "Maksimum Kapasite",
+    "isAvailable": "Müsait Mi?",
+    "roomTypeId": "Oda Tipi ID",
+    "roomType": "Oda Tipi",
+    "amenities": "Olanaklar"
   }
 }

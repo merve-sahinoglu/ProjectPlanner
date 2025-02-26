@@ -137,7 +137,6 @@ function UserDetail({
   };
 
   const sendPostRequestForCreatedItem = async () => {
-    debugger;
     if (
       form.values["profilePicture"] !== null &&
       form.values["profilePicture"] !== undefined

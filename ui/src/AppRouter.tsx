@@ -5,6 +5,7 @@ import { ContactUs } from "./page/contact/ContactUs";
 import CalendarComponent from "./page/appointment/CalendarComponent";
 import InstructorOverview from "./page/instructor/InstructorOverview";
 import UserOverview from "./page/user/UserOverwiew";
+import RoomOverview from "./page/rooms/RoomOverview";
 
 const AppRouter = () => {
   return (
@@ -41,6 +42,14 @@ const AppRouter = () => {
           element={
             <Main>
               <InstructorOverview />
+            </Main>
+          }
+        />
+        <Route
+          path={routes.room}
+          element={
+            <Main>
+              <RoomOverview />
             </Main>
           }
         />
