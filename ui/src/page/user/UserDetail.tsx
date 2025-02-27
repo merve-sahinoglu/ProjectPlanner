@@ -11,7 +11,7 @@ import {
   TextInput,
   Image,
   Avatar,
-  rem,
+  Divider,
 } from "@mantine/core";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import styles from "./UserDetail.module.css";
@@ -250,25 +250,16 @@ function UserDetail({
 
   return (
     <>
-      <Card.Section
-        className={globalStyles.detailHeader}
-        withBorder
-        inheritPadding
-      >
+      <Card.Section className={globalStyles.detailHeader} inheritPadding>
         <CircleDot isActive={form.values.isActive} />
         <Text lineClamp={1} fw={400} fz={20}>
           ({form.values.userName}) - {form.values.name} {form.values.surname}
         </Text>
       </Card.Section>
-      <Tabs
-        keepMounted={false}
-        className={styles.itemTab}
-        m={0}
-        p={0}
-        defaultValue="item"
-      >
+      <Divider mb={20} />
+      <Tabs keepMounted={false} defaultValue="item">
         <Card.Section pb={0}>
-          <Tabs.List pl={20}>
+          <Tabs.List>
             <Tabs.Tab
               leftSection={<RiInformationLine size="1rem" />}
               value="item"

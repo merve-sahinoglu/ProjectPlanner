@@ -1,6 +1,7 @@
 import {
   Card,
   Checkbox,
+  Divider,
   Grid,
   Group,
   Select,
@@ -184,25 +185,16 @@ function RoomDetail({
 
   return (
     <>
-      <Card.Section
-        className={globalStyles.detailHeader}
-        withBorder
-        inheritPadding
-      >
+      <Card.Section className={globalStyles.detailHeader} inheritPadding>
         <CircleDot isActive={form.values.isAvailable} />
         <Text lineClamp={1} fw={400} fz={20}>
           {form.values.name}
         </Text>
       </Card.Section>
-      <Tabs
-        keepMounted={false}
-        className={styles.itemTab}
-        m={0}
-        p={0}
-        defaultValue="item"
-      >
-        <Card.Section pb={0}>
-          <Tabs.List pl={20}>
+      <Divider mb={20} />
+      <Tabs keepMounted={false} defaultValue="item">
+        <Card.Section inheritPadding>
+          <Tabs.List>
             <Tabs.Tab
               leftSection={<RiInformationLine size="1rem" />}
               value="item"
