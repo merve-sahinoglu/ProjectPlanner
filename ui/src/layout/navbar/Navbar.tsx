@@ -8,7 +8,7 @@ import {
 } from "@tabler/icons-react";
 import { Title, Tooltip, UnstyledButton } from "@mantine/core";
 import { MantineLogo } from "@mantinex/mantine-logo";
-import classes from "./NavbarMinimal.module.css";
+import classes from "./Navbar.module.css";
 import routes from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
 
@@ -19,7 +19,11 @@ const mainLinksMockdata = [
     SubLinks: [{ label: "My Callender", root: routes.user }],
   },
   { icon: IconGauge, label: "" },
-  { icon: IconCalendarStats, label: "Analytics", root: routes.appointment },
+  {
+    icon: IconCalendarStats,
+    label: "Appointment",
+    SubLinks: [{ label: "My Appointment", root: routes.appointment }],
+  },
   {
     icon: IconDeviceDesktopAnalytics,
     label: "Instructor",
