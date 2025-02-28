@@ -2,6 +2,7 @@ import { IconChevronDown } from "@tabler/icons-react";
 import { Burger, Center, Container, Group, Menu } from "@mantine/core";
 import classes from "./Header.module.css";
 import routes from "../../constants/routes";
+import UserProfileDropdown from "./UserProfileDropdown";
 
 const links = [
   { link: "/about", label: "Features" },
@@ -15,7 +16,6 @@ const links = [
       { link: "/blog", label: "Blog" },
     ],
   },
-  { link: routes.contact, label: "ContactUs" },
 ];
 
 interface HeaderMenuProps {
@@ -57,6 +57,9 @@ export function Header({
             </a>
           </Menu.Target>
           <Menu.Dropdown>{menuItems}</Menu.Dropdown>
+          <Group justify="flex-end">
+            <UserProfileDropdown />
+          </Group>
         </Menu>
       );
     }
@@ -77,9 +80,6 @@ export function Header({
     <header className={classes.header}>
       <Container size="md">
         <div className={classes.inner}>
-          <Group gap={5} visibleFrom="sm">
-            {items}
-          </Group>
           <Burger
             opened={mobileOpened}
             onClick={toggleMobile}
@@ -92,6 +92,9 @@ export function Header({
             visibleFrom="sm"
             size="sm"
           />
+          <Group gap={5} visibleFrom="sm">
+            {items}
+          </Group>
         </div>
       </Container>
     </header>

@@ -23,6 +23,7 @@
     "@mantine/form": "^7.16.2",
     "@mantine/hooks": "^7.16.2",
     "@mantine/modals": "^7.16.2",
+    "@mantinex/mantine-logo": "^1.1.0",
     "@radix-ui/colors": "^0.1.8",
     "@radix-ui/react-scroll-area": "^1.2.3",
     "@tabler/icons-react": "^3.29.0",

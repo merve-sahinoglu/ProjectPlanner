@@ -120,6 +120,33 @@ abstract class Dictionary {
     };
   };
 
+  static PlayGroup = class {
+    static readonly TITLE = "playGroup.title";
+    static readonly CARD_TITLE = "playGroup.cardTitle";
+    static readonly NAME = "playGroup.name";
+    static readonly MIN_AGE = "playGroup.minAge";
+    static readonly MAX_AGE = "playGroup.maxAge";
+    static readonly MAX_PARTICIPANTS = "playGroup.maxParticipants";
+    static readonly PLAYGROUP_THERAPISTS = "playGroup.playgroupTherapists";
+    static readonly IS_ACTIVE = "playGroup.isActive";
+
+    static Validation = class {
+      static readonly NAME_MIN = "playGroup.validation.nameMinimum";
+      static readonly NAME_MAX = "playGroup.validation.nameMaximum";
+      static readonly MIN_AGE_REQUIRED = "playGroup.validation.minAgeRequired";
+      static readonly MAX_AGE_REQUIRED = "playGroup.validation.maxAgeRequired";
+      static readonly MAX_PARTICIPANTS_REQUIRED =
+        "playGroup.validation.maxParticipantsRequired";
+      static readonly THERAPIST_REQUIRED =
+        "playGroup.validation.therapistRequired";
+    };
+  };
+
+  static PlaygroupTherapist = class {
+    static readonly ID = "playgroupTherapist.id";
+    static readonly THERAPIST_ID = "playgroupTherapist.therapistId";
+  };
+
   static Validation = class {
     static Input = class {
       static readonly MIN = "validation.inputValidation.min";

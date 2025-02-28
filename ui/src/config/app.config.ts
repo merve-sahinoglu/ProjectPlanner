@@ -4,6 +4,7 @@ export interface ServiceUrls {
   userUrl: string;
   appointmentUrl: string;
   appointmentRoomsUrl: string;
+  appointmentPlayGroupUrl: string;
 }
 
 interface Endpoints {
@@ -15,6 +16,7 @@ interface Endpoints {
   user: string;
   appointment: string;
   room: string;
+  playGroup: string;
 }
 
 interface ServiceAddress {
@@ -30,6 +32,7 @@ export const endpoints: Endpoints = {
   user: "user",
   appointment: "appointment",
   room: "room",
+  playGroup: "playGroups",
 } as const;
 
 export const services: ServiceAddress = {
@@ -45,6 +48,7 @@ export const apiUrl: ServiceUrls = {
   userUrl: `${services.userService}/${endpoints.user}`,
   appointmentUrl: `${services.appointmentService}/${endpoints.appointment}`,
   appointmentRoomsUrl: `${services.appointmentService}/${endpoints.room}`,
+  appointmentPlayGroupUrl: `${services.appointmentService}/${endpoints.playGroup}`,
 };
 
 export function createRequestUrl(

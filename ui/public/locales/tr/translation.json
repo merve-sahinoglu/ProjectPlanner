@@ -186,5 +186,27 @@
     "roomTypeId": "Oda Tipi ID",
     "roomType": "Oda Tipi",
     "amenities": "Olanaklar"
+  },
+  "playGroup": {
+    "title": "Oyun Grubu Tanimlama",
+    "cardTitle": "Oyun Grubu Listesi",
+    "name": "Ad",
+    "isActive": "Aktif",
+    "minAge": "Minimum Yaş",
+    "maxAge": "Maksimum Yaş",
+    "maxParticipants": "Maksimum Katılımcı Sayısı",
+    "playgroupTherapists": "Oyun Grubu Terapistleri",
+    "validation": {
+      "nameMinimum": "Ad gereklidir.",
+      "nameMaximum": "Ad 128 karakterden az olmalıdır.",
+      "minAgeRequired": "Minimum yaş gereklidir.",
+      "maxAgeRequired": "Maksimum yaş gereklidir.",
+      "maxParticipantsRequired": "Maksimum katılımcı sayısı gereklidir.",
+      "therapistRequired": "En az bir terapist seçilmelidir."
+    }
+  },
+  "playgroupTherapist": {
+    "id": "ID",
+    "therapistId": "Terapist ID"
   }
 }

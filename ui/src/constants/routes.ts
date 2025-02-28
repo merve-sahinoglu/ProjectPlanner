@@ -6,6 +6,7 @@ const routes = {
   instructor: "/instructor",
   user: "/user",
   room: "/room",
+  playGroups: "/playGroups",
 } as const;
 
 export default routes;

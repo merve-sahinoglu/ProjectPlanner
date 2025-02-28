@@ -212,5 +212,27 @@
       "roomTypeIdRequired": "Room type ID is required.",
       "amenitiesRequired": "At least one amenity is required."
     }
+  },
+  "playGroup": {
+    "title": "Play Group Definition",
+    "isActive": "Is Active",
+    "cardTitle": "Play Group List",
+    "name": "Name",
+    "minAge": "Minimum Age",
+    "maxAge": "Maximum Age",
+    "maxParticipants": "Maximum Participants",
+    "playgroupTherapists": "Playgroup Therapists",
+    "validation": {
+      "nameMinimum": "Name is required.",
+      "nameMaximum": "Name must be less than or equal to 128.",
+      "minAgeRequired": "Minimum age is required.",
+      "maxAgeRequired": "Maximum age is required.",
+      "maxParticipantsRequired": "Maximum participants is required.",
+      "therapistRequired": "At least one therapist is required."
+    }
+  },
+  "playgroupTherapist": {
+    "id": "ID",
+    "therapistId": "Therapist ID"
   }
 }

@@ -1,120 +1,131 @@
+import { useState } from "react";
 import {
-  IconBulb,
-  IconCheckbox,
-  IconPlus,
-  IconSearch,
-  IconUser,
+  IconCalendarStats,
+  IconDeviceDesktopAnalytics,
+  IconGauge,
+  IconHome2,
+  IconSettings,
 } from "@tabler/icons-react";
-import {
-  ActionIcon,
-  Badge,
-  Box,
-  Code,
-  Group,
-  Text,
-  TextInput,
-  Tooltip,
-  UnstyledButton,
-} from "@mantine/core";
-import classes from "./navbar.module.css";
+import { Title, Tooltip, UnstyledButton } from "@mantine/core";
+import { MantineLogo } from "@mantinex/mantine-logo";
+import classes from "./NavbarMinimal.module.css";
 import routes from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
-import { UserInfoIcons } from "../../components/UserInfoIcons/UserInfoIcons";
-import { MdMeetingRoom } from "react-icons/md";
-import { PiUserCircleDashedFill } from "react-icons/pi";
-import { GiTeacher } from "react-icons/gi";
 
-const links = [
-  { icon: IconBulb, label: "Activity", notifications: 3 },
-  { icon: IconCheckbox, label: "Tasks", notifications: 4 },
-  { icon: IconUser, label: "Contacts" },
-];
+interface NavbarLinkProps {
+  icon: typeof IconHome2;
+  label: string;
+  active?: boolean;
+  root?: string;
+  onClick?: () => void;
+}
 
-const collections = [
-  { emoji: "👍", label: "Sales" },
-  { emoji: "🚚", label: "Deliveries" },
-  { emoji: "💸", label: "Discounts" },
-  { emoji: "💰", label: "Profits" },
-  { emoji: <MdMeetingRoom />, label: "Room", root: routes.room },
-  { emoji: "📅", label: "Appointment", root: routes.appointment },
-  { emoji: <GiTeacher />, label: "Instructor", root: routes.instructor },
-  { emoji: <PiUserCircleDashedFill />, label: "User", root: routes.user },
+function NavbarLink({ icon: Icon, label, active, onClick }: NavbarLinkProps) {
+  return (
+    <Tooltip label={label} position="right" transitionProps={{ duration: 0 }}>
+      <UnstyledButton
+        onClick={onClick}
+        className={classes.link}
+        data-active={active || undefined}
+      >
+        <Icon size={20} stroke={1.5} />
+      </UnstyledButton>
+    </Tooltip>
+  );
+}
+
+const mainLinksMockdata = [
+  {
+    icon: IconHome2,
+    label: "Home",
+    SubLinks: [{ label: "My Callender", root: routes.user }],
+  },
+  { icon: IconGauge, label: "" },
+  { icon: IconCalendarStats, label: "Analytics", root: routes.appointment },
+  {
+    icon: IconDeviceDesktopAnalytics,
+    label: "Instructor",
+    root: routes.instructor,
+  },
+  {
+    icon: IconSettings,
+    label: "Settings",
+    SubLinks: [
+      { label: "User", root: routes.user },
+      { label: "Room", root: routes.room },
+      {
+        label: "Play Groups",
+        root: routes.playGroups,
+      },
+    ],
+  },
 ];
 
 export function Navbar() {
-  const [isSelected, setIsSelected] = useState<string>("");
+  const [active, setActive] = useState("Home");
+  const [activeLink, setActiveLink] = useState("User");
 
   const navigate = useNavigate();
 
   const handleMenuItemSelect = (route: string) => {
-    setIsSelected(route);
+    setActive(route);
+  };
+
+  const handleActiveLink = (route: string) => {
+    setActiveLink(route);
     navigate(route);
   };
 
-  const mainLinks = links.map((link) => (
-    <UnstyledButton key={link.label} className={classes.mainLink}>
-      <div className={classes.mainLinkInner}>
-        <link.icon size={20} className={classes.mainLinkIcon} stroke={1.5} />
-        <span>{link.label}</span>
-      </div>
-      {link.notifications && (
-        <Badge size="sm" variant="filled" className={classes.mainLinkBadge}>
-          {link.notifications}
-        </Badge>
-      )}
-    </UnstyledButton>
+  const mainLinks = mainLinksMockdata.map((link) => (
+    <Tooltip
+      label={link.label}
+      position="right"
+      withArrow
+      transitionProps={{ duration: 0 }}
+      key={link.label}
+    >
+      <UnstyledButton
+        onClick={() => handleMenuItemSelect(link.label)}
+        className={classes.mainLink}
+        data-active={link.label === active || undefined}
+      >
+        <link.icon size={22} stroke={1.5} />
+      </UnstyledButton>
+    </Tooltip>
   ));
 
-  const collectionLinks = collections.map((collection) => (
-    <a
-      onClick={() => handleMenuItemSelect(collection.root || "")}
-      key={collection.label}
-      className={classes.collectionLink}
-    >
-      <Box
-        component="span"
-        mr={9}
-        fz={16}
-        className={isSelected === collection.root ? classes.selected : ""}
-      >
-        {collection.emoji}
-      </Box>{" "}
-      {collection.label}
-    </a>
-  ));
+  const activeMenu = mainLinksMockdata.find((link) => link.label === active);
 
   return (
     <nav className={classes.navbar}>
-      <div className={classes.section}>
-        <UserInfoIcons />
-      </div>
-      <TextInput
-        placeholder="Search"
-        size="xs"
-        leftSection={<IconSearch size={12} stroke={1.5} />}
-        rightSectionWidth={70}
-        rightSection={<Code className={classes.searchCode}>Ctrl + K</Code>}
-        styles={{ section: { pointerEvents: "none" } }}
-        mb="sm"
-      />
-
-      <div className={classes.section}>
-        <div className={classes.mainLinks}>{mainLinks}</div>
-      </div>
-
-      <div className={classes.section}>
-        <Group className={classes.collectionsHeader} justify="space-between">
-          <Text size="xs" fw={500} c="dimmed">
-            Collections
-          </Text>
-          <Tooltip label="Create collection" withArrow position="right">
-            <ActionIcon variant="default" size={18}>
-              <IconPlus size={12} stroke={1.5} />
-            </ActionIcon>
-          </Tooltip>
-        </Group>
-        <div className={classes.collections}>{collectionLinks}</div>
+      <div className={classes.wrapper}>
+        <div className={classes.aside}>
+          <div className={classes.logo}>
+            <MantineLogo type="mark" size={30} />
+          </div>
+          {mainLinks}
+        </div>
+        {activeMenu?.SubLinks && (
+          <div className={classes.main}>
+            <Title order={4} className={classes.title}>
+              {active}
+            </Title>
+            {activeMenu.SubLinks.map((subLink) => (
+              <a
+                className={classes.link}
+                data-active={activeLink === subLink.label || undefined}
+                href="#"
+                onClick={(event) => {
+                  event.preventDefault();
+                  handleActiveLink(subLink.root);
+                }}
+                key={subLink.label}
+              >
+                {subLink.label}
+              </a>
+            ))}
+          </div>
+        )}
       </div>
     </nav>
   );

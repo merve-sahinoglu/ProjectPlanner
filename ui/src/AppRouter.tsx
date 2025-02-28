@@ -6,6 +6,7 @@ import CalendarComponent from "./page/appointment/CalendarComponent";
 import InstructorOverview from "./page/instructor/InstructorOverview";
 import UserOverview from "./page/user/UserOverwiew";
 import RoomOverview from "./page/rooms/RoomOverview";
+import PlayGroupOverview from "./page/playgroups/PlayGroupOverview";
 
 const AppRouter = () => {
   return (
@@ -50,6 +51,14 @@ const AppRouter = () => {
           element={
             <Main>
               <RoomOverview />
+            </Main>
+          }
+        />
+        <Route
+          path={routes.playGroups}
+          element={
+            <Main>
+              <PlayGroupOverview />
             </Main>
           }
         />
