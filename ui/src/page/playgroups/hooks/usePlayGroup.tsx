@@ -85,7 +85,6 @@ const usePlayGroup = ({
 
       const data: PlayGroupRowProps[] = retVal.map((x) => ({
         ...x,
-        PlayGroupTypeId: x.PlayGroupTypeId.toString(),
       }));
 
       return {

@@ -3,7 +3,8 @@
     var(--mantine-color-white),
     var(--mantine-color-dark-6)
   );
-  height: "%100";
+  /* TODO:  Burayi parametrok yyapmak gerekir %100 ise yaramiyor */
+  height: 1200px;
   width: 300px;
   display: flex;
   flex-direction: column;

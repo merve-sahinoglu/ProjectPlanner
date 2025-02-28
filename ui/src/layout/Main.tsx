@@ -29,7 +29,7 @@ function Main({ children }: MainProps) {
             toggleDesktop={toggleDesktop}
           ></Header>
         </AppShell.Header>
-        <AppShell.Navbar mt={5}>
+        <AppShell.Navbar mt={5} h={"%100"}>
           <Navbar></Navbar>
         </AppShell.Navbar>
         <AppShell.Main>{children}</AppShell.Main>
