@@ -15,7 +15,7 @@ import {
 } from "@mantine/core";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
 import styles from "./UserDetail.module.css";
-import { UserRowProps } from "./props/UserTypes";
+import { UserRowProps, UserResponse } from "./props/UserTypes";
 import { useTranslation } from "react-i18next";
 import Dictionary from "../../constants/dictionary";
 import { z } from "zod";
@@ -33,7 +33,8 @@ import globalStyles from "../../assets/global.module.css";
 import useRequestHandler from "../../hooks/useRequestHandler";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
-import { IconUpload } from "@tabler/icons-react";
+import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
+import { DateInput } from "@mantine/dates";
 
 interface ItemDetailProps {
   selectedUser: UserRowProps;
@@ -109,51 +110,53 @@ function UserDetail({
 
   const initialValues = useRef<UserRowProps>(form.values);
 
-  function fileToByteArray(file: File): Promise<Uint8Array> {
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
+  const userType = [
+    {
+      value: "0",
+      label: "Teacher",
+    },
+    {
+      value: "1",
+      label: "Chield",
+    },
+    {
+      value: "2",
+      label: "Relative",
+    },
+  ];
 
-      reader.onload = () => {
-        if (reader.result instanceof ArrayBuffer) {
-          resolve(new Uint8Array(reader.result));
-        } else {
-          reject(new Error("Dosya okunamadı."));
-        }
-      };
+  function base64ToBlob(
+    base64: string,
+    mimeType: "image/jpeg" | "image/png"
+  ): Blob {
+    // Check if base64 contains the data URL prefix
+    const base64Data = base64.split(",")[1] || base64; // Take part after the comma or the entire string if no comma
 
-      reader.onerror = (error) => reject(error);
+    const byteCharacters = atob(base64Data); // Decode the base64 string
+    const byteNumbers = new Array(byteCharacters.length);
 
-      reader.readAsArrayBuffer(file);
-    });
-  }
-
-  // Kullanım
-  const handleFileUpload = async (event: Event) => {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-      const file = input.files[0];
-      const byteArray = await fileToByteArray(file);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i); // Convert characters to byte values
     }
-  };
+
+    const byteArray = new Uint8Array(byteNumbers); // Create Uint8Array from byte numbers
+    const blob = new Blob([byteArray], { type: mimeType }); // Create a blob with the correct mime type
+
+    return new File([blob], "image.jpeg", { type: mimeType }); // Return as File
+  }
 
   const sendPostRequestForCreatedItem = async () => {
     if (
       form.values["profilePicture"] !== null &&
       form.values["profilePicture"] !== undefined
     ) {
-      const reader = new FileReader();
-      reader.readAsDataURL(form.values["profilePicture"] as File);
-
-      reader.onloadend = () => {
-        const data = reader.result as string;
-        const parsedData = data.split(",");
-        if (!data) return;
-        const base64 = parsedData[1];
-        form.setFieldValue("profilePicture", base64);
-      };
+      const base64 = await readFileAsBase64(
+        form.values["profilePicture"] as File
+      );
+      form.values.profilePicture = base64ToByteArray(base64);
     }
 
-    const response = await sendData<UserRowProps, UserRowProps>(
+    const response = await sendData<UserRowProps, UserResponse>(
       createRequestUrl(apiUrl.userUrl),
       RequestType.Post,
       form.values
@@ -164,17 +167,28 @@ function UserDetail({
     if (response.isSuccess) {
       setDisabled(true);
 
-      initialValues.current = response.value;
+      const retval = {
+        ...response.value,
+        birthDate: response.value.birthDate
+          ? new Date(response.value.birthDate)
+          : null,
+        typeId: response.value.typeId.toString(),
+        profilePicture:
+          response.value &&
+          base64ToBlob(response.value.profilePicture as string, "image/jpeg"),
+      };
 
-      form.setValues(response.value);
+      initialValues.current = retval;
+
+      form.setValues(retval);
 
       form.resetDirty();
 
       setCanAddItem(!canAddItem);
 
-      handleUpdateItemWithId(response.value, createdItemGuid);
+      handleUpdateItemWithId(retval, createdItemGuid);
 
-      changeSelectedItem(response.value);
+      changeSelectedItem(retval);
 
       changeCreatedItemGuid("");
 
@@ -182,11 +196,55 @@ function UserDetail({
     }
   };
 
+  const readFileAsBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+
+      reader.onloadend = () => {
+        if (reader.result) {
+          const data = reader.result as string;
+          const base64 = data.split(",")[1]; // Base64 verisini al
+          resolve(base64);
+        } else {
+          reject(new Error("FileReader failed to load the file"));
+        }
+      };
+
+      reader.onerror = () => reject(new Error("File reading error"));
+    });
+  };
+
+  function base64ToByteArray(base64String: string): number[] {
+    const cleanedBase64 = base64String.includes(",")
+      ? base64String.split(",")[1]
+      : base64String;
+    const binaryString = atob(cleanedBase64);
+    return Array.from(binaryString, (char) => char.charCodeAt(0)); // Uint8Array yerine number[]
+  }
+
   const sendPatchRequestForModifiedItem = async () => {
     const patchDocument = createJsonPatchDocumentFromDirtyForm<UserRowProps>(
       form,
-      form.values
+      form.values,
+      ["profilePicture"]
     );
+
+    if (
+      form.values["profilePicture"] !== null &&
+      form.values["profilePicture"] !== undefined
+    ) {
+      const base64 = await readFileAsBase64(
+        form.values["profilePicture"] as File
+      );
+      const picture = {
+        op: "replace",
+        path: "/profilePicture",
+        value: base64ToByteArray(base64), // Binary olarak saklamak istersen
+      };
+
+      patchDocument.push(picture);
+    }
 
     const response = await sendData(
       createRequestUrl(apiUrl.userUrl, form.values.id),
@@ -248,6 +306,10 @@ function UserDetail({
     setDisabled(true);
   };
 
+  const clearRelativeId = () => {
+    form.setFieldValue("relativeId", "");
+  };
+
   return (
     <>
       <Card.Section className={globalStyles.detailHeader} inheritPadding>
@@ -281,14 +343,14 @@ function UserDetail({
               <Group>
                 <Avatar src={preview} size={90} />
                 <FileInput
-                  clearable
+                  clearable={!disabled}
                   disabled={disabled}
-                  accept="image/png,image/jpeg"
+                  accept="image/jpeg"
                   label="Attach your picture"
                   {...form.getInputProps(
                     nameof<UserRowProps>("profilePicture")
                   )}
-                  placeholder={`${t(Dictionary.ExcelImport.SELECT_FILE)}`}
+                  placeholder={`${t(Dictionary.User.SELECT_FILE)}`}
                   onChange={(file) => {
                     form.setFieldValue("profilePicture", file);
                     if (file) {
@@ -329,20 +391,47 @@ function UserDetail({
                 />
               </Group>
               <Group grow>
-                <TextInput
+                <Select
                   className={styles.input}
                   disabled={disabled}
+                  {...form.getInputProps(nameof<UserRowProps>("typeId"))}
                   label={t(Dictionary.User.USER_TITLE)}
-                  {...form.getInputProps(nameof<UserRowProps>("title"))}
+                  data={userType}
                 />
-                {/* <DatePickerInput
-                  mt={15}
-                  locale={language}
+                <FormAutocomplete
+                  marginTop={15}
+                  searchInputLabel={t(Dictionary.User.RELATIVE)}
+                  placeholder={t(Dictionary.User.RELATIVE)}
+                  description=""
+                  disabled={disabled}
+                  apiUrl={createRequestUrl(apiUrl.userUrl)}
+                  form={form}
+                  clearValue={clearRelativeId}
+                  formInputProperty="relativeId"
+                  additionalQueries={"&typeId=2&isActive=true"}
+                  initialData={[
+                    {
+                      value:
+                        initialValues.current &&
+                        initialValues.current.relativeId
+                          ? initialValues.current.relativeId
+                          : "",
+                      label:
+                        initialValues.current &&
+                        initialValues.current.relativeName
+                          ? `${initialValues.current.relativeName}`
+                          : "",
+                    },
+                  ]}
+                  {...form.getInputProps(nameof<UserRowProps>("relativeId"))}
+                />
+                <DateInput
+                  className={styles.input}
                   disabled={disabled}
                   label={t(Dictionary.User.BIRTH_DATE)}
                   mx="auto"
                   {...form.getInputProps(nameof<UserRowProps>("birthDate"))}
-                /> */}
+                />
               </Group>
               <Group grow>
                 <Select

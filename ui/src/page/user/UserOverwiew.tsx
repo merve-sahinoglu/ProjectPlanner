@@ -82,18 +82,9 @@ const UserOverview: React.FC = () => {
     }
   };
 
-  const handleKeepModifiedItem = (item: UserRowProps) => {
-    if (selectedItem) {
-      handleUpdateItems(selectedItem);
-    }
-
-    setIsDisabled(true);
-    setSelectedItem(item);
-  };
-
   const handleClickItem = (event: React.MouseEvent, item: UserRowProps) => {
     event.preventDefault();
-    debugger;
+
     if (!canAddItem) {
       modals.openConfirmModal({
         title: (
@@ -154,7 +145,6 @@ const UserOverview: React.FC = () => {
   );
 
   const handleAdd = (e: React.MouseEvent) => {
-    debugger;
     e.preventDefault();
     if (!isDisabled) {
       modals.openConfirmModal({
@@ -200,12 +190,12 @@ const UserOverview: React.FC = () => {
       password: null,
       cardNumber: null,
       searchText: "",
-      title: null,
       name: "",
       surname: "",
       birthDate: null,
       gender: "",
       isActive: true,
+      relativeId: "",
     };
 
     setSelectedItem(newUser);

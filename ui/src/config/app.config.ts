@@ -30,7 +30,7 @@ export const endpoints: Endpoints = {
   authenticate: "authenticate",
   refreshAuthentication: "refresh-authentication",
   user: "user",
-  appointment: "appointment",
+  appointment: "appointments",
   room: "room",
   playGroup: "playGroups",
 } as const;

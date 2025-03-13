@@ -1,6 +1,6 @@
 import { useEffect, useReducer, useState } from "react";
 import customReducer from "../../../services/custom-reducer/customReducer";
-import { UserRowProps } from "../props/UserTypes";
+import { UserResponse, UserRowProps } from "../props/UserTypes";
 import { useDebouncedValue } from "@mantine/hooks";
 import ReducerActions from "../../../enum/reducer-action.enum";
 import { apiUrl, createRequestUrl } from "../../../config/app.config";
@@ -62,19 +62,57 @@ const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
       searchText: searchQuery,
     };
 
-    const response = await fetchData<UserRowProps[]>(
+    const response = await fetchData<UserResponse[]>(
       createRequestUrl(apiUrl.userUrl),
       request
     );
 
     if (response.isSuccess) {
       setTotalRecords(response.metadata?.TotalItemCount || 0);
+
+      debugger;
+
+      const retval = response.value.map((item) => ({
+        ...item,
+        birthDate: item.birthDate ? new Date(item.birthDate) : null,
+        typeId: item.typeId.toString(),
+        relativeName: item.relativeName,
+        profilePicture:
+          item.profilePicture &&
+          base64ToBlob(item.profilePicture as string, "image/jpeg"),
+      }));
+
       changeMetadata(response.metadata ? response.metadata : null);
-      return response;
+
+      return {
+        isSuccess: true,
+        metadata: response.metadata,
+        value: retval,
+      } as SuccessResponse<UserRowProps[]>;
     }
 
     return Promise.reject(new Error(response.error));
   };
+
+  function base64ToBlob(
+    base64: string,
+    mimeType: "image/jpeg" | "image/png"
+  ): Blob {
+    // Check if base64 contains the data URL prefix
+    const base64Data = base64.split(",")[1] || base64; // Take part after the comma or the entire string if no comma
+
+    const byteCharacters = atob(base64Data); // Decode the base64 string
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i); // Convert characters to byte values
+    }
+
+    const byteArray = new Uint8Array(byteNumbers); // Create Uint8Array from byte numbers
+    const blob = new Blob([byteArray], { type: mimeType }); // Create a blob with the correct mime type
+
+    return new File([blob], "image.jpeg", { type: mimeType }); // Return as File
+  }
 
   function handleUpdateItemWithId(item: UserRowProps, id: string) {
     dispatch({

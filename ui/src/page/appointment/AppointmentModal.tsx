@@ -9,11 +9,14 @@ import {
   Select,
   Tabs,
   Text,
+  Textarea,
   TextInput,
 } from "@mantine/core";
-import { Appointment } from "./types/Appointment";
-import { RiInformationLine } from "react-icons/ri";
-import globalStyles from "../../assets/global.module.css";
+import {
+  Appointment,
+  AppointmentType,
+  SelectedDates,
+} from "./types/Appointment";
 import useRequestHandler from "../../hooks/useRequestHandler";
 import { useTranslation } from "react-i18next";
 import { useForm, zodResolver } from "@mantine/form";
@@ -27,26 +30,8 @@ import RequestType from "../../enum/request-type";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
-import CardGridDetail from "../../components/CardGrid/CardGridDetail";
-
-const appointmentType = [
-  {
-    value: "0",
-    label: "InitialConsultation",
-  },
-  {
-    value: "1",
-    label: "SpeechTherapy",
-  },
-  {
-    value: "2",
-    label: "PsychologicalTherapy",
-  },
-  {
-    value: "3",
-    label: "Game Groups",
-  },
-];
+import { DatePickerInput, DateTimePicker } from "@mantine/dates";
+import DateTimeSelector from "../../components/DateTimeSelector/DateTimeSelector";
 
 const appointmentStatus = [
   {
@@ -94,7 +79,7 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
   const { t } = useTranslation();
 
   const schema = z.object({
-    title: z
+    name: z
       .string()
       .min(1, { message: `${t(Dictionary.PlayGroup.Validation.NAME_MIN)}` })
       .max(100, {
@@ -111,17 +96,43 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
 
   const initialValues = useRef<Appointment>(form.values);
 
+  const appointmentTypes = [
+    {
+      value: "0",
+      label: t(Dictionary.AppointmentType.INITIAL_CONSULTATION),
+    },
+    {
+      value: "1",
+      label: t(Dictionary.AppointmentType.SPEECH_THERAPY),
+    },
+    {
+      value: "2",
+      label: t(Dictionary.AppointmentType.PSYCHOLOGICAL_THERAPY),
+    },
+    {
+      value: "3",
+      label: t(Dictionary.AppointmentType.GAME_GROUPS),
+    },
+  ];
+
   const sendPostRequestForCreatedItem = async () => {
+    const request = form.values;
+
     const response = await sendData<Appointment, Appointment>(
-      createRequestUrl(apiUrl.userUrl),
+      createRequestUrl(apiUrl.appointmentUrl),
       RequestType.Post,
-      form.values
+      request
     );
 
     if (!response.isSuccess) return;
 
     if (response.isSuccess) {
       setDisabled(true);
+
+      response.value.appointmentDays?.map((item) => {
+        item.end = new Date(item.end);
+        item.start = new Date(item.start);
+      });
 
       initialValues.current = response.value;
 
@@ -146,7 +157,7 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
     );
 
     const response = await sendData(
-      createRequestUrl(apiUrl.userUrl, form.values.appointmenId),
+      createRequestUrl(apiUrl.userUrl, form.values.id),
       RequestType.Patch,
       patchDocument
     );
@@ -173,7 +184,7 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
 
     if (!form.isDirty()) return;
 
-    if (createdItemGuid === form.values.appointmenId) {
+    if (createdItemGuid === form.values.id) {
       sendPostRequestForCreatedItem();
       return;
     }
@@ -189,8 +200,8 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
   const handleCancel = (event: React.MouseEvent) => {
     event.preventDefault();
 
-    if (createdItemGuid === form.values.appointmenId) {
-      handleDeleteItem(form.values.appointmenId);
+    if (createdItemGuid === form.values.id) {
+      handleDeleteItem(form.values.id);
       setDisabled(true);
       form.reset();
       form.setFieldValue(nameof<Appointment>("id"), "");
@@ -209,39 +220,47 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
     form.setFieldValue("playgroupId", "");
   };
 
+  const handleDateTimeChange = (dates: SelectedDates[]) => {
+    form.setFieldValue("appointmentDays", dates);
+  };
+
   return (
     <>
-      {/* <Card.Section className={globalStyles.detailHeader} inheritPadding>
-          <Text lineClamp={1} fw={400} fz={20}>
-            {form.values.title}
-          </Text>
-        </Card.Section> */}
-      <Divider mb={20} />
-      {/* <Tabs keepMounted={false} defaultValue="item"> */}
-      {/* <Card.Section inheritPadding>
-          <Tabs.List>
-            <Tabs.Tab
-              leftSection={<RiInformationLine size="1rem" />}
-              value="item"
-            >
-              {t(Dictionary.PlayGroup.TITLE)}
-            </Tabs.Tab>
-          </Tabs.List>
-        </Card.Section> */}
-      {/* <Tabs.Panel value="item"> */}
       <Grid grow>
         <Grid.Col span={5}>
-          <TextInput
-            className={styles.input}
-            disabled={disabled}
-            label={`${t(Dictionary.Room.NAME)}`}
-            {...form.getInputProps(nameof<Appointment>("title"))}
-          />
+          <Group grow>
+            <TextInput
+              className={styles.input}
+              disabled={disabled}
+              label={`${t(Dictionary.Appointment.TITLE)}`}
+              {...form.getInputProps(nameof<Appointment>("name"))}
+            />
+          </Group>
+          <Group grow>
+            <Select
+              disabled={disabled}
+              {...form.getInputProps(nameof<Appointment>("typeId"))}
+              label={t(Dictionary.Appointment.TYPE_ID)}
+              data={appointmentTypes}
+            />
+            <FormAutocomplete
+              searchInputLabel={t(Dictionary.Appointment.ROOM_ID)}
+              placeholder={t(Dictionary.Appointment.ROOM_ID)}
+              description=""
+              disabled={disabled}
+              apiUrl={createRequestUrl(apiUrl.appointmentRoomsUrl)}
+              form={form}
+              formInputProperty="chieldId"
+              {...form.getInputProps(nameof<Appointment>("roomId"))}
+              clearValue={clearChieldId}
+            />
+          </Group>
           <Group grow>
             <FormAutocomplete
-              searchInputLabel={"Chield"}
-              placeholder={t(Dictionary.CardGrid.SEARCH_INPUT)}
+              searchInputLabel={t(Dictionary.Appointment.CHIELD_ID)}
+              placeholder={t(Dictionary.Appointment.CHIELD_ID)}
               description=""
+              disabled={disabled}
               apiUrl={createRequestUrl(apiUrl.userUrl)}
               form={form}
               formInputProperty="chieldId"
@@ -249,9 +268,10 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
               clearValue={clearChieldId}
             />
             <FormAutocomplete
-              searchInputLabel={"TherapistId"}
-              placeholder={t(Dictionary.CardGrid.SEARCH_INPUT)}
+              searchInputLabel={t(Dictionary.Appointment.THERAPIST_ID)}
+              placeholder={t(Dictionary.Appointment.THERAPIST_ID)}
               description=""
+              disabled={disabled}
               apiUrl={createRequestUrl(apiUrl.userUrl)}
               form={form}
               formInputProperty="therapistId"
@@ -260,41 +280,41 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
             />
           </Group>
           <Group grow>
-            <FormAutocomplete
-              searchInputLabel={"playgroup"}
-              placeholder={t(Dictionary.CardGrid.SEARCH_INPUT)}
-              description=""
-              apiUrl={createRequestUrl(apiUrl.appointmentPlayGroupUrl)}
-              form={form}
-              formInputProperty="playgroupId"
-              {...form.getInputProps(nameof<Appointment>("playgroupId"))}
-              clearValue={clearPlaygroupId}
-            />
-            <FormAutocomplete
-              searchInputLabel={"Room"}
-              placeholder={t(Dictionary.CardGrid.SEARCH_INPUT)}
-              description=""
-              apiUrl={createRequestUrl(apiUrl.userUrl)}
-              form={form}
-              formInputProperty="chieldId"
-              {...form.getInputProps(nameof<Appointment>("roomId"))}
-              clearValue={clearChieldId}
+            {form.values.typeId == AppointmentType.GAME_GROUPS && (
+              <FormAutocomplete
+                searchInputLabel={t(Dictionary.Appointment.PLAYGROUP_ID)}
+                placeholder={t(Dictionary.Appointment.PLAYGROUP_ID)}
+                description=""
+                apiUrl={createRequestUrl(apiUrl.appointmentPlayGroupUrl)}
+                form={form}
+                disabled={disabled}
+                formInputProperty="playgroupId"
+                {...form.getInputProps(nameof<Appointment>("playgroupId"))}
+                clearValue={clearPlaygroupId}
+              />
+            )}
+
+            {form.values.id && (
+              <Select
+                mt={15}
+                disabled={disabled}
+                {...form.getInputProps(nameof<Appointment>("statusId"))}
+                label={t(Dictionary.Appointment.STATUS_ID)}
+                data={appointmentStatus}
+              />
+            )}
+          </Group>
+          <Group grow>
+            <Textarea
+              disabled={disabled}
+              label={t(Dictionary.Appointment.DESCRIPTION)}
+              {...form.getInputProps(nameof<Appointment>("description"))}
             />
           </Group>
           <Group grow>
-            <Select
-              mt={15}
-              disabled={disabled}
-              {...form.getInputProps(nameof<Appointment>("statusId"))}
-              label={t(Dictionary.User.GENDER)}
-              data={appointmentStatus}
-            />
-            <Select
-              mt={15}
-              disabled={disabled}
-              {...form.getInputProps(nameof<Appointment>("typeId"))}
-              label={t(Dictionary.User.GENDER)}
-              data={appointmentType}
+            <DateTimeSelector
+              onChange={handleDateTimeChange}
+              value={form.values.appointmentDays || []}
             />
           </Group>
         </Grid.Col>

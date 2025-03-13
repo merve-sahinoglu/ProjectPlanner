@@ -87,7 +87,6 @@ function FormAutocomplete<T>({
       clearValue();
       return;
     }
-    debugger;
 
     if (searchValue.length >= 3) {
       setLoading(true);
@@ -115,8 +114,9 @@ function FormAutocomplete<T>({
   }, [clearValue, searchValue]);
 
   const handleSearchChange = (eventValue: string) => {
-    debugger;
-    setSearchValue(eventValue);
+    if (eventValue !== searchValue) {
+      setSearchValue(eventValue);
+    }
   };
 
   const handleClearClick = useCallback(
@@ -150,7 +150,7 @@ function FormAutocomplete<T>({
   return (
     <Select
       searchValue={searchValue}
-      onSearchChange={(e) => handleSearchChange(e)}
+      onSearchChange={handleSearchChange}
       allowDeselect
       disabled={disabled}
       label={searchInputLabel}
@@ -161,14 +161,13 @@ function FormAutocomplete<T>({
       description={description}
       {...form.getInputProps(formInputProperty)}
       rightSection={
-        // eslint-disable-next-line no-nested-ternary
         loading ? (
           <Loader size="1rem" />
         ) : searchValue && !disabled ? (
           <IconX
             size={18}
             style={{ display: "block", opacity: 0.5, cursor: "pointer" }}
-            onClick={(event) => handleClearClick(event)}
+            onClick={handleClearClick}
           />
         ) : null
       }

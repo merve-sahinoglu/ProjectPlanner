@@ -41,7 +41,10 @@
     "passwordRegex": "Şifreniz en az 6 karakter, bir büyük harf, bir küçük harf, bir numara ve bir özel karakter içermelidir.",
     "currentPassword": "Geçerli parola",
     "userAuthorization": "Kullanıcı Profil Grupları",
-    "userFacility": "Kullanıcı Şubeleri"
+    "userFacility": "Kullanıcı Şubeleri",
+    "selectFile": "Dokuman Secin",
+    "relative": "Yakini",
+    "executive": "Yönetenler"
   },
   "actionBar": {
     "define": "Tanımla",
@@ -78,7 +81,7 @@
     },
     "listValidation": {
       "alreadyInList": "Eklemeye çalıştığınız {{entity}} listede mevcuttur.",
-      "invalidItem": "Lütfen bir {{entity}} seçiniz.",
+      "invalidItem": "Lütfen  seçiniz.",
       "select": "Lütfen silinecek {{entity}} seçiniz."
     },
     "login": {
@@ -208,5 +211,39 @@
   "playgroupTherapist": {
     "id": "ID",
     "therapistId": "Terapist ID"
+  },
+
+  "appointment": {
+    "cardTitle": "Randevu Listesi",
+    "id": "ID",
+    "appointmentId": "Randevu ",
+    "description": "Aciklama",
+    "childId": "Çocuk",
+    "playgroupId": "Oyun Grubu",
+    "roomId": "Oda ",
+    "therapistId": "Terapist ",
+    "typeId": "Tip ",
+    "statusId": "Durum ",
+    "title": "Başlık",
+    "start": "Başlangıç Tarihi",
+    "end": "Bitiş Tarihi",
+    "allDay": "Tüm Gün",
+    "validation": {
+      "appointmentIdRequired": "Randevu  gereklidir.",
+      "childIdRequired": "Çocuk  gereklidir.",
+      "therapistIdRequired": "Terapist  gereklidir.",
+      "typeIdRequired": "Tip  gereklidir.",
+      "statusIdRequired": "Durum  gereklidir.",
+      "titleMinimum": "Başlık gereklidir.",
+      "titleMaximum": "Başlık 128 karakterden az olmalıdır.",
+      "startRequired": "Başlangıç tarihi gereklidir.",
+      "endRequired": "Bitiş tarihi gereklidir."
+    }
+  },
+  "appointmentType": {
+    "initialConsultation": "Danışma",
+    "speechTherapy": "Konuşma Terapisi",
+    "psychologicalTherapy": "Psikolojik Terapi",
+    "gameGroups": "Oyun Grupları"
   }
 }

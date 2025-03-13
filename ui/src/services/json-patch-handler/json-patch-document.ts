@@ -11,12 +11,12 @@ enum JsonPatchOperationType {
 type JsonPatchOperation = {
   op: JsonPatchOperationType;
   path: string;
-  value: string;
+  value: string | Uint8Array | number[];
 };
 
 export interface JsonPatchKeyValuePair {
   path: string;
-  value: string;
+  value: string | Uint8Array | number[];
 }
 
 function addOperations(
@@ -54,39 +54,48 @@ export function addOperationToJsonPatchRecord(
   key: string,
   values: JsonPatchKeyValuePair
 ) {
+  let valueToStore = values.value;
+
+  if (values.value instanceof Uint8Array) {
+    valueToStore = btoa(String.fromCharCode(...values.value)); // Uint8Array -> Base64
+  }
+
   if (record[key] && record[key].length > 0) {
     record[key].push({
       op: JsonPatchOperationType.Replace,
       path: `/${values.path}`,
-      value: values.value,
+      value: valueToStore,
     });
     return;
   }
-  // eslint-disable-next-line no-param-reassign
+
   record[key] = [
     {
       op: JsonPatchOperationType.Replace,
       path: `/${values.path}`,
-      value: values.value,
+      value: valueToStore,
     },
   ];
 }
 
 export function createJsonPatchDocumentFromDirtyForm<T>(
   form: UseFormReturnType<T>,
-  obj: T
+  obj: T,
+  ignoredObject: string[] = []
 ): JsonPatchKeyValuePair[] {
   const jsonPatchList: JsonPatchKeyValuePair[] = [];
 
   let property: keyof typeof obj;
-  debugger;
 
   // TODO: Use of Object.keys & Object.values for generic objects
   // eslint-disable-next-line no-restricted-syntax
   for (property in obj) {
     if (form.isDirty(property)) {
       console.log(obj[property]);
-      jsonPatchList.push({ path: property, value: String(obj[property]) });
+      const ignored0bj = ignoredObject.find((x) => x === property);
+      if (!ignored0bj) {
+        jsonPatchList.push({ path: property, value: String(obj[property]) });
+      }
     }
   }
   console.log(jsonPatchList);

@@ -40,7 +40,10 @@
     "bio": "About You",
     "manageInformation": "Manage and control your personal information",
     "passwordRegex": "Your password must have minimum six characters, at least one uppercase letter, one lowercase letter, one number and one special character.",
-    "currentPassword": "Current Password"
+    "currentPassword": "Current Password",
+    "selectFile": "Select Document",
+    "relative": "Relative",
+    "executive": "Executive"
   },
   "dataGrid": {
     "lastRefreshed": "Last refreshed: {{date}}",
@@ -125,7 +128,7 @@
     },
     "listValidation": {
       "alreadyInList": "This {{entity}} is already in the list.",
-      "invalidItem": "Please select an {{entity}}",
+      "invalidItem": "Please select",
       "select": "Please select {{entity}} to delete."
     }
   },
@@ -234,5 +237,39 @@
   "playgroupTherapist": {
     "id": "ID",
     "therapistId": "Therapist ID"
+  },
+
+  "appointment": {
+    "cardTitle": "Appointment List",
+    "id": "ID",
+    "appointmentId": "Appointment",
+    "description": "Description",
+    "childId": "Child",
+    "playgroupId": "Playgroup",
+    "roomId": "Room",
+    "therapistId": "Therapist",
+    "typeId": "Type",
+    "statusId": "Status",
+    "title": "Title",
+    "start": "Start Date",
+    "end": "End Date",
+    "allDay": "All Day",
+    "validation": {
+      "appointmentIdRequired": "Appointment  is required.",
+      "childIdRequired": "Child  is required.",
+      "therapistIdRequired": "Therapist  is required.",
+      "typeIdRequired": "Type  is required.",
+      "statusIdRequired": "Status is required.",
+      "titleMinimum": "Title is required.",
+      "titleMaximum": "Title must be less than or equal to 128 characters.",
+      "startRequired": "Start date is required.",
+      "endRequired": "End date is required."
+    }
+  },
+  "appointmentType": {
+    "initialConsultation": "Initial Consultation",
+    "speechTherapy": "Speech Therapy",
+    "psychologicalTherapy": "Psychological Therapy",
+    "gameGroups": "Game Groups"
   }
 }

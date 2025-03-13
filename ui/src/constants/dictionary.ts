@@ -2,6 +2,8 @@
 abstract class Dictionary {
   static User = class {
     static readonly TITLE = "user.modalsTitle";
+    static readonly SELECT_FILE = "user.selectFile";
+    static readonly RELATIVE = "user.relative";
 
     static readonly CARD_TITLE = "user.cardTitle";
 
@@ -85,6 +87,8 @@ abstract class Dictionary {
     static readonly PASSWORD_REGEX = "user.passwordRegex";
 
     static readonly CURRENT_PASSWORD = "user.currentPassword";
+
+    static readonly EXECUTIVE = "user.executive";
 
     static Validation = class {
       static readonly NAME_MIN = "validation.user.nameMinimum";
@@ -639,6 +643,49 @@ abstract class Dictionary {
         "validation.room.roomTypeIdRequired";
       static readonly AMENITIES_REQUIRED = "validation.room.amenitiesRequired";
     };
+  };
+
+  static Appointment = class {
+    static readonly CARD_TITLE = "appointment.cardTitle";
+    static readonly ID = "appointment.id";
+    static readonly DESCRIPTION = "appointment.description";
+    static readonly APPOINTMENT_ID = "appointment.appointmentId";
+    static readonly CHIELD_ID = "appointment.childId";
+    static readonly PLAYGROUP_ID = "appointment.playgroupId";
+    static readonly ROOM_ID = "appointment.roomId";
+    static readonly THERAPIST_ID = "appointment.therapistId";
+    static readonly TYPE_ID = "appointment.typeId";
+    static readonly STATUS_ID = "appointment.statusId";
+    static readonly TITLE = "appointment.title";
+    static readonly START = "appointment.start";
+    static readonly END = "appointment.end";
+    static readonly ALL_DAY = "appointment.allDay";
+
+    static Validation = class {
+      static readonly APPOINTMENT_ID_REQUIRED =
+        "validation.appointment.appointmentIdRequired";
+      static readonly CHILD_ID_REQUIRED =
+        "validation.appointment.childIdRequired";
+      static readonly THERAPIST_ID_REQUIRED =
+        "validation.appointment.therapistIdRequired";
+      static readonly TYPE_ID_REQUIRED =
+        "validation.appointment.typeIdRequired";
+      static readonly STATUS_ID_REQUIRED =
+        "validation.appointment.statusIdRequired";
+      static readonly TITLE_MIN = "validation.appointment.titleMinimum";
+      static readonly TITLE_MAX = "validation.appointment.titleMaximum";
+      static readonly START_REQUIRED = "validation.appointment.startRequired";
+      static readonly END_REQUIRED = "validation.appointment.endRequired";
+    };
+  };
+
+  static AppointmentType = class {
+    static readonly INITIAL_CONSULTATION =
+      "appointmentType.initialConsultation";
+    static readonly SPEECH_THERAPY = "appointmentType.speechTherapy";
+    static readonly PSYCHOLOGICAL_THERAPY =
+      "appointmentType.psychologicalTherapy";
+    static readonly GAME_GROUPS = "appointmentType.gameGroups";
   };
 }
 export default Dictionary;

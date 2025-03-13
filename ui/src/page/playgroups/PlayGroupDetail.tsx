@@ -26,6 +26,7 @@ import { RiInformationLine } from "react-icons/ri";
 import globalStyles from "../../assets/global.module.css";
 import useRequestHandler from "../../hooks/useRequestHandler";
 import CircleDot from "../../components/CircleDot/CircleDot";
+import ExecutiveMultiSelect from "../../components/MultiSelect/ExecutiveMultiSelect";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
 import { PlayGroupRowProps } from "./props/PlayGroupRowProps";
 
@@ -184,6 +185,18 @@ function PlayGroupDetail({
     setDisabled(true);
   };
 
+  const handleTherapistChange = (selectedIds: string[]) => {
+    const therapists = selectedIds.map((id) => ({
+      id: crypto.randomUUID(),
+      therapistId: id,
+    }));
+
+    form.setFieldValue(
+      nameof<PlayGroupRowProps>("playgroupTherapists"),
+      therapists
+    );
+  };
+
   return (
     <>
       <Card.Section className={globalStyles.detailHeader} inheritPadding>
@@ -236,13 +249,11 @@ function PlayGroupDetail({
                 />
               </Group>
               <Group grow>
-                <Textarea
-                  className={styles.input}
-                  disabled={disabled}
-                  label={t(Dictionary.PlayGroup.PLAYGROUP_THERAPISTS)}
-                  {...form.getInputProps(
-                    nameof<PlayGroupRowProps>("playgroupTherapists")
-                  )}
+                <ExecutiveMultiSelect
+                  changeSelectedIds={(ids) => handleTherapistChange(ids)}
+                  selectedIds={
+                    form.values.playgroupTherapists.map((pt) => pt.id) || []
+                  }
                 />
               </Group>
               <Group grow>
