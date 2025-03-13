@@ -5,7 +5,7 @@ import {
   Grid,
   Group,
   NumberInput,
-  Select,
+  Avatar,
   Tabs,
   Text,
   TextInput,
@@ -26,9 +26,10 @@ import { RiInformationLine } from "react-icons/ri";
 import globalStyles from "../../assets/global.module.css";
 import useRequestHandler from "../../hooks/useRequestHandler";
 import CircleDot from "../../components/CircleDot/CircleDot";
-import ExecutiveMultiSelect from "../../components/MultiSelect/ExecutiveMultiSelect";
+import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
 import { PlayGroupRowProps } from "./props/PlayGroupRowProps";
+import ExecutiveAutocomplete from "./ExecutiveAutocomplete";
 
 interface PlayGroupDetailProps {
   selectedPlayGroup: PlayGroupRowProps;
@@ -197,6 +198,14 @@ function PlayGroupDetail({
     );
   };
 
+  const avatars = form.values.playgroupTherapists.map((therapist) => (
+    <Avatar
+      key={therapist.id}
+      name={therapist.therapistName}
+      color="initials"
+    />
+  ));
+
   return (
     <>
       <Card.Section className={globalStyles.detailHeader} inheritPadding>
@@ -249,13 +258,26 @@ function PlayGroupDetail({
                 />
               </Group>
               <Group grow>
-                <ExecutiveMultiSelect
-                  changeSelectedIds={(ids) => handleTherapistChange(ids)}
-                  selectedIds={
-                    form.values.playgroupTherapists.map((pt) => pt.id) || []
-                  }
+                <ExecutiveAutocomplete
+                  searchInputLabel="Terapist Seç"
+                  placeholder="Terapist ara..."
+                  description=""
+                  apiUrl={createRequestUrl(apiUrl.userUrl)}
+                  additionalQueries={{ typeId: 0, isActive: true }}
+                  selectedTherapists={form.values.playgroupTherapists} // 🎯 Seçilenleri buradan gönderiyoruz
+                  setFieldValue={(
+                    newValue: {
+                      id: string;
+                      therapistId: string;
+                      therapistName: string;
+                    }[]
+                  ) => form.setFieldValue("playgroupTherapists", newValue)} // 🎯 Güncellemeyi buradan yapıyoruz
+                  clearValue={
+                    () => console.log("clearValue") // 🎯 Temizleme işlemi
+                  } // 🎯 Temizleme işlemi
                 />
               </Group>
+              <Group grow>{avatars}</Group>
               <Group grow>
                 <Checkbox
                   mt={25}

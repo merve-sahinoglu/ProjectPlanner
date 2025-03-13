@@ -11,6 +11,7 @@ type PlayGroupRowProps = {
 type PlaygroupTherapist = {
   id: string;
   therapistId: string;
+  therapistName: string;
 };
 
 type PlayGroupResponse = Omit<PlayGroupRowProps, "PlayGroupTypeId"> & {

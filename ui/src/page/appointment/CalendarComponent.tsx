@@ -107,6 +107,7 @@ const CalendarComponent = () => {
   useEffect(() => {
     fetchAppointments();
   }, []);
+
   const names = [
     "John Doe",
     "Jane Mol",

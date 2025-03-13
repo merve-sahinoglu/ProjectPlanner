@@ -7,8 +7,8 @@ import Dictionary from "../../constants/dictionary";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 
 interface AutocompleteOption {
-  value: string;
-  label: string;
+  value: string; // ID olacak
+  label: string; // İsim Soyisim olacak
 }
 
 interface UserResponse {
@@ -28,24 +28,21 @@ function ExecutiveMultiSelect({
 }: MultiSelectProps) {
   const { t } = useTranslation();
   const { fetchData } = useRequestHandler();
-
   const [users, setUsers] = useState<AutocompleteOption[]>([]);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const request: { [key: string]: any } = { isActive: true };
       const response = await fetchData<UserResponse[]>(
         createRequestUrl(apiUrl.userUrl),
-        request
+        { isActive: true }
       );
 
       if (response.isSuccess) {
-        setUsers(
-          response.value.map((user) => ({
-            value: user.id, // ID değerini value olarak set ediyoruz
-            label: `${user.name} ${user.surname}`, // Görünen ismi oluşturuyoruz
-          }))
-        );
+        const formattedUsers = response.value.map((user) => ({
+          value: user.id, // MultiSelect için ID olarak kullanılacak
+          label: `${user.name} ${user.surname}`, // Görünen isim soyisim
+        }));
+        setUsers(formattedUsers);
       }
     };
 
@@ -56,13 +53,19 @@ function ExecutiveMultiSelect({
     changeSelectedIds([]);
   };
 
+  // **Seçili olan ID'leri alıp kullanıcıların label'larını eşleştiriyoruz.**
+  const selectedOptions = selectedIds.map((id) => {
+    const user = users.find((u) => u.value === id);
+    return user ? user.value : id; // Eğer isim bulunamazsa ID'yi koruyoruz
+  });
+
   return (
     <MultiSelect
       placeholder={t(Dictionary.User.EXECUTIVE)}
       label={t(Dictionary.Validation.List.SELECT)}
-      data={users}
-      value={selectedIds} // Seçili ID'leri burada kullanıyoruz
-      onChange={(selected) => changeSelectedIds(selected)} // ID listesini güncelliyoruz
+      data={users} // Kullanıcı listesini `data` olarak sağlıyoruz
+      value={selectedOptions} // Seçili ID'leri burada gösteriyoruz
+      onChange={(selected) => changeSelectedIds(selected)} // Seçim değiştiğinde güncelliyoruz
       clearable
       searchable
       rightSection={
