@@ -12,7 +12,7 @@ interface AutocompleteOption {
 
 interface AutocompleteResponse {
   id: string;
-  name: string;
+  label: string;
 }
 
 // 🎯 `additionalQueries` eklendi!
@@ -61,6 +61,7 @@ function ExecutiveAutocomplete({
   const [loading, setLoading] = useState<boolean>(false);
   const [debouncedQuery] = useDebouncedValue(searchValue, 500);
   const componentMounted = useRef<boolean>(false);
+  const [selectKey, setSelectKey] = useState<number>(0);
 
   const fetchItems = useCallback(async () => {
     if (searchValue.length >= 3) {
@@ -80,7 +81,7 @@ function ExecutiveAutocomplete({
         setItems(
           response.value.map((element) => ({
             value: element.id,
-            label: element.name,
+            label: element.label,
           }))
         );
       }
@@ -113,7 +114,12 @@ function ExecutiveAutocomplete({
 
       setFieldValue([...selectedTherapists, newTherapist]);
 
-      setSearchValue("");
+      setTimeout(() => {
+        setSearchValue(""); // 🎯 Seçimden sonra input'u temizle
+        setItems([]);
+      }, 10);
+
+      setSelectKey((prev) => prev + 1);
     }
   };
 
@@ -121,13 +127,15 @@ function ExecutiveAutocomplete({
     event.preventDefault();
     setSearchValue("");
     clearValue();
+    setItems([]);
+    setSelectKey((prev) => prev + 1); // 🎯 Component'i sıfırla
   };
 
   return (
     <Select
+      key={selectKey}
       searchValue={searchValue}
       onSearchChange={handleSearchChange}
-      allowDeselect
       disabled={disabled}
       label={searchInputLabel}
       placeholder={placeholder}

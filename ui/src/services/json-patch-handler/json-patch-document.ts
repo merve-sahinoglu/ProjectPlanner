@@ -11,12 +11,12 @@ enum JsonPatchOperationType {
 type JsonPatchOperation = {
   op: JsonPatchOperationType;
   path: string;
-  value: string | Uint8Array | number[];
+  value: string | Uint8Array | number[] | object;
 };
 
 export interface JsonPatchKeyValuePair {
   path: string;
-  value: string | Uint8Array | number[];
+  value: string | Uint8Array | number[] | object;
 }
 
 function addOperations(

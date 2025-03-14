@@ -28,8 +28,11 @@ import useRequestHandler from "../../hooks/useRequestHandler";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
-import { PlayGroupRowProps } from "./props/PlayGroupRowProps";
 import ExecutiveAutocomplete from "./ExecutiveAutocomplete";
+import {
+  PlayGroupResponse,
+  PlayGroupRowProps,
+} from "./props/PlayGroupRowProps";
 
 interface PlayGroupDetailProps {
   selectedPlayGroup: PlayGroupRowProps;
@@ -101,17 +104,23 @@ function PlayGroupDetail({
     if (response.isSuccess) {
       setDisabled(true);
 
-      initialValues.current = response.value;
+      const retVal = await fetchData<PlayGroupResponse>(
+        createRequestUrl(apiUrl.appointmentPlayGroupUrl, response.value.id)
+      );
 
-      form.setValues(response.value);
+      if (!retVal.isSuccess) return;
+
+      initialValues.current = retVal.value;
+
+      form.setValues(retVal.value);
 
       form.resetDirty();
 
       setCanAddItem(!canAddItem);
 
-      handleUpdateItemWithId(response.value, createdItemGuid);
+      handleUpdateItemWithId(retVal.value, createdItemGuid);
 
-      changeSelectedItem(response.value);
+      changeSelectedItem(retVal.value);
 
       changeCreatedItemGuid("");
 
@@ -123,9 +132,25 @@ function PlayGroupDetail({
     const patchDocument =
       createJsonPatchDocumentFromDirtyForm<PlayGroupRowProps>(
         form,
-        form.values
+        form.values,
+        ["playgroupTherapists"]
       );
 
+    if (form.values.playgroupTherapists.length > 0) {
+      const updatedTherapists = form.values.playgroupTherapists.map(
+        (therapist) => therapist.therapistId
+      );
+
+      const playGroup = {
+        op: "replace",
+        path: "/playgroupTherapistsId",
+        value: updatedTherapists, // Binary olarak saklamak istersen
+      };
+
+      patchDocument.push(playGroup);
+    }
+
+    debugger;
     const response = await sendData(
       createRequestUrl(apiUrl.appointmentPlayGroupUrl, form.values.id),
       RequestType.Patch,
@@ -186,16 +211,16 @@ function PlayGroupDetail({
     setDisabled(true);
   };
 
-  const handleTherapistChange = (selectedIds: string[]) => {
-    const therapists = selectedIds.map((id) => ({
-      id: crypto.randomUUID(),
-      therapistId: id,
-    }));
-
-    form.setFieldValue(
-      nameof<PlayGroupRowProps>("playgroupTherapists"),
-      therapists
-    );
+  const handleRemoveTherapist = (therapistId: string) => {
+    if (!disabled) {
+      const updatedTherapists = form.values.playgroupTherapists.filter(
+        (therapist) => therapist.therapistId !== therapistId
+      );
+      form.setFieldValue(
+        nameof<PlayGroupRowProps>("playgroupTherapists"),
+        updatedTherapists
+      );
+    }
   };
 
   const avatars = form.values.playgroupTherapists.map((therapist) => (
@@ -203,6 +228,8 @@ function PlayGroupDetail({
       key={therapist.id}
       name={therapist.therapistName}
       color="initials"
+      onClick={() => handleRemoveTherapist(therapist.therapistId)}
+      alt={therapist.therapistName}
     />
   ));
 
@@ -262,6 +289,7 @@ function PlayGroupDetail({
                   searchInputLabel="Terapist Seç"
                   placeholder="Terapist ara..."
                   description=""
+                  disabled={disabled}
                   apiUrl={createRequestUrl(apiUrl.userUrl)}
                   additionalQueries={{ typeId: 0, isActive: true }}
                   selectedTherapists={form.values.playgroupTherapists} // 🎯 Seçilenleri buradan gönderiyoruz
@@ -277,7 +305,7 @@ function PlayGroupDetail({
                   } // 🎯 Temizleme işlemi
                 />
               </Group>
-              <Group grow>{avatars}</Group>
+              <Group mt={15}>{avatars}</Group>
               <Group grow>
                 <Checkbox
                   mt={25}
