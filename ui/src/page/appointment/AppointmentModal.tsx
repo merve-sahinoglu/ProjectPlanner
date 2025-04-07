@@ -1,17 +1,5 @@
-import { Dispatch, SetStateAction, useRef, useState } from "react";
-import {
-  Card,
-  Checkbox,
-  Divider,
-  Grid,
-  Group,
-  NumberInput,
-  Select,
-  Tabs,
-  Text,
-  Textarea,
-  TextInput,
-} from "@mantine/core";
+import { Dispatch, SetStateAction, useRef } from "react";
+import { Grid, Group, Select, Textarea, TextInput } from "@mantine/core";
 import {
   Appointment,
   AppointmentType,
@@ -30,7 +18,6 @@ import RequestType from "../../enum/request-type";
 import toast from "react-hot-toast";
 import { z } from "zod";
 import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
-import { DatePickerInput, DateTimePicker } from "@mantine/dates";
 import DateTimeSelector from "../../components/DateTimeSelector/DateTimeSelector";
 
 const appointmentStatus = [

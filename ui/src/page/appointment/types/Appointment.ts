@@ -45,6 +45,8 @@ interface CallenderProps {
   description: string;
   appointmentDays?: SelectedDates[];
   teacherId: string;
+  chieldName: string;
+  teacherName: string;
 }
 
 interface SelectedDates {

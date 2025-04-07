@@ -18,7 +18,6 @@ import {
   CallenderProps,
   UserInformationResponse,
 } from "./types/Appointment";
-import Dictionary from "../../constants/dictionary";
 import { useTranslation } from "react-i18next";
 import useRequestHandler from "../../hooks/useRequestHandler";
 import { never } from "zod";
@@ -73,6 +72,8 @@ const CalendarComponent = () => {
       name: "",
       description: "",
       teacherId: "",
+      chieldName: "",
+      teacherName: "",
     };
     setAppointment(model);
     open();
@@ -112,6 +113,8 @@ const CalendarComponent = () => {
             statusId: appointment.statusId || "", // Default value if missing
             name: appointment.name || "", // Default value if missing
             description: appointment.description || "", // Default value if missing
+            chieldName: appointment.chieldName || "", // Default value if missing
+            teacherName: appointment.teacherName || "", // Default value if missing
           }));
         }
       );
@@ -179,6 +182,8 @@ const CalendarComponent = () => {
         name: selectedAppointment.name || "",
         description: selectedAppointment.description || "",
         teacherId: selectedAppointment.teacherId || "",
+        chieldName: selectedAppointment.chieldName || "", // Default value if missing
+        teacherName: selectedAppointment.teacherName || "", // Default value if missing
       });
       editopen();
     } else {

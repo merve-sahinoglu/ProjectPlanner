@@ -46,7 +46,6 @@ interface EditAppointmentFormProps {
 
 const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
   itemGuid,
-  closeOnSave,
   disabled,
   changeSelectedItem,
   setDisabled,
