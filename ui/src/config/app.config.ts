@@ -36,9 +36,9 @@ export const endpoints: Endpoints = {
 } as const;
 
 export const services: ServiceAddress = {
-  coreService: `https://localhost:5001/api`,
-  userService: `https://localhost:5002/api`,
-  appointmentService: `https://localhost:5003/api`,
+  coreService: `https://localhost:5030/api`,
+  userService: `https://localhost:5031/api`,
+  appointmentService: `https://localhost:5032/api`,
 } as const;
 
 export const apiUrl: ServiceUrls = {
