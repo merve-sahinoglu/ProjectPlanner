@@ -1,0 +1,10 @@
+version: 2
+updates:
+  - package-ecosystem: "npm" # Kullandığınız paket yöneticisi (npm, yarn, pip, etc.)
+    directory: "/" # Projenizin kök dizini. Alt dizinler için değiştirin. (Örneğin: `/backend`)
+    schedule:
+      interval: "daily" # Güncelleme sıklığı (daily, weekly, monthly)
+  - package-ecosystem: "github-actions"
+    directory: "/" 
+    schedule:
+      interval: "daily"
