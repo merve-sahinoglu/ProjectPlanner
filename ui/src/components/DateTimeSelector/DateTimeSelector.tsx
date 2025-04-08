@@ -1,7 +1,7 @@
 import { DatePickerInput, TimeInput } from "@mantine/dates";
 import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import { Group, rem } from "@mantine/core";
+import { Checkbox, Group, rem } from "@mantine/core";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 dayjs.extend(isSameOrAfter);
 import { IconClock } from "@tabler/icons-react";
@@ -135,6 +135,10 @@ function DateTimeSelector({ value = [], onChange }: DateTimeSelectorProps) {
                 tempTimes[`${index}-start`] ??
                 dayjs(entry.start).format("HH:mm")
               }
+              disabled={
+                entry.lineStatusId === LineStatus.Canceled ||
+                entry.lineStatusId === LineStatus.Completed
+              }
               leftSection={
                 <IconClock
                   style={{
@@ -148,15 +152,15 @@ function DateTimeSelector({ value = [], onChange }: DateTimeSelectorProps) {
               onChange={(event) =>
                 handleTimeChange(index, "start", event.target.value)
               }
-              disabled={
-                entry.lineStatusId === LineStatus.Canceled ||
-                entry.lineStatusId === LineStatus.Completed
-              }
             />
             <TimeInput
               label={`End ${dayjs(entry.end).format("YYYY MMM DD")}`}
               value={
                 tempTimes[`${index}-end`] ?? dayjs(entry.end).format("HH:mm")
+              }
+              disabled={
+                entry.lineStatusId === LineStatus.Canceled ||
+                entry.lineStatusId === LineStatus.Completed
               }
               leftSection={
                 <IconClock
@@ -171,11 +175,20 @@ function DateTimeSelector({ value = [], onChange }: DateTimeSelectorProps) {
               onChange={(event) =>
                 handleTimeChange(index, "end", event.target.value)
               }
-              disabled={
-                entry.lineStatusId === LineStatus.Canceled ||
-                entry.lineStatusId === LineStatus.Completed
-              }
             />
+            {entry.lineStatusId === LineStatus.Waiting && (
+              <Checkbox
+                label="Is Canceled"
+                onChange={(event) => {
+                  const updatedList = [...dateTimeList];
+                  updatedList[index].lineStatusId = event.target.checked
+                    ? LineStatus.Canceled
+                    : LineStatus.Waiting;
+                  setDateTimeList(updatedList);
+                  onChange?.(updatedList);
+                }}
+              />
+            )}
           </div>
         ))}
       </Group>

@@ -104,11 +104,19 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
   const sendPatchRequestForModifiedItem = async () => {
     const patchDocument = createJsonPatchDocumentFromDirtyForm<Appointment>(
       form,
-      form.values
+      form.values,
+      [
+        "id",
+        "chieldName",
+        "teacherName",
+        "roomName",
+        "playgroupName",
+        "appointmentDays",
+      ]
     );
 
     const response = await sendData(
-      createRequestUrl(apiUrl.userUrl, form.values.id),
+      createRequestUrl(apiUrl.appointmentUrl, form.values.id),
       RequestType.Patch,
       patchDocument
     );
@@ -173,19 +181,22 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
     const response = await fetchData<AppointmentResponse>(
       createRequestUrl(apiUrl.appointmentUrl, itemGuid)
     );
-    debugger;
     if (response.isSuccess) {
-      console.table(response.value);
       form.setValues({
         ...response.value,
         typeId: response.value.typeId.toString(),
         appointmentDays:
           response.value.appointmentDays &&
-          response.value.appointmentDays.map((date) => ({
-            ...date,
-            start: new Date(date.start),
-            end: new Date(date.end),
-          })),
+          response.value.appointmentDays
+            .sort(
+              (a, b) =>
+                new Date(a.start).getTime() - new Date(b.start).getTime()
+            )
+            .map((date) => ({
+              ...date,
+              start: new Date(date.start),
+              end: new Date(date.end),
+            })),
       });
     }
   };
