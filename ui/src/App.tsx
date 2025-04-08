@@ -6,6 +6,7 @@ import AppRouter from "./AppRouter";
 import { QueryClientProvider } from "@tanstack/react-query";
 import queryClient from "./services/query-client";
 import { MantineEmotionProvider } from "@mantine/emotion";
+import "@mantine/tiptap/styles.css";
 
 function App() {
   return (

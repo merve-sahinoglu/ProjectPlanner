@@ -171,7 +171,7 @@ const CalendarComponent = () => {
     const selectedAppointment = callenders.find(
       (appointment) => appointment.appointmenId === event.appointmenId
     );
-    debugger;
+
     if (selectedAppointment) {
       setAppointment({
         id: selectedAppointment.appointmenId,

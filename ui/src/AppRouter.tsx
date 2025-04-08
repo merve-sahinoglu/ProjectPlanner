@@ -7,6 +7,7 @@ import InstructorOverview from "./page/instructor/InstructorOverview";
 import UserOverview from "./page/user/UserOverwiew";
 import RoomOverview from "./page/rooms/RoomOverview";
 import PlayGroupOverview from "./page/playgroups/PlayGroupOverview";
+import Note from "./page/note/Note";
 
 const AppRouter = () => {
   return (
@@ -59,6 +60,14 @@ const AppRouter = () => {
           element={
             <Main>
               <PlayGroupOverview />
+            </Main>
+          }
+        />
+        <Route
+          path={routes.notes}
+          element={
+            <Main>
+              <Note />
             </Main>
           }
         />

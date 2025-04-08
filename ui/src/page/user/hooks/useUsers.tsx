@@ -70,8 +70,6 @@ const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
     if (response.isSuccess) {
       setTotalRecords(response.metadata?.TotalItemCount || 0);
 
-      debugger;
-
       const retval = response.value.map((item) => ({
         ...item,
         birthDate: item.birthDate ? new Date(item.birthDate) : null,

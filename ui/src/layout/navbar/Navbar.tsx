@@ -15,14 +15,16 @@ import { useNavigate } from "react-router-dom";
 const mainLinksMockdata = [
   {
     icon: IconHome2,
-    label: "Home",
-    SubLinks: [{ label: "My Callender", root: routes.user }],
+    label: "My Page",
+    SubLinks: [
+      { label: "My Notes", root: routes.notes },
+      { label: "My Appointment", root: routes.appointment },
+    ],
   },
-  { icon: IconGauge, label: "" },
   {
     icon: IconCalendarStats,
     label: "Appointment",
-    SubLinks: [{ label: "My Appointment", root: routes.appointment }],
+    SubLinks: [{ label: "Appointment", root: routes.appointment }],
   },
   {
     icon: IconDeviceDesktopAnalytics,

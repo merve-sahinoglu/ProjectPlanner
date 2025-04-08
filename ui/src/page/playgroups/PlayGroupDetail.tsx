@@ -150,7 +150,6 @@ function PlayGroupDetail({
       patchDocument.push(playGroup);
     }
 
-    debugger;
     const response = await sendData(
       createRequestUrl(apiUrl.appointmentPlayGroupUrl, form.values.id),
       RequestType.Patch,
