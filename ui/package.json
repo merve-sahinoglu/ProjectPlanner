@@ -15,7 +15,7 @@
     "@ag-grid-community/infinite-row-model": "^32.3.3",
     "@ag-grid-community/locale": "^32.3.3",
     "@ag-grid-community/react": "^32.3.3",
-    "@ag-grid-community/styles": "^32.3.3",
+    "@ag-grid-community/styles": "^32.3.4",
     "@ag-grid-community/theming": "^32.3.3",
     "@mantine/core": "^7.16.2",
     "@mantine/dates": "^7.17.4",
