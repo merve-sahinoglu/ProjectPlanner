@@ -18,7 +18,7 @@
     "@ag-grid-community/styles": "^32.3.3",
     "@ag-grid-community/theming": "^32.3.3",
     "@mantine/core": "^7.16.2",
-    "@mantine/dates": "^7.16.2",
+    "@mantine/dates": "^7.17.4",
     "@mantine/emotion": "^7.16.2",
     "@mantine/form": "^7.16.2",
     "@mantine/hooks": "^7.16.2",
