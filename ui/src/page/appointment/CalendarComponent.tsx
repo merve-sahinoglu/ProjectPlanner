@@ -1,18 +1,18 @@
 import {
-  SetStateAction,
   SyntheticEvent,
   useEffect,
   useRef,
   useState,
 } from "react";
-import { Avatar, Button, Group, Modal } from "@mantine/core";
+import FullCalendar from "@fullcalendar/react";
+import dayGridPlugin from "@fullcalendar/daygrid";
+import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
+import { ActionIcon, Avatar, Button, Group, Modal } from "@mantine/core";
 import AppointmentModal from "./AppointmentModal";
-import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay } from "date-fns";
-import "react-big-calendar/lib/css/react-big-calendar.css";
-import { enUS as enUsLocale } from "date-fns/locale";
-import { tr } from "date-fns/locale/tr"; // Türkçe dili desteği
 import { useDisclosure } from "@mantine/hooks";
+import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import moment from "moment";
 import {
   Appointment,
   CallenderProps,
@@ -23,25 +23,43 @@ import useRequestHandler from "../../hooks/useRequestHandler";
 import { never } from "zod";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import EditAppointmentModal from "./compoonent/EditAppointmentModal";
+import CustomButton from "../../components/CustomButton/CustomButton";
+import { IconGraphFilled, IconList } from "@tabler/icons-react";
 
-const locales = {
-  "en-US": enUsLocale,
-  tr: tr,
-};
+interface DateModel {
+  date: string;
+  startTime: string;
+  endTime: string;
+}
 
-const localizer = dateFnsLocalizer({
-  format,
-  parse,
-  startOfWeek,
-  getDay,
-  locales,
-});
+interface EventSlotClickArg {
+  start: Date;
+  end: Date;
+  view?: {
+    type?: string;
+  };
+  event?: {
+    extendedProps?: {
+      agenda?: any;
+      agendaId?: string;
+      [key: string]: any;
+    };
+  };
+}
 
 const CalendarComponent = () => {
+  const calendarComponentRef = useRef(null);
+  const [calendarRefresh, setCalendarRefresh] = useState(0);
+  const [tooltipShow, setTooltipShow] = useState({});
+  const [agendas, setAgendas] = useState([]);
+  const [agendaListView, setAgendaListView] = useState([]);
+  const [selectedEventSlotDate, setSelectedEventSlotDate] = useState(null as DateModel | null);
+  const [showAddCloseAppointment, setShowAddCloseAppointment] = useState(false);
+  const [view, setView] = useState(true);
+
   const { sendData, fetchData } = useRequestHandler();
   const [callenders, setCallenders] = useState([] as CallenderProps[]);
   const [opened, { open, close }] = useDisclosure(false);
-
   const [editopened, { open: editopen, close: editclose }] =
     useDisclosure(false);
 
@@ -56,9 +74,11 @@ const CalendarComponent = () => {
 
   const createdItemGuid = useRef<string>("");
   const [isDisabled, setIsDisabled] = useState<boolean>(false);
+
   const [teachers, setTeachers] = useState<
     { id: string; nameSurname: string }[]
   >([]);
+
   const [canAddItem, setCanAddItem] = useState<boolean>(true);
   const [selectedItem, setSelectedItem] = useState<Appointment>();
 
@@ -191,6 +211,212 @@ const CalendarComponent = () => {
     }
   }
 
+  const handleEventMouseEnter = (eventInfo) => {
+    const eventElement = eventInfo.el;
+    const event = eventInfo.event;
+
+    const tooltipContent = `
+      <div>
+        <strong>${event.title}</strong>
+      </div>
+    `;
+
+    // create tooltip element
+    const tooltipElement = document.createElement("div");
+    tooltipElement.classList.add("event-tooltip");
+    tooltipElement.innerHTML = tooltipContent;
+
+    // Place the tooltip element according to the position of the event element
+    const eventElementRect = eventElement.getBoundingClientRect();
+    tooltipElement.style.top = eventElementRect.bottom + "px";
+    tooltipElement.style.left = eventElementRect.left + "px";
+
+    // Add to page tooltip element
+    document.body.appendChild(tooltipElement);
+  };
+
+  const handleEventMouseLeave = () => {
+    const tooltipElement = document.querySelectorAll(".event-tooltip");
+    tooltipElement.forEach((element) => {
+      element.remove();
+    });
+  };
+
+  const getColorForFullCalendar = (agenda) => {
+    if (agenda.typeId == 4)
+      // Surgery
+      return "#800080";
+    if (agenda.typeId == 3) return "#CFCACA";
+    if (agenda.statusId == 0) return "#A9A9A9";
+    else if (agenda.statusId == 1)
+      // Singup
+      return "#0284c7";
+    else if (agenda.statusId == 2)
+      // In Examination Room
+      return "#d97706";
+    else if (agenda.statusId == 3)
+      //Completed
+      return "#16a34a";
+  };
+
+  const getAgendaTitle = (agenda) => {
+    if (agenda.typeId == 1)
+      return `${agenda.gender} ${
+        agenda.fullText ?? agenda.initialName
+      } (${moment(agenda.birthDate).format("DD-MM-YYYY")}) ${
+        agenda.patientId
+      } ${agenda.serviceName}`;
+    else if (agenda.typeId == 2)
+      return `${agenda.gender} ${
+        agenda.fullText ?? agenda.initialName
+      } (${moment(agenda.birthDate).format("DD-MM-YYYY")}) ${
+        agenda.patientId
+      } ${agenda.serviceName}`;
+    else if (agenda.typeId == 3)
+      return `${
+        agenda.reasonDescription ? agenda.reasonDescription : agenda.note
+      }`;
+    else if (agenda.typeId == 4)
+      return `${agenda.gender} ${
+        agenda.fullText ?? agenda.initialName
+      } (${moment(agenda.birthDate).format("DD-MM-YYYY")}) ${
+        agenda.patientId
+      } ${agenda.serviceName}`;
+  };
+
+
+  const onDropdownClick = async (e:string, item) => {
+console.log("Dropdown clicked:", e, item);
+  };
+
+
+
+
+  const eventContainerWrapper = (event: EventSlotClickArg) => {
+    const isDayGridMonth = event?.view?.type === "dayGridMonth";
+    const extendedProps = event?.event?.extendedProps;
+
+    return (
+      <div>
+        <div className="d-flex justify-content-between align-items-center w-100">
+          {isDayGridMonth && (
+            <div
+              className="fc-daygrid-event-dot"
+              style={{
+                borderColor: getColorForFullCalendar(
+                  event?.event?.extendedProps?.agenda
+                ),
+                //  backgroundColor: getColorForFullCalendar(event?.event?.extendedProps?.agenda),
+              }}
+            ></div>
+          )}
+
+          <div className="text-truncate max-w-100">
+            {" "}
+            {getAgendaTitle(extendedProps?.agenda)}
+          </div>
+          {extendedProps?.agenda?.typeId !== 3 && (
+            <OverlayTrigger
+              key={calendarRefresh}
+              trigger="click"
+              placement="auto-start"
+              // show={tooltipShow[extendedProps?.agendaId]}
+              overlay={
+                <Tooltip className="tooltip-transparent">
+                  <p>Burda dropdown</p>
+                  {/* <Dropdown
+                    color="primary"
+                    view="outline"
+                    rounded="full"
+                    size="sm"
+                    hidden="hidden"
+                    icon="ate-icon-dots-menu"
+                    tooltip={true}
+                    items={[
+                      {
+                        id: "3",
+                        text: intl.completeAppointment,
+                        hidden:
+                          extendedProps.agenda.statusId !== 2 ||
+                          !filters?.find(
+                            (x) =>
+                              x.parameterId ===
+                              "22b7a7b2-daf1-4f1a-b33f-d19d45b58f5c"
+                          )?.isShow,
+                      },
+                      {
+                        id: "2",
+                        text: intl.inExaminationRoom,
+                        hidden:
+                          extendedProps.agenda.statusId !== 1 &&
+                          extendedProps.agenda.statusId !== 4,
+                      },
+                      {
+                        id: "4",
+                        text: intl.onHold,
+                        hidden:
+                          extendedProps.agenda.statusId !== 1 &&
+                          extendedProps.agenda.statusId !== 2,
+                      },
+                      {
+                        id: "5",
+                        text: intl.history,
+                      },
+                    ]}
+                    onClick={(e) => onDropdownClick(e, extendedProps)}
+                  /> */}
+                </Tooltip>
+              }
+            >
+              <span>
+                <p>Buton vardi burda</p>
+              </span>
+            </OverlayTrigger>
+          )}
+        </div>
+      </div>
+    );
+  };
+
+   const ParseDateFromISOString = (date:Date, format = "DD.MMM.YYYY") => {
+    return moment(date).format(format);
+  };
+
+
+
+  const onEventSlotClick = (e: EventSlotClickArg) => {
+    if (e && e.view?.type != "dayGridMonth") {
+      let dateModel: DateModel = {
+        date: ParseDateFromISOString(e.start),
+        startTime: `${e.start.getHours().toString().padStart(2, "0")}:${e.start
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`,
+        endTime: `${e.end.getHours().toString().padStart(2, "0")}:${e.end
+          .getMinutes()
+          .toString()
+          .padStart(2, "0")}`,
+      };
+      setSelectedEventSlotDate(dateModel);
+      setShowAddCloseAppointment(true);
+    }
+  };
+
+  const onEvent = async (e) => {
+    if (
+      e?.jsEvent?.target?.className.includes("tooltip-menu") ||
+      e?.jsEvent?.target?.className.includes("ate-icon-dots-menu")
+    )
+      return;
+    console.log(e.event?.extendedProps);
+ 
+  };
+
+  const viewClick = (id:string) => {
+    debugger;
+    id === "graphic" ? setView(true) : setView(false);
+  };
+
   useEffect(() => {
     fetchAppointments();
     fetchTeachers();
@@ -198,18 +424,75 @@ const CalendarComponent = () => {
 
   return (
     <>
-      <Group grow>{avatars}</Group>
+      <Group grow>
+        <div className="flex justify-items-end">
+          <OverlayTrigger overlay={<Tooltip>{"intl.agendaView"}</Tooltip>}>
+            <div>
+              <ActionIcon
+                variant="flat"
+                color={view ? "primary" : "secondary"}
+                onClick={(id) => viewClick("graphic")}
+              >
+                <IconGraphFilled />
+              </ActionIcon>
+            </div>
+          </OverlayTrigger>
+          <OverlayTrigger overlay={<Tooltip>{"intl.listView"}</Tooltip>}>
+            <div>
+              <ActionIcon
+                color={view ? "secondary" : "primary"}
+                variant="flat"
+                onClick={(id) => viewClick("list")}
+              >
+                <IconList />
+              </ActionIcon>
+            </div>
+          </OverlayTrigger>
+        </div>
+      </Group>
       <Group grow mt={10}>
-        <div style={{ height: 500, top: 50 }}>
-          <Calendar
-            localizer={localizer}
-            events={callenders}
-            startAccessor="start"
-            endAccessor="end"
-            selectable
-            // onSelectSlot={handleSelectSlot}
-            onSelectEvent={handleEditSlot}
-            style={{ height: "100%" }}
+        <div
+          className="agenda-fullcalendar"
+          style={{ display: view ? "block" : "none" }}
+        >
+          <FullCalendar
+            allDaySlot={false}
+            ref={calendarComponentRef}
+            // className="mx-n3"
+            plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+            headerToolbar={{
+              left: "",
+              center: "",
+              right: "",
+            }}
+            nowIndicator={true}
+            initialView="timeGridDay"
+            height="auto"
+            // locale={intl.translateLocale}
+            slotMinTime="07:00:00"
+            slotMaxTime="20:00:00"
+            selectable={true}
+            selectMirror={false}
+            dayMaxEvents={true}
+            select={(e) => onEventSlotClick(e)}
+            eventClick={(e) => onEvent(e)}
+            events={agendas}
+            eventMouseEnter={handleEventMouseEnter}
+            eventMouseLeave={handleEventMouseLeave}
+            eventMinHeight={50}
+            eventContent={eventContainerWrapper}
+            eventDisplay="block"
+            eventTimeFormat={{
+              hour: "2-digit",
+              minute: "2-digit",
+              meridiem: false,
+              hour12: false,
+            }}
+            slotLabelFormat={{
+              hour: "2-digit",
+              minute: "2-digit",
+              hour12: false,
+            }}
           />
         </div>
       </Group>
