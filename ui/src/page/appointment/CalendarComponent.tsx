@@ -8,7 +8,7 @@ import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
-import { ActionIcon, Avatar, Button, Group, Modal } from "@mantine/core";
+import { ActionIcon, Avatar, Button, Group, Modal, Radio } from "@mantine/core";
 import AppointmentModal from "./AppointmentModal";
 import { useDisclosure } from "@mantine/hooks";
 import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
@@ -56,6 +56,7 @@ const CalendarComponent = () => {
   const [selectedEventSlotDate, setSelectedEventSlotDate] = useState(null as DateModel | null);
   const [showAddCloseAppointment, setShowAddCloseAppointment] = useState(false);
   const [view, setView] = useState(true);
+  const [isDailyView, setIsDailyView] = useState(true);
 
   const { sendData, fetchData } = useRequestHandler();
   const [callenders, setCallenders] = useState([] as CallenderProps[]);
@@ -417,6 +418,55 @@ console.log("Dropdown clicked:", e, item);
     id === "graphic" ? setView(true) : setView(false);
   };
 
+  const handleToday = () => {
+    let calendarApi = calendarComponentRef.current.getApi();
+    calendarApi.today();
+    calendarApi.changeView("timeGridDay");
+    let startDate = moment(calendarApi.view.currentStart).format(
+      "DD.MMM.YYYY HH:mm"
+    );
+    let endDate = moment(calendarApi.view.currentEnd).format(
+      "DD.MMM.YYYY HH:mm"
+    );
+    // setSearchField({ ...searchField, startDate: startDate, endDate: endDate });
+    // setTitle(calendarApi.view.title);
+    setIsDailyView(true);
+  };
+
+  const handleMonth = async () => {
+    let calendarApi = calendarComponentRef.current.getApi();
+    calendarApi.changeView("dayGridMonth");
+    let startDate = moment(calendarApi.view.currentStart).format(
+      "DD.MMM.YYYY HH:mm"
+    );
+    let endDate = moment(calendarApi.view.currentEnd).format(
+      "DD.MMM.YYYY HH:mm"
+    );
+    // setSearchField({ ...searchField, startDate: startDate, endDate: endDate });
+    // setTitle(calendarApi.view.title);
+    setIsDailyView(false);
+  };
+
+  const handleWeek = () => {
+    let calendarApi = calendarComponentRef.current.getApi();
+    calendarApi.changeView("timeGridWeek");
+    let startDate = moment(calendarApi.view.currentStart).format(
+      "DD.MMM.YYYY HH:mm"
+    );
+    let endDate = moment(calendarApi.view.currentEnd).format(
+      "DD.MMM.YYYY HH:mm"
+    );
+    // setSearchField({ ...searchField, startDate: startDate, endDate: endDate });
+    // setTitle(calendarApi.view.title);
+    setIsDailyView(false);
+  };
+
+  const agendaViewHandler = (e) => {
+    if (e.target.value == 1) handleMonth();
+    else if (e.target.value == 2) handleWeek();
+    else if (e.target.value == 3) handleToday();
+  };
+
   useEffect(() => {
     fetchAppointments();
     fetchTeachers();
@@ -425,6 +475,29 @@ console.log("Dropdown clicked:", e, item);
   return (
     <>
       <Group grow>
+        <div>
+          <Radio
+            items={[
+              {
+                value: "1",
+                text: 'monthly',
+                checked: false,
+              },
+              {
+                value: "2",
+                text: 'weekly',
+                checked: false,
+              },
+              {
+                value: "3",
+                text: 'daily',
+                checked: true,
+              },
+            ]}
+            className="agenda-view-radio mb-4"
+            onChange={(e) => agendaViewHandler(e)}
+          />
+        </div>
         <div className="flex justify-items-end">
           <OverlayTrigger overlay={<Tooltip>{"intl.agendaView"}</Tooltip>}>
             <div>
