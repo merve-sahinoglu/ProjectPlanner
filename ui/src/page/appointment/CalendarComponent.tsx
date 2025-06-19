@@ -1,5 +1,4 @@
 import {
-  SyntheticEvent,
   useEffect,
   useRef,
   useState,
@@ -11,7 +10,7 @@ import interactionPlugin from "@fullcalendar/interaction";
 import { ActionIcon, Avatar, Button, Group, Modal, Radio } from "@mantine/core";
 import AppointmentModal from "./AppointmentModal";
 import { useDisclosure } from "@mantine/hooks";
-import { Col, OverlayTrigger, Row, Tooltip } from "react-bootstrap";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import moment from "moment";
 import {
   Appointment,
@@ -20,10 +19,8 @@ import {
 } from "./types/Appointment";
 import { useTranslation } from "react-i18next";
 import useRequestHandler from "../../hooks/useRequestHandler";
-import { never } from "zod";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import EditAppointmentModal from "./compoonent/EditAppointmentModal";
-import CustomButton from "../../components/CustomButton/CustomButton";
 import { IconGraphFilled, IconList } from "@tabler/icons-react";
 
 interface DateModel {
@@ -51,12 +48,19 @@ const CalendarComponent = () => {
   const calendarComponentRef = useRef(null);
   const [calendarRefresh, setCalendarRefresh] = useState(0);
   const [tooltipShow, setTooltipShow] = useState({});
-  const [agendas, setAgendas] = useState([]);
-  const [agendaListView, setAgendaListView] = useState([]);
+  const [agendas, setAgendas] = useState<CallenderProps[]>([]);
+  const [agendaListView, setAgendaListView] = useState<Appointment[]>([]);
   const [selectedEventSlotDate, setSelectedEventSlotDate] = useState(null as DateModel | null);
   const [showAddCloseAppointment, setShowAddCloseAppointment] = useState(false);
   const [view, setView] = useState(true);
   const [isDailyView, setIsDailyView] = useState(true);
+  const [title, setTitle] = useState("");
+  const [searchField, setSearchField] = useState({
+    userId: undefined,
+    theacherId: undefined,
+    startDate: moment(new Date()).startOf("day").format("DD.MMM.YYYY HH:mm"),
+    endDate: moment(new Date()).add(1, "days").format("DD.MMM.YYYY HH:mm"),
+  });
 
   const { sendData, fetchData } = useRequestHandler();
   const [callenders, setCallenders] = useState([] as CallenderProps[]);
@@ -74,7 +78,8 @@ const CalendarComponent = () => {
   };
 
   const createdItemGuid = useRef<string>("");
-  const [isDisabled, setIsDisabled] = useState<boolean>(false);
+  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+  const [isDisabledNew, setIsDisabledNew] = useState<boolean>(false);
 
   const [teachers, setTeachers] = useState<
     { id: string; nameSurname: string }[]
@@ -85,16 +90,18 @@ const CalendarComponent = () => {
 
   const openAppointment = () => {
     const model: Appointment = {
-      id: "",
+      id: 0,
       chieldId: "",
+      appointmenId: "",
       therapistId: "",
       typeId: "",
       statusId: "",
       name: "",
       description: "",
-      teacherId: "",
       chieldName: "",
-      teacherName: "",
+      therapistName: "",
+      playgroupId:  "",
+      playgroupName:  "",
     };
     setAppointment(model);
     open();
@@ -111,36 +118,61 @@ const CalendarComponent = () => {
   };
 
   const fetchAppointments = async () => {
+    const request: { [key: string]: any } = {
+      userId: searchField.userId,
+      theacherId: searchField.theacherId,
+      startDate: searchField.startDate,
+      endDate: searchField.endDate,
+    };
+
+    if(request.userId === undefined) {
+      delete request.userId;
+    }
+
+    if(request.theacherId === undefined) {
+      delete request.theacherId;
+    }
+
+
     const response = await fetchData<Appointment[]>(
-      createRequestUrl(apiUrl.appointmentUrl)
+      createRequestUrl(apiUrl.appointmentUrl),
+      request
     );
 
     if (response.isSuccess) {
+      
       const calendarEvents: CallenderProps[] = response.value.flatMap(
         (appointment) => {
           if (!appointment.appointmentDays) return []; // Eğer appointmentDays yoksa boş dizi döndür
-
           return appointment.appointmentDays.map((day) => ({
-            id: Math.floor(Math.random() * 100000), // Rastgele bir id oluştur
+            id: appointment.id, // Rastgele bir id oluştur
             title: appointment.name,
             start: new Date(day.start),
             end: new Date(day.end),
             allDay: false, // allDay varsayılan olarak false
-            appointmenId: appointment.id, // Appointment'ın id'sini kullan
+            appointmenId: appointment.appointmenId, // Appointment'ın id'sini string olarak kullan
             therapistId: appointment.therapistId, // Therapist'ın id'sini kullan
-            teacherId: appointment.teacherId, // Teacher'ların id'lerini kullan
             chieldId: appointment.chieldId || "", // Default value if missing
             typeId: appointment.typeId || "", // Default value if missing
-            statusId: appointment.statusId || "", // Default value if missing
+            statusId: appointment.statusId.toString(), // Default value if missing
             name: appointment.name || "", // Default value if missing
             description: appointment.description || "", // Default value if missing
             chieldName: appointment.chieldName || "", // Default value if missing
-            teacherName: appointment.teacherName || "", // Default value if missing
+            therapistName: appointment.therapistName || "", // Added missing property
+            borderColor: "transparent",
+            appointmentDays: appointment.appointmentDays || [],
+            playgroupId: appointment.playgroupId || "",
+            playgroupName: appointment.playgroupName || "",
+            roomId: appointment.roomId || "",
+            roomName: appointment.roomName || "",
           }));
         }
       );
+      
 
-      setCallenders(calendarEvents);
+
+      setAgendaListView(response.value);
+      setAgendas(calendarEvents);
     }
   };
 
@@ -168,51 +200,47 @@ const CalendarComponent = () => {
     console.log(`Selected teacher ID: ${teacherId}`);
 
     const filtered = callenders.filter((callender) =>
-      callender.teacherId.includes(teacherId)
+      callender.therapistId.includes(teacherId)
     );
 
     setCallenders(filtered);
     // Add your logic here for handling calendar selection
   };
 
-  const avatars = teachers.map((teacher) => (
-    <Avatar
-      key={teacher.id}
-      name={teacher.nameSurname}
-      color="initials"
-      onClick={() => handleCallenderSelect(teacher.id)}
-      alt={teacher.nameSurname}
-    />
-  ));
-
   function handleEditSlot(
     event: CallenderProps,
-    e: SyntheticEvent<HTMLElement, Event>
   ): void {
-    const selectedAppointment = callenders.find(
+    
+    const selectedAppointment = agendas.find(
       (appointment) => appointment.appointmenId === event.appointmenId
     );
-
     if (selectedAppointment) {
       setAppointment({
-        id: selectedAppointment.appointmenId,
+        roomId: selectedAppointment.roomId || "",
+        roomName: selectedAppointment.roomName || "",
+        id: Math.floor(Math.random() * 100000), // Generate a random id
+        appointmenId: selectedAppointment.appointmenId,
         chieldId: selectedAppointment.chieldId || "",
         therapistId: selectedAppointment.therapistId || "",
         typeId: selectedAppointment.typeId || "",
         statusId: selectedAppointment.statusId || "",
         name: selectedAppointment.name || "",
         description: selectedAppointment.description || "",
-        teacherId: selectedAppointment.teacherId || "",
         chieldName: selectedAppointment.chieldName || "", // Default value if missing
-        teacherName: selectedAppointment.teacherName || "", // Default value if missing
+        therapistName: selectedAppointment.therapistName || "", // Added missing property
+        appointmentDays: selectedAppointment.appointmentDays || [],
+        playgroupId: selectedAppointment.playgroupId || "",
+        playgroupName: selectedAppointment.playgroupName || "",
       });
+
+      
       editopen();
     } else {
       console.warn("Appointment not found for the selected event.");
     }
   }
 
-  const handleEventMouseEnter = (eventInfo) => {
+  const handleEventMouseEnter = (eventInfo:any) => {
     const eventElement = eventInfo.el;
     const event = eventInfo.event;
 
@@ -243,50 +271,29 @@ const CalendarComponent = () => {
     });
   };
 
-  const getColorForFullCalendar = (agenda) => {
-    if (agenda.typeId == 4)
+  const getColorForFullCalendar = (agenda: Appointment) => {
+    if (!agenda) return "";
+    if (agenda.typeId == "1")
       // Surgery
       return "#800080";
-    if (agenda.typeId == 3) return "#CFCACA";
-    if (agenda.statusId == 0) return "#A9A9A9";
-    else if (agenda.statusId == 1)
+    if (agenda.typeId == "3") return "#CFCACA";
+    if (agenda.statusId == "0") return "#A9A9A9";
+    else if (agenda.statusId == "1")
       // Singup
       return "#0284c7";
-    else if (agenda.statusId == 2)
+    else if (agenda.statusId == "2")
       // In Examination Room
       return "#d97706";
-    else if (agenda.statusId == 3)
-      //Completed
-      return "#16a34a";
+    else if (agenda.statusId == "3") return "#16a34a";
   };
 
-  const getAgendaTitle = (agenda) => {
-    if (agenda.typeId == 1)
-      return `${agenda.gender} ${
-        agenda.fullText ?? agenda.initialName
-      } (${moment(agenda.birthDate).format("DD-MM-YYYY")}) ${
-        agenda.patientId
-      } ${agenda.serviceName}`;
-    else if (agenda.typeId == 2)
-      return `${agenda.gender} ${
-        agenda.fullText ?? agenda.initialName
-      } (${moment(agenda.birthDate).format("DD-MM-YYYY")}) ${
-        agenda.patientId
-      } ${agenda.serviceName}`;
-    else if (agenda.typeId == 3)
-      return `${
-        agenda.reasonDescription ? agenda.reasonDescription : agenda.note
-      }`;
-    else if (agenda.typeId == 4)
-      return `${agenda.gender} ${
-        agenda.fullText ?? agenda.initialName
-      } (${moment(agenda.birthDate).format("DD-MM-YYYY")}) ${
-        agenda.patientId
-      } ${agenda.serviceName}`;
+  const getAgendaTitle = (agenda: any) => {
+    if (!agenda) return "";
+    return agenda.chieldName;
   };
 
 
-  const onDropdownClick = async (e:string, item) => {
+  const onDropdownClick = async (e:string, item:any) => {
 console.log("Dropdown clicked:", e, item);
   };
 
@@ -314,63 +321,21 @@ console.log("Dropdown clicked:", e, item);
 
           <div className="text-truncate max-w-100">
             {" "}
-            {getAgendaTitle(extendedProps?.agenda)}
+            {getAgendaTitle(extendedProps)}
           </div>
-          {extendedProps?.agenda?.typeId !== 3 && (
+          {extendedProps?.typeId !== 3 && (
             <OverlayTrigger
               key={calendarRefresh}
               trigger="click"
               placement="auto-start"
-              // show={tooltipShow[extendedProps?.agendaId]}
               overlay={
                 <Tooltip className="tooltip-transparent">
-                  <p>Burda dropdown</p>
-                  {/* <Dropdown
-                    color="primary"
-                    view="outline"
-                    rounded="full"
-                    size="sm"
-                    hidden="hidden"
-                    icon="ate-icon-dots-menu"
-                    tooltip={true}
-                    items={[
-                      {
-                        id: "3",
-                        text: intl.completeAppointment,
-                        hidden:
-                          extendedProps.agenda.statusId !== 2 ||
-                          !filters?.find(
-                            (x) =>
-                              x.parameterId ===
-                              "22b7a7b2-daf1-4f1a-b33f-d19d45b58f5c"
-                          )?.isShow,
-                      },
-                      {
-                        id: "2",
-                        text: intl.inExaminationRoom,
-                        hidden:
-                          extendedProps.agenda.statusId !== 1 &&
-                          extendedProps.agenda.statusId !== 4,
-                      },
-                      {
-                        id: "4",
-                        text: intl.onHold,
-                        hidden:
-                          extendedProps.agenda.statusId !== 1 &&
-                          extendedProps.agenda.statusId !== 2,
-                      },
-                      {
-                        id: "5",
-                        text: intl.history,
-                      },
-                    ]}
-                    onClick={(e) => onDropdownClick(e, extendedProps)}
-                  /> */}
+                  <p>Degistirmek icin tiklayin</p> 
                 </Tooltip>
               }
             >
               <span>
-                <p>Buton vardi burda</p>
+                <p>{extendedProps?.description}</p>
               </span>
             </OverlayTrigger>
           )}
@@ -403,100 +368,122 @@ console.log("Dropdown clicked:", e, item);
     }
   };
 
-  const onEvent = async (e) => {
+  const onEvent = async (e: any) => {
     if (
       e?.jsEvent?.target?.className.includes("tooltip-menu") ||
       e?.jsEvent?.target?.className.includes("ate-icon-dots-menu")
     )
       return;
+      if (e.event?.extendedProps) {
+      handleEditSlot(e.event?.extendedProps);
+
+      }
     console.log(e.event?.extendedProps);
  
   };
 
   const viewClick = (id:string) => {
-    debugger;
+    
     id === "graphic" ? setView(true) : setView(false);
   };
 
   const handleToday = () => {
-    let calendarApi = calendarComponentRef.current.getApi();
-    calendarApi.today();
-    calendarApi.changeView("timeGridDay");
-    let startDate = moment(calendarApi.view.currentStart).format(
-      "DD.MMM.YYYY HH:mm"
-    );
-    let endDate = moment(calendarApi.view.currentEnd).format(
-      "DD.MMM.YYYY HH:mm"
-    );
-    // setSearchField({ ...searchField, startDate: startDate, endDate: endDate });
-    // setTitle(calendarApi.view.title);
+    if (calendarComponentRef.current) {
+      // @ts-ignore
+      let calendarApi = calendarComponentRef.current.getApi();
+      calendarApi.today();
+      calendarApi.changeView("timeGridDay");
+      let startDate = moment(calendarApi.view.currentStart).format(
+        "DD.MMM.YYYY HH:mm"
+      );
+      let endDate = moment(calendarApi.view.currentEnd).format(
+        "DD.MMM.YYYY HH:mm"
+      );
+      setSearchField({
+        ...searchField,
+        startDate: startDate,
+        endDate: endDate,
+      });
+      setTitle(calendarApi.view.title);
+    }
+
     setIsDailyView(true);
   };
 
   const handleMonth = async () => {
-    let calendarApi = calendarComponentRef.current.getApi();
-    calendarApi.changeView("dayGridMonth");
-    let startDate = moment(calendarApi.view.currentStart).format(
-      "DD.MMM.YYYY HH:mm"
-    );
-    let endDate = moment(calendarApi.view.currentEnd).format(
-      "DD.MMM.YYYY HH:mm"
-    );
-    // setSearchField({ ...searchField, startDate: startDate, endDate: endDate });
-    // setTitle(calendarApi.view.title);
+    if (calendarComponentRef.current) {
+      // @ts-ignore
+      let calendarApi = calendarComponentRef.current.getApi();
+      calendarApi.changeView("dayGridMonth");
+      let startDate = moment(calendarApi.view.currentStart).format(
+        "DD.MMM.YYYY HH:mm"
+      );
+      let endDate = moment(calendarApi.view.currentEnd).format(
+        "DD.MMM.YYYY HH:mm"
+      );
+      setSearchField({ ...searchField, startDate: startDate, endDate: endDate });
+      setTitle(calendarApi.view.title);
+    }
+
     setIsDailyView(false);
   };
 
   const handleWeek = () => {
-    let calendarApi = calendarComponentRef.current.getApi();
-    calendarApi.changeView("timeGridWeek");
-    let startDate = moment(calendarApi.view.currentStart).format(
-      "DD.MMM.YYYY HH:mm"
-    );
-    let endDate = moment(calendarApi.view.currentEnd).format(
-      "DD.MMM.YYYY HH:mm"
-    );
-    // setSearchField({ ...searchField, startDate: startDate, endDate: endDate });
-    // setTitle(calendarApi.view.title);
+    if (calendarComponentRef.current) {
+      // @ts-ignore
+      let calendarApi = calendarComponentRef.current.getApi();
+      calendarApi.changeView("timeGridWeek");
+
+      let startDate = moment(calendarApi.view.currentStart).format(
+        "DD.MMM.YYYY HH:mm"
+      );
+      let endDate = moment(calendarApi.view.currentEnd).format(
+        "DD.MMM.YYYY HH:mm"
+      );
+      setSearchField({ ...searchField, startDate: startDate, endDate: endDate });
+      setTitle(calendarApi.view.title);
+    }
+ 
     setIsDailyView(false);
   };
 
-  const agendaViewHandler = (e) => {
-    if (e.target.value == 1) handleMonth();
-    else if (e.target.value == 2) handleWeek();
-    else if (e.target.value == 3) handleToday();
+  const agendaViewHandler = (e:string) => {
+    
+    if (e == "1") handleMonth();
+    else if (e == "2") handleWeek();
+    else if (e == "3") handleToday();
   };
+
+  const refreshAgentasAfterEdite = () =>{
+    fetchAppointments();
+    editclose();
+  }
+
+  const refreshAgentasAfterCreate = () => {
+    fetchAppointments();
+    close();
+  };
+
 
   useEffect(() => {
     fetchAppointments();
-    fetchTeachers();
-  }, []);
+  }, [searchField]);
 
   return (
     <>
       <Group grow>
         <div>
-          <Radio
-            items={[
-              {
-                value: "1",
-                text: 'monthly',
-                checked: false,
-              },
-              {
-                value: "2",
-                text: 'weekly',
-                checked: false,
-              },
-              {
-                value: "3",
-                text: 'daily',
-                checked: true,
-              },
-            ]}
-            className="agenda-view-radio mb-4"
+          <Radio.Group
+            name="favoriteFramework"
             onChange={(e) => agendaViewHandler(e)}
-          />
+            withAsterisk
+          >
+            <Group mt="xs">
+              <Radio value="1" label="monthly" />
+              <Radio value="2" label="weekly" />
+              <Radio value="3" label="daily" />
+            </Group>
+          </Radio.Group>
         </div>
         <div className="flex justify-items-end">
           <OverlayTrigger overlay={<Tooltip>{"intl.agendaView"}</Tooltip>}>
@@ -572,11 +559,11 @@ console.log("Dropdown clicked:", e, item);
       {appointment && (
         <Modal size={"xl"} opened={opened} onClose={close} title="" centered>
           <AppointmentModal
-            closeOnSave={close}
+            closeOnSave={refreshAgentasAfterCreate}
             selectedAppointment={appointment}
             handleAppointments={handleAppointments}
             createdItemGuid={createdItemGuid.current}
-            disabled={isDisabled}
+            disabled={isDisabledNew}
             changeCreatedItemGuid={changeCreatedItemGuid}
             changeSelectedItem={changeSelectedItem}
             handleUpdateItemWithId={function (
@@ -585,7 +572,7 @@ console.log("Dropdown clicked:", e, item);
             ): void {
               console.log(item);
             }}
-            setDisabled={setIsDisabled}
+            setDisabled={setIsDisabledNew}
             handleDeleteItem={function (itemId: string): void {
               throw new Error("Function not implemented.");
             }}
@@ -600,13 +587,14 @@ console.log("Dropdown clicked:", e, item);
         <Modal
           size={"xl"}
           opened={editopened}
-          onClose={editclose}
+          onClose={refreshAgentasAfterEdite}
           title=""
           centered
         >
           <EditAppointmentModal
-            closeOnSave={editclose}
-            itemGuid={appointment.id}
+            closeOnSave={refreshAgentasAfterEdite}
+            itemGuid={appointment.appointmenId}
+            appointment={appointment}
             disabled={isDisabled}
             changeSelectedItem={changeSelectedItem}
             setDisabled={setIsDisabled}

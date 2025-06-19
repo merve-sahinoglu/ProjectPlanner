@@ -103,6 +103,26 @@ export function createJsonPatchDocumentFromDirtyForm<T>(
   return createJsonPatchDocument(jsonPatchList);
 }
 
+export function createJsonPatchDocumentFromList<T>(
+  obj: T
+): JsonPatchKeyValuePair[] {
+  const jsonPatchList: JsonPatchKeyValuePair[] = [];
+
+  if (Array.isArray(obj)) {
+    obj.forEach((item, index) => {
+      debugger;
+      Object.entries(item).forEach(([key, value]) => {
+        jsonPatchList.push({
+          path: `/UpdateAppointmentDayDtos/${item.id}/${key}`,
+          value: value as object,
+        });
+      });
+    });
+  }
+
+  return jsonPatchList;
+}
+
 /** Patch isteği atılacak form ve form.values objesi verildikten sonra patch gönderilmesi istenmeyen
  * property değerleri list of olarak içine verilerek kullanılır.
  *

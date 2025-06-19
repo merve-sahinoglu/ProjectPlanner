@@ -18,7 +18,10 @@ import OperationButtons from "../../../components/OperationButtons/OperationButt
 import RequestType from "../../../enum/request-type";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import { createJsonPatchDocumentFromDirtyForm } from "../../../services/json-patch-handler/json-patch-document";
+import {
+  createJsonPatchDocumentFromDirtyForm,
+  createJsonPatchDocumentFromList,
+} from "../../../services/json-patch-handler/json-patch-document";
 import DateTimeSelector from "../../../components/DateTimeSelector/DateTimeSelector";
 
 const appointmentStatus = [
@@ -36,6 +39,7 @@ const appointmentStatus = [
   },
 ];
 interface EditAppointmentFormProps {
+  appointment: Appointment;
   closeOnSave: () => void;
   itemGuid: string;
   disabled: boolean;
@@ -50,8 +54,9 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
   changeSelectedItem,
   setDisabled,
   handleUpdateItem,
+  appointment,
 }) => {
-  const { fetchData, sendData } = useRequestHandler();
+  const { sendData } = useRequestHandler();
 
   const { t } = useTranslation();
 
@@ -64,18 +69,34 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
       }),
   });
 
+
   const form = useForm<Appointment>({
     initialValues: {
-      id: "",
-      chieldId: "",
-      therapistId: "",
-      typeId: "",
-      statusId: "",
-      name: "",
-      description: "",
-      teacherId: "",
-      chieldName: "",
-      teacherName: "",
+      roomId: appointment.roomId || "",
+      roomName: appointment.roomName || "",
+      playgroupId: appointment.playgroupId || "",
+      playgroupName: appointment.playgroupName || "",
+      id: appointment.id || 0,
+      appointmenId: appointment.appointmenId,
+      chieldId: appointment.chieldId,
+      therapistId: appointment.therapistId,
+      typeId: appointment.typeId.toString(),
+      statusId: appointment.statusId.toString(),
+      name: appointment.name,
+      description: appointment.description,
+      chieldName: appointment.chieldName,
+      therapistName: appointment.therapistName || "",
+      appointmentDays:
+        appointment.appointmentDays &&
+        appointment.appointmentDays
+          .sort(
+            (a, b) => new Date(a.start).getTime() - new Date(b.start).getTime()
+          )
+          .map((date) => ({
+            ...date,
+            start: new Date(date.start),
+            end: new Date(date.end),
+          })),
     },
     validate: zodResolver(schema),
   });
@@ -101,24 +122,35 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
     },
   ];
 
-  const sendPatchRequestForModifiedItem = async () => {
-    const patchDocument = createJsonPatchDocumentFromDirtyForm<Appointment>(
-      form,
-      form.values,
-      [
-        "id",
-        "chieldName",
-        "teacherName",
-        "roomName",
-        "playgroupName",
-        "appointmentDays",
-      ]
-    );
+  const sendPutRequestForModifiedItem = async () => {
+debugger;
+    const updateAppointment = {
+      id: form.values.id,
+      appointmenId: form.values.appointmenId,
+      chieldId: appointment.chieldId,
+      playgroupId: form.values.playgroupId || null,
+      playgroupName: form.values.playgroupName || null,
+      roomId: form.values.roomId || null,
+      roomName: form.values.roomName || null,
+      therapistId: form.values.therapistId,
+      therapistName: form.values.therapistName,
+      typeId: form.values.typeId,
+      statusId: form.values.statusId,
+      name: form.values.name,
+      description: form.values.description,
+      appointmentDays:
+        form.values.appointmentDays?.map((day) => ({
+          id: day.id,
+          start: day.start.toISOString(),
+          end: day.end.toISOString(),
+          lineStatusId: day.lineStatusId,
+        })) || [],
+    };
 
     const response = await sendData(
-      createRequestUrl(apiUrl.appointmentUrl, form.values.id),
-      RequestType.Patch,
-      patchDocument
+      createRequestUrl(apiUrl.appointmentUrl, form.values.appointmenId),
+      RequestType.Put,
+      updateAppointment
     );
 
     if (response.isSuccess) {
@@ -143,7 +175,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
 
     if (!form.isDirty()) return;
 
-    sendPatchRequestForModifiedItem();
+    sendPutRequestForModifiedItem();
   };
 
   const handleEdit = (event: React.MouseEvent) => {
@@ -154,10 +186,10 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
   const handleCancel = (event: React.MouseEvent) => {
     event.preventDefault();
 
-    if (itemGuid === form.values.id) {
+    if (itemGuid === form.values.appointmenId) {
       setDisabled(true);
       form.reset();
-      form.setFieldValue(nameof<Appointment>("id"), "");
+      form.setFieldValue(nameof<Appointment>("appointmenId"), "");
       changeSelectedItem(null);
       return;
     }
@@ -177,34 +209,6 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
     form.setFieldValue("appointmentDays", dates);
   };
 
-  const fetchAppointment = async () => {
-    const response = await fetchData<AppointmentResponse>(
-      createRequestUrl(apiUrl.appointmentUrl, itemGuid)
-    );
-    if (response.isSuccess) {
-      form.setValues({
-        ...response.value,
-        typeId: response.value.typeId.toString(),
-        appointmentDays:
-          response.value.appointmentDays &&
-          response.value.appointmentDays
-            .sort(
-              (a, b) =>
-                new Date(a.start).getTime() - new Date(b.start).getTime()
-            )
-            .map((date) => ({
-              ...date,
-              start: new Date(date.start),
-              end: new Date(date.end),
-            })),
-      });
-    }
-  };
-
-  useEffect(() => {
-    fetchAppointment();
-  }, []);
-
   return (
     <>
       <Grid grow>
@@ -219,7 +223,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
           </Group>
           <Group grow>
             <Select
-              disabled={disabled}
+              disabled={true}
               {...form.getInputProps(nameof<Appointment>("typeId"))}
               label={t(Dictionary.Appointment.TYPE_ID)}
               data={appointmentTypes}
@@ -227,6 +231,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
             <FormAutocomplete
               searchInputLabel={t(Dictionary.Appointment.ROOM_ID)}
               placeholder={t(Dictionary.Appointment.ROOM_ID)}
+              initialSearchValue={appointment?.roomName || ""}
               description=""
               disabled={disabled}
               apiUrl={createRequestUrl(apiUrl.appointmentRoomsUrl)}
@@ -253,7 +258,8 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               searchInputLabel={t(Dictionary.Appointment.CHIELD_ID)}
               placeholder={t(Dictionary.Appointment.CHIELD_ID)}
               description=""
-              disabled={disabled}
+              initialSearchValue={appointment?.chieldName || ""}
+              disabled={true}
               apiUrl={createRequestUrl(apiUrl.userUrl)}
               form={form}
               formInputProperty="chieldId"
@@ -284,12 +290,12 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               initialData={[
                 {
                   value:
-                    initialValues.current && initialValues.current.teacherId
-                      ? initialValues.current.teacherId
+                    initialValues.current && initialValues.current.therapistId
+                      ? initialValues.current.therapistId
                       : "",
                   label:
-                    initialValues.current && initialValues.current.teacherName
-                      ? `${initialValues.current.teacherName}`
+                    initialValues.current && initialValues.current.therapistName
+                      ? `${initialValues.current.therapistName}`
                       : "",
                 },
               ]}

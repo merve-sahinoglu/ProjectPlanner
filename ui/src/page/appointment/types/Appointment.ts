@@ -12,44 +12,46 @@ enum AppointmentType {
 }
 
 interface Appointment {
-  id: string;
-  chieldId: string;
+  id: number;
+  appointmenId: string;
+  chieldId: string | null;
   chieldName: string;
   playgroupId?: string;
   playgroupName?: string;
   roomId?: string;
   roomName?: string;
   therapistId: string;
+  therapistName: string;
   typeId: string;
   statusId: string;
   name: string;
   description: string;
   appointmentDays?: SelectedDates[];
-  teacherId: string;
-  teacherName: string;
 }
 interface CallenderProps {
   id: number;
+  appointmenId: string;
   title: string;
   start: Date;
   end: Date;
   allDay: boolean;
-  appointmenId: string;
   chieldId: string;
   playgroupId?: string;
+  playgroupName?: string;
   roomId?: string;
+  roomName?: string;
   therapistId: string;
+  therapistName: string;
   typeId: string;
   statusId: string;
   name: string;
   description: string;
   appointmentDays?: SelectedDates[];
-  teacherId: string;
   chieldName: string;
-  teacherName: string;
 }
 
 interface SelectedDates {
+  id?: string;
   start: Date;
   end: Date;
   lineStatusId: number;

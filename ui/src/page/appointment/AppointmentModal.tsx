@@ -121,31 +121,6 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
     }
   };
 
-  const sendPatchRequestForModifiedItem = async () => {
-    const patchDocument = createJsonPatchDocumentFromDirtyForm<Appointment>(
-      form,
-      form.values
-    );
-
-    const response = await sendData(
-      createRequestUrl(apiUrl.userUrl, form.values.id),
-      RequestType.Patch,
-      patchDocument
-    );
-
-    if (response.isSuccess) {
-      setDisabled(true);
-
-      form.resetDirty();
-
-      initialValues.current = form.values;
-
-      handleUpdateItem(form.values);
-
-      toast.success(`${t(Dictionary.Success.POSITIVE)}`);
-    }
-  };
-
   const handleSave = async (event: React.MouseEvent) => {
     event.preventDefault();
 
@@ -155,12 +130,10 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
 
     if (!form.isDirty()) return;
 
-    if (createdItemGuid === form.values.id) {
+  
       sendPostRequestForCreatedItem();
       return;
-    }
-
-    sendPatchRequestForModifiedItem();
+ 
   };
 
   const handleEdit = (event: React.MouseEvent) => {
@@ -171,11 +144,11 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
   const handleCancel = (event: React.MouseEvent) => {
     event.preventDefault();
 
-    if (createdItemGuid === form.values.id) {
-      handleDeleteItem(form.values.id);
+    if (createdItemGuid === form.values.appointmenId) {
+      handleDeleteItem(form.values.appointmenId);
       setDisabled(true);
       form.reset();
-      form.setFieldValue(nameof<Appointment>("id"), "");
+      form.setFieldValue(nameof<Appointment>("appointmenId"), "");
       changeSelectedItem(null);
       return;
     }

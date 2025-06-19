@@ -179,6 +179,7 @@ function DateTimeSelector({ value = [], onChange }: DateTimeSelectorProps) {
             {entry.lineStatusId === LineStatus.Waiting && (
               <Checkbox
                 label="Is Canceled"
+                style={{ marginTop: 10 }}
                 onChange={(event) => {
                   const updatedList = [...dateTimeList];
                   updatedList[index].lineStatusId = event.target.checked
