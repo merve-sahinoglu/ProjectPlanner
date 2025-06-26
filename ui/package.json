@@ -22,7 +22,7 @@
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/react": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17",
-    "@mantine/core": "^7.17.7",
+    "@mantine/core": "^8.1.2",
     "@mantine/dates": "^7.17.7",
     "@mantine/emotion": "^7.17.7",
     "@mantine/form": "^7.17.7",
