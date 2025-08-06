@@ -123,7 +123,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
   ];
 
   const sendPutRequestForModifiedItem = async () => {
-debugger;
+
     const updateAppointment = {
       id: form.values.id,
       appointmenId: form.values.appointmenId,

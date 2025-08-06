@@ -24,6 +24,14 @@ const AppRouter = () => {
           }
         />
         <Route
+          path={routes.myAppointment}
+          element={
+            <Main>
+              <CalendarComponent />
+            </Main>
+          }
+        />
+        <Route
           path={routes.contact}
           element={
             <Main>

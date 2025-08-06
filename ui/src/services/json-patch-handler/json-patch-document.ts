@@ -110,7 +110,6 @@ export function createJsonPatchDocumentFromList<T>(
 
   if (Array.isArray(obj)) {
     obj.forEach((item, index) => {
-      debugger;
       Object.entries(item).forEach(([key, value]) => {
         jsonPatchList.push({
           path: `/UpdateAppointmentDayDtos/${item.id}/${key}`,

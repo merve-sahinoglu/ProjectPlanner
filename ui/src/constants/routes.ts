@@ -2,6 +2,7 @@ const routes = {
   login: "/login",
   main: "/",
   appointment: "/appointment",
+  myAppointment: "/appointment/:userId",
   contact: "/contact",
   instructor: "/instructor",
   user: "/user",

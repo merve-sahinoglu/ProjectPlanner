@@ -77,8 +77,8 @@ export function Header({
   });
 
   return (
-    <header className={classes.header}>
-      <Container size="md">
+    <header className={classes.header} >
+      <Container size="md" >
         <div className={classes.inner}>
           <Burger
             opened={mobileOpened}

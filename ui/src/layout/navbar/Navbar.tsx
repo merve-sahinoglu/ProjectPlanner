@@ -1,52 +1,17 @@
 import { useState } from "react";
 import {
   IconCalendarStats,
-  IconDeviceDesktopAnalytics,
-  IconGauge,
   IconHome2,
   IconSettings,
 } from "@tabler/icons-react";
-import { Title, Tooltip, UnstyledButton } from "@mantine/core";
-import { MantineLogo } from "@mantinex/mantine-logo";
+import { Group, ScrollArea, Title } from "@mantine/core";
 import classes from "./Navbar.module.css";
 import routes from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
-
-const mainLinksMockdata = [
-  {
-    icon: IconHome2,
-    label: "My Page",
-    SubLinks: [
-      { label: "My Notes", root: routes.notes },
-      { label: "My Appointment", root: routes.appointment },
-    ],
-  },
-  {
-    icon: IconCalendarStats,
-    label: "Appointment",
-    SubLinks: [{ label: "Appointment", root: routes.appointment }],
-  },
-  {
-    icon: IconDeviceDesktopAnalytics,
-    label: "Instructor",
-    root: routes.instructor,
-  },
-  {
-    icon: IconSettings,
-    label: "Settings",
-    SubLinks: [
-      { label: "User", root: routes.user },
-      { label: "Room", root: routes.room },
-      {
-        label: "Play Groups",
-        root: routes.playGroups,
-      },
-    ],
-  },
-];
+import { LinksGroup } from "./LinksGroup";
 
 export function Navbar() {
-  const [active, setActive] = useState("Home");
+  const [active, setActive] = useState("My Page");
   const [activeLink, setActiveLink] = useState("User");
 
   const navigate = useNavigate();
@@ -55,62 +20,73 @@ export function Navbar() {
     setActive(route);
   };
 
-  const handleActiveLink = (route: string) => {
+  const handleActiveLink = (route: string, additionalInfo?: string) => {
     setActiveLink(route);
-    navigate(route);
+    if (additionalInfo) {
+      navigate(`/appointment/${additionalInfo}`);
+    } else {
+      navigate(route);
+    }
   };
 
-  const mainLinks = mainLinksMockdata.map((link) => (
-    <Tooltip
-      label={link.label}
-      position="right"
-      withArrow
-      transitionProps={{ duration: 0 }}
-      key={link.label}
-    >
-      <UnstyledButton
-        onClick={() => handleMenuItemSelect(link.label)}
-        className={classes.mainLink}
-        data-active={link.label === active || undefined}
-      >
-        <link.icon size={22} stroke={1.5} />
-      </UnstyledButton>
-    </Tooltip>
-  ));
+  const userId = "fe1d676f-1eb6-4c97-9f41-237322e1cc1f"; // Replace with actual user ID logic
 
-  const activeMenu = mainLinksMockdata.find((link) => link.label === active);
+  const mainLinksMockdata = [
+    {
+      icon: IconHome2,
+      label: "My Page",
+      initiallyOpened: true,
+      links: [
+        { label: "My Notes", link: routes.notes },
+        {
+          label: "My Appointment",
+          link: routes.appointment,
+          additionalInfo: userId,
+        },
+      ],
+    },
+    {
+      icon: IconCalendarStats,
+      label: "Appointment",
+
+      link: `${routes.appointment}`,
+    },
+    {
+      icon: IconSettings,
+      label: "Settings",
+      links: [
+        { label: "User", link: routes.user },
+        { label: "Room", link: routes.room },
+        {
+          label: "Play Groups",
+          link: routes.playGroups,
+        },
+      ],
+    },
+  ];
+
+  const links = mainLinksMockdata.map((item) => (
+    <LinksGroup
+      {...item}
+      key={item.label}
+      handleActiveLink={handleActiveLink}
+      handleMenuItemSelect={handleMenuItemSelect}
+    />
+  ));
 
   return (
     <nav className={classes.navbar}>
-      <div className={classes.wrapper}>
-        <div className={classes.aside}>
-          <div className={classes.logo}>
-            <MantineLogo type="mark" size={30} />
-          </div>
-          {mainLinks}
-        </div>
-        {activeMenu?.SubLinks && (
-          <div className={classes.main}>
-            <Title order={4} className={classes.title}>
-              {active}
-            </Title>
-            {activeMenu.SubLinks.map((subLink) => (
-              <a
-                className={classes.link}
-                data-active={activeLink === subLink.label || undefined}
-                href="#"
-                onClick={(event) => {
-                  event.preventDefault();
-                  handleActiveLink(subLink.root);
-                }}
-                key={subLink.label}
-              >
-                {subLink.label}
-              </a>
-            ))}
-          </div>
-        )}
+      <div className={classes.header}>
+        <Group justify="space-between">
+          <Title order={4} className={classes.title}>
+            {active}
+          </Title>
+        </Group>
       </div>
+
+      <ScrollArea className={classes.links}>
+        <div className={classes.linksInner}>{links}</div>
+      </ScrollArea>
     </nav>
   );
 }

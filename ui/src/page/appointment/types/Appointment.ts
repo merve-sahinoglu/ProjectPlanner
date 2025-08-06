@@ -1,3 +1,4 @@
+import { EventInput } from "@fullcalendar/core";
 enum LineStatus {
   Waiting = 0,
   Completed = 1,
@@ -11,9 +12,16 @@ enum AppointmentType {
   GAME_GROUPS = "3",
 }
 
+interface SearchSchema {
+  chieldId?: string;
+  therapistId?: string;
+  startDate: string;
+  endDate: string;
+}
+
 interface Appointment {
   id: number;
-  appointmenId: string;
+  appointmenId?: string;
   chieldId: string | null;
   chieldName: string;
   playgroupId?: string;
@@ -28,26 +36,21 @@ interface Appointment {
   description: string;
   appointmentDays?: SelectedDates[];
 }
-interface CallenderProps {
-  id: number;
-  appointmenId: string;
-  title: string;
-  start: Date;
-  end: Date;
-  allDay: boolean;
-  chieldId: string;
+interface CallenderProps extends EventInput {
+  appointmenId?: string;
+  therapistId?: string;
+  chieldId?: string;
+  typeId?: string;
+  statusId?: string;
+  name?: string;
+  description?: string;
+  chieldName?: string;
+  therapistName?: string;
+  appointmentDays?: any[];
   playgroupId?: string;
   playgroupName?: string;
   roomId?: string;
   roomName?: string;
-  therapistId: string;
-  therapistName: string;
-  typeId: string;
-  statusId: string;
-  name: string;
-  description: string;
-  appointmentDays?: SelectedDates[];
-  chieldName: string;
 }
 
 interface SelectedDates {
@@ -73,6 +76,7 @@ export type {
   CallenderProps,
   UserInformationResponse,
   AppointmentResponse,
+  SearchSchema,
 };
 
 export { AppointmentType, LineStatus };

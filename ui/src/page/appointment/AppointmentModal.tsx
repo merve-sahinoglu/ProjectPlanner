@@ -160,6 +160,14 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
   const clearChieldId = () => {
     form.setFieldValue("chieldId", "");
   };
+  const clearTherapistId = () => {
+    form.setFieldValue("therapistId", "");
+  };
+
+  const clearRoomId = () => {
+    form.setFieldValue("roomId", "");
+  };
+
   const clearPlaygroupId = () => {
     form.setFieldValue("playgroupId", "");
   };
@@ -194,9 +202,9 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
               disabled={disabled}
               apiUrl={createRequestUrl(apiUrl.appointmentRoomsUrl)}
               form={form}
-              formInputProperty="chieldId"
+              formInputProperty="roomId"
               {...form.getInputProps(nameof<Appointment>("roomId"))}
-              clearValue={clearChieldId}
+              clearValue={clearRoomId}
             />
           </Group>
           <Group grow>
@@ -220,7 +228,7 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
               form={form}
               formInputProperty="therapistId"
               {...form.getInputProps(nameof<Appointment>("therapistId"))}
-              clearValue={clearChieldId}
+              clearValue={clearTherapistId}
             />
           </Group>
           <Group grow>

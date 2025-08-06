@@ -130,6 +130,9 @@ function UserDetail({
     mimeType: "image/jpeg" | "image/png"
   ): Blob {
     // Check if base64 contains the data URL prefix
+    if (!base64) {
+      return new Blob(); // Return an empty Blob if base64 is empty
+    }
     const base64Data = base64.split(",")[1] || base64; // Take part after the comma or the entire string if no comma
 
     const byteCharacters = atob(base64Data); // Decode the base64 string
