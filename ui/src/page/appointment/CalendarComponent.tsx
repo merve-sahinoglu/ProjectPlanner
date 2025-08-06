@@ -384,10 +384,6 @@ const CalendarComponent = () => {
     console.log(e.event?.extendedProps);
   };
 
-  const viewClick = (id: string) => {
-    id === "graphic" ? setView(true) : setView(false);
-  };
-
   const handleToday = () => {
     if (calendarComponentRef.current) {
       // @ts-ignore
@@ -611,7 +607,7 @@ const CalendarComponent = () => {
             >
               <EditAppointmentModal
                 closeOnSave={refreshAgentasAfterEdite}
-                itemGuid={appointment.appointmenId}
+                itemGuid={appointment.appointmenId || ""}
                 appointment={appointment}
                 disabled={isDisabled}
                 changeSelectedItem={changeSelectedItem}
