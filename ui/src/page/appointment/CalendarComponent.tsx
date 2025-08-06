@@ -16,7 +16,7 @@ import EditAppointmentModal from "./compoonent/EditAppointmentModal";
 import { useParams } from "react-router-dom";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import Dictionary from "../../constants/dictionary";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm } from "@mantine/form";
 import { nameof } from "../../helpers/name-of";
 
 interface DateModel {
