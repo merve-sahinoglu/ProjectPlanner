@@ -17,7 +17,6 @@ import OperationButtons from "../../components/OperationButtons/OperationButtons
 import RequestType from "../../enum/request-type";
 import toast from "react-hot-toast";
 import { z } from "zod";
-import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
 import DateTimeSelector from "../../components/DateTimeSelector/DateTimeSelector";
 
 const appointmentStatus = [
@@ -160,6 +159,7 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
   const clearChieldId = () => {
     form.setFieldValue("chieldId", "");
   };
+
   const clearTherapistId = () => {
     form.setFieldValue("therapistId", "");
   };
