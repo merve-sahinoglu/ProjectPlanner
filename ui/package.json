@@ -24,7 +24,7 @@
     "@fullcalendar/timegrid": "^6.1.17",
     "@mantine/core": "^8.2.3",
     "@mantine/dates": "^8.2.3",
-    "@mantine/emotion": "^8.2.3",
+    "@mantine/emotion": "^8.2.4",
     "@mantine/form": "^7.17.7",
     "@mantine/hooks": "^8.2.3",
     "@mantine/modals": "^8.2.3",
