@@ -1,6 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import routes from "./constants/routes";
-import Main from "./layout/Main";
+import Main from "./layout/AppLayout";
 import { ContactUs } from "./page/contact/ContactUs";
 import CalendarComponent from "./page/appointment/CalendarComponent";
 import InstructorOverview from "./page/instructor/InstructorOverview";
@@ -8,76 +8,121 @@ import UserOverview from "./page/user/UserOverwiew";
 import RoomOverview from "./page/rooms/RoomOverview";
 import PlayGroupOverview from "./page/playgroups/PlayGroupOverview";
 import NoteBook from "./page/note/NoteBook";
-// import Note from "./page/note/Note";
+import { RequireAuthentication } from "./authentication/AuthenticationContext";
+import UserRelationManager from "./page/userprofile/UserRelationManager";
+import Login from "./page/login/Login";
 
 const AppRouter = () => {
   return (
     <BrowserRouter>
       <Routes>
-        {/* <Route path={routes.login} element={<Login />} /> */}
-        <Route path={routes.main} element={<Main />} />
+        <Route path={routes.login} element={<Login />} />
+        <Route
+          path={routes.main}
+          element={
+            <RequireAuthentication>
+              <Main />
+            </RequireAuthentication>
+          }
+        />
         <Route
           path={routes.appointment}
           element={
-            <Main>
-              <CalendarComponent />
-            </Main>
+            <RequireAuthentication>
+              <Main>
+                <CalendarComponent />
+              </Main>
+            </RequireAuthentication>
           }
         />
         <Route
           path={routes.myAppointment}
           element={
-            <Main>
-              <CalendarComponent />
-            </Main>
+            <RequireAuthentication>
+              <Main>
+                <CalendarComponent />
+              </Main>
+            </RequireAuthentication>
           }
         />
         <Route
           path={routes.contact}
           element={
-            <Main>
-              <ContactUs />
-            </Main>
+            <RequireAuthentication>
+              <Main>
+                <ContactUs />
+              </Main>
+            </RequireAuthentication>
           }
         />
         <Route
           path={routes.user}
           element={
-            <Main>
-              <UserOverview />
-            </Main>
+            <RequireAuthentication>
+              <Main>
+                <UserOverview />
+              </Main>
+            </RequireAuthentication>
           }
         />
         <Route
           path={routes.instructor}
           element={
-            <Main>
-              <InstructorOverview />
-            </Main>
+            <RequireAuthentication>
+              <Main>
+                <InstructorOverview />
+              </Main>
+            </RequireAuthentication>
           }
         />
         <Route
           path={routes.room}
           element={
-            <Main>
-              <RoomOverview />
-            </Main>
+            <RequireAuthentication>
+              <Main>
+                <RoomOverview />
+              </Main>
+            </RequireAuthentication>
           }
         />
         <Route
           path={routes.playGroups}
           element={
-            <Main>
-              <PlayGroupOverview />
-            </Main>
+            <RequireAuthentication>
+              <Main>
+                <PlayGroupOverview />
+              </Main>
+            </RequireAuthentication>
           }
         />
         <Route
           path={routes.notes}
           element={
-            <Main>
-              <NoteBook />
-            </Main>
+            <RequireAuthentication>
+              <Main>
+                <NoteBook />
+              </Main>
+            </RequireAuthentication>
+          }
+        />
+        <Route
+          path={routes.myNote}
+          element={
+            <RequireAuthentication>
+              <Main>
+                <NoteBook />
+              </Main>
+            </RequireAuthentication>
+          }
+        />
+        <Route
+          path={routes.userRelation}
+          element={
+            <RequireAuthentication>
+              <Main>
+                <UserRelationManager />
+              </Main>
+            </RequireAuthentication>
           }
         />
       </Routes>

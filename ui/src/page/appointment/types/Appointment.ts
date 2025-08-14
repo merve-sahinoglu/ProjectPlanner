@@ -13,7 +13,7 @@ enum AppointmentType {
 }
 
 interface SearchSchema {
-  chieldId?: string;
+  childId?: string;
   therapistId?: string;
   startDate: string;
   endDate: string;

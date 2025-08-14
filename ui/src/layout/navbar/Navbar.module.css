@@ -1,36 +1,40 @@
 .navbar {
-  background-color: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
-  height: 800px;
-  width: 300px;
-  padding: var(--mantine-spacing-md);
-  padding-bottom: 0;
+  width: 280px;
+  height: 100dvh;
   display: flex;
   flex-direction: column;
+  background:
+    linear-gradient(180deg, rgba(139, 92, 246, 0.06), transparent 120px),
+    light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
   border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  position: sticky;
+  top: 0;
 }
 
-.header {
-  padding: var(--mantine-spacing-md);
-  padding-top: 0;
-  margin-left: calc(var(--mantine-spacing-md) * -1);
-  margin-right: calc(var(--mantine-spacing-md) * -1);
-  color: light-dark(var(--mantine-color-black), var(--mantine-color-white));
-  border-bottom: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+.ribbon {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, #f472b6, #8b5cf6);
 }
 
 .links {
   flex: 1;
-  margin-left: calc(var(--mantine-spacing-md) * -1);
-  margin-right: calc(var(--mantine-spacing-md) * -1);
+  padding: var(--mantine-spacing-sm);
 }
 
 .linksInner {
-  padding-top: var(--mantine-spacing-xl);
+  padding-top: var(--mantine-spacing-md);
   padding-bottom: var(--mantine-spacing-xl);
 }
 
-.footer {
-  margin-left: calc(var(--mantine-spacing-md) * -1);
-  margin-right: calc(var(--mantine-spacing-md) * -1);
-  border-top: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+/* Scrollbar ince ayar (opsiyonel) */
+.links :global(.mantine-ScrollArea-thumb) {
+  background: light-dark(var(--mantine-color-gray-5), var(--mantine-color-dark-2));
+}
+
+/* Küçük ekran: genişlik daralsın */
+@media (max-width: 640px) {
+  .navbar {
+    width: 240px;
+  }
 }

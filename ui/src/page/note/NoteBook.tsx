@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Group,
@@ -7,11 +7,26 @@ import {
   Title,
   Divider,
   Modal,
+  Grid,
 } from "@mantine/core";
 import dayjs from "dayjs";
-import type { ColDef } from "@ag-grid-community/core";// ← kendi path'ine göre düzelt
+import type { ColDef } from "@ag-grid-community/core"; // ← kendi path'ine göre düzelt
 import DataTable from "../../components/DataTable/DataTable";
 import AddNoteForm, { AddNoteFormValues } from "./AddNoteForm";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import RequestType from "../../enum/request-type";
+import { useParams } from "react-router-dom";
+import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
+import { SearchSchema } from "../appointment/types/Appointment";
+import Dictionary from "../../constants/dictionary";
+import { nameof } from "../../helpers/name-of";
+import moment from "moment";
+import { useForm } from "@mantine/form";
+import { useTranslation } from "react-i18next";
+import PictureRenderer from "./PictureRenderer";
+import EditNoteForm, { EditNoteFormValues } from "./EditNoteFrom";
+import { NoteTitleBar } from "./NoteTitleBar";
 
 export type NoteItem = {
   id: string;
@@ -21,110 +36,246 @@ export type NoteItem = {
   noteHtml: string;
 };
 
-const LS_KEY = "daily_notes_v7";
-
-const loadNotes = (): NoteItem[] => {
-  try {
-    const raw = localStorage.getItem(LS_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as Array<
-      Omit<NoteItem, "date"> & { date: string }
-    >;
-    return parsed.map((n) => ({ ...n, date: new Date(n.date) })); // string → Date
-  } catch {
-    return [];
-  }
-};
-
-const saveNotes = (items: NoteItem[]) => {
-  const serializable = items.map((n) => ({ ...n, date: n.date.toISOString() })); // Date → string
-  localStorage.setItem(LS_KEY, JSON.stringify(serializable));
+export type GridNoteItem = {
+  id: string;
+  date: Date; // ✅ Date olarak kalıyor
+  childId: string;
+  childName: string;
+  therapistId: string;
+  therapistName: string;
+  noteHtml: string;
+  therapistProfilePicture: Blob | number[];
+  childProfilePicture: Blob | number[];
 };
 
 export default function NoteBook() {
-  const [notes, setNotes] = useState<NoteItem[]>([]);
-  const [opened, setOpened] = useState(false);
+  const { t } = useTranslation();
+  const [notes, setNotes] = useState<GridNoteItem[]>([]);
+  const [selectedNote, setSelectedNote] = useState<GridNoteItem | null>(null);
+  const [createOpened, setCreateOpened] = useState(false);
+  const [editOpened, setEditOpened] = useState(false);
+  const { fetchData, sendData } = useRequestHandler();
+  const { userId: IdFromUrl } = useParams();
+  const form = useForm<SearchSchema>({
+    initialValues: {
+      childId: undefined,
+      therapistId: undefined,
+      startDate: moment(new Date()).startOf("day").format("DD.MMM.YYYY HH:mm"),
+      endDate: moment(new Date()).add(1, "days").format("DD.MMM.YYYY HH:mm"),
+    },
+  });
 
-  useEffect(() => {
-    setNotes(loadNotes());
-  }, []);
 
-  const columns = useMemo<ColDef<NoteItem>[]>(
+
+  const columns = useMemo<ColDef<GridNoteItem>[]>(
     () => [
       {
         headerName: "Date",
         field: "date",
-        valueFormatter: (p) =>
-          p.value instanceof Date ? dayjs(p.value).format("YYYY-MM-DD") : "",
+        valueFormatter: (p) => dayjs(p.value).format("DD-MM-YYYY"),
         width: 140,
         sortable: true,
-        filter: "agDateColumnFilter",
       },
       {
-        headerName: "Child ID",
-        field: "childId",
+        headerName: "Child",
+        field: "childProfilePicture",
         flex: 1,
         sortable: true,
         filter: true,
+        cellRenderer: PictureRenderer,
+        cellRendererParams: {
+          labelField: "childName", // label'ı data.childName'den al
+          defaultMime: "image/jpeg",
+        },
       },
       {
-        headerName: "Therapist ID",
-        field: "therapistId",
+        headerName: "Therapist",
+        field: "therapistProfilePicture",
         flex: 1,
         sortable: true,
+        hide: IdFromUrl === undefined ? false : true, // sadece IdFromUrl varsa göster
         filter: true,
+        cellRenderer: PictureRenderer,
+        cellRendererParams: {
+          labelField: "therapistName",
+          defaultMime: "image/jpeg",
+        },
       },
     ],
     []
   );
 
-  const handleSave = (values: AddNoteFormValues) => {
+  const handleCreate = async (values: AddNoteFormValues) => {    
     const newItem: NoteItem = {
       id: crypto.randomUUID(),
       date: values.date!, // validate sayesinde Date garantili
-      childId: values.childId.trim(),
-      therapistId: values.therapistId.trim(),
+      childId: values.childId,
+      therapistId: values.therapistId,
       noteHtml: values.noteHtml,
     };
 
-    const updated = [newItem, ...notes].sort(
-      (a, b) => b.date.getTime() - a.date.getTime() // en yeni üste
+    const response = await sendData<NoteItem, GridNoteItem>(
+      createRequestUrl(apiUrl.noteUrl),
+      RequestType.Post,
+      newItem
     );
-    setNotes(updated);
-    saveNotes(updated);
-    setOpened(false);
+
+    if (!response.isSuccess) return;
+
+    if (response.isSuccess) {
+      const updated = [response.value, ...notes];
+      setNotes(updated);
+      setCreateOpened(false);
+    }
   };
+
+    const handleUpdate = async (value: EditNoteFormValues) => {
+
+      const response = await sendData<EditNoteFormValues, GridNoteItem>(
+        createRequestUrl(apiUrl.noteUrl, value.id),
+        RequestType.Put,
+        value
+      );
+
+      if (!response.isSuccess) return;
+
+      if (response.isSuccess) {
+        const updated = notes.map((note) =>
+          note.id === response.value.id ? response.value : note
+        );
+        setNotes(updated);
+        setEditOpened(false);
+      }
+    };
+
+  const fetchNotes = async () => {
+    const request: { [key: string]: any } = {
+      childId: form.values.childId ?? undefined,
+      therapistId: IdFromUrl ?? form.values.therapistId,
+      dateFrom: undefined,
+      dateTo: undefined,
+    };
+
+    if (request.chieldId === undefined) {
+      delete request.chieldId;
+    }
+
+    if (request.therapistId === undefined) {
+      delete request.therapistId;
+    }
+    if (request.dateFrom === undefined) {
+      delete request.dateFrom;
+    }
+    if (request.dateTo === undefined) {
+      delete request.dateTo;
+    }
+
+    const response = await fetchData<GridNoteItem[]>(
+      createRequestUrl(apiUrl.noteUrl),
+      request
+    );
+
+    if (response.isSuccess) {
+      setNotes(response.value || []);
+    }
+  };
+  const clearChildId = () => {
+    form.setFieldValue("childId", "");
+  };
+
+  const clearTherapistId = () => {
+    form.setFieldValue("therapistId", "");
+  };
+
+
+  useEffect(() => {
+    fetchNotes();
+  }, []);
 
   return (
     <Stack gap="lg">
-      <Group justify="space-between">
-        <Title order={3}>Daily Notes</Title>
-        <Button onClick={() => setOpened(true)}>Add note</Button>
-      </Group>
+      <Grid>
+        {IdFromUrl === undefined && (
+          <Grid.Col span={{ xs: 2 }}>
+            <Group grow mt={40}>
+              <>
+                <FormAutocomplete
+                  searchInputLabel={t(Dictionary.Appointment.CHIELD_ID)}
+                  placeholder={t(Dictionary.Appointment.CHIELD_ID)}
+                  description=""
+                  apiUrl={createRequestUrl(apiUrl.userUrl)}
+                  form={form}
+                  {...form.getInputProps(nameof<SearchSchema>("childId"))}
+                  formInputProperty="childId"
+                  clearValue={clearChildId}
+                />
+                <FormAutocomplete
+                  searchInputLabel={t(Dictionary.Appointment.THERAPIST_ID)}
+                  placeholder={t(Dictionary.Appointment.THERAPIST_ID)}
+                  description=""
+                  apiUrl={createRequestUrl(apiUrl.userUrl)}
+                  form={form}
+                  {...form.getInputProps(nameof<SearchSchema>("therapistId"))}
+                  formInputProperty="therapistId"
+                  clearValue={clearTherapistId}
+                />
+              </>
+            </Group>
+          </Grid.Col>
+        )}
+        <Grid.Col span={{ xs: IdFromUrl === undefined ? 10 : 12 }}>
+          <Group justify="end" p="md">
+            <Button onClick={() => setCreateOpened(true)}>Add note</Button>
+          </Group>
 
-      <Paper withBorder p="md" radius="md">
-        <Title order={5} mb="sm">
-          Notes
-        </Title>
-        <DataTable<NoteItem>
-          records={notes}
-          columns={columns}
-          isFetching={false}
-          h={460}
-          hasPagination
-        />
-      </Paper>
+          <DataTable<GridNoteItem>
+            records={notes}
+            columns={columns}
+            rowHeight={46}
+            isFetching={false}
+            onRowClicked={(data) => {
+              setEditOpened(true);
+              setSelectedNote(data);
+            }}
+            h={"800px"}
+            hasPagination={true}
+          />
 
-      <Divider />
-
-      <Modal
-        opened={opened}
-        onClose={() => setOpened(false)}
-        title="Add note"
-        size="xl"
-      >
-        <AddNoteForm onCancel={() => setOpened(false)} onSave={handleSave} />
-      </Modal>
+          <Divider />
+          <Modal
+            opened={createOpened}
+            onClose={() => setCreateOpened(false)}
+            title="Add note"
+            size="xl"
+          >
+            <AddNoteForm
+              onCancel={() => setCreateOpened(false)}
+              onSave={handleCreate}
+              therapistId={IdFromUrl ?? form.values.therapistId ?? ""}
+            />
+          </Modal>
+          {selectedNote && (
+            <Modal
+              opened={editOpened}
+              onClose={() => setEditOpened(false)}
+              title={
+                <NoteTitleBar
+                  name={selectedNote.childName ?? "Not"}
+                  date={selectedNote.date}
+                  avatar={selectedNote.childProfilePicture /* varsa */}
+                />
+              }
+              size="xl"
+            >
+              <EditNoteForm
+                data={selectedNote}
+                onCancel={() => setEditOpened(false)}
+                onSave={handleUpdate}
+              />
+            </Modal>
+          )}
+        </Grid.Col>
+      </Grid>
     </Stack>
   );
 }

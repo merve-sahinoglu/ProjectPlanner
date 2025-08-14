@@ -1,0 +1,30 @@
+.chrome {
+  /* Tüm krom için ortak değişkenler */
+  --chrome-bg: light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
+  --chrome-border: light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  --chrome-ribbon: linear-gradient(90deg, #f472b6, #8b5cf6);
+}
+
+/* Header + Navbar aynı zemin ve kenarlık dili */
+.header {
+  background: var(--chrome-bg);
+  border-bottom: 1px solid var(--chrome-border);
+  padding-inline: var(--mantine-spacing-md);
+}
+
+.ribbon {
+  height: 3px;
+  width: 100%;
+  background: var(--chrome-ribbon);
+}
+
+.navbar {
+  background: var(--chrome-bg);
+  border-right: 1px solid var(--chrome-border);
+  padding: var(--mantine-spacing-sm);
+}
+
+.main {
+  background: light-dark(var(--mantine-color-gray-0), var(--mantine-color-dark-7));
+  /* içerik alanı için hafif bir kontrast */
+}

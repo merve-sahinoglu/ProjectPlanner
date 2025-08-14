@@ -1,9 +1,7 @@
 import { Navigate, useLocation } from "react-router-dom";
 import {
   AuthenticatedUser,
-  AuthenticationRequest,
-  AuthenticationResponse,
-  ThirdPartyAuthenticationRequest,
+  AuthenticationRequest
 } from "./types/authentication-types";
 import { createContext, useContext } from "react";
 import RequestType from "../enum/request-type";
@@ -15,14 +13,11 @@ import {
 } from "./store/useCredentialsStore";
 import { useTokenActions } from "./store/useTokensStore";
 import useRequestHandler from "../hooks/useRequestHandler";
+import { apiUrl, createRequestUrl } from "../config/app.config";
 
 interface AuthenticationProps {
   currentUser: AuthenticatedUser | null;
   authenticateUser(user: AuthenticationRequest): Promise<boolean>;
-  authenticateThirdParty: (
-    accessToken: string,
-    userId: string
-  ) => Promise<boolean>;
   logoutUser(): void;
 }
 
@@ -59,7 +54,9 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
     const response = await sendData<
       AuthenticationRequest,
       AuthenticationResponseDto
-    >(`https://localhost:5001/api/authenticate`, RequestType.Post, user);
+    >(createRequestUrl(apiUrl.coreUrl), RequestType.Post, user);
+
+      debugger;
 
     if (!response.isSuccess) {
       return false;
@@ -72,46 +69,9 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
     };
 
     const auths = await fetchData<AuthorizationResponseDto>(
-      `https://localhost:5001/api/authorizations`,
+      createRequestUrl(apiUrl.authorizationsUrl),
       { userId: decodedToken.UserId },
       headers
-    );
-
-    if (!auths.isSuccess) return false;
-
-    setCurrentUser({
-      name: auths.value.name,
-      surname: auths.value.surname,
-      userId: auths.value.userId,
-    });
-
-    setAccessToken(response.value.accessToken);
-
-    return true;
-  };
-
-  const authenticateThirdParty = async (
-    accessToken: string,
-    userId: string
-  ) => {
-    const response = await sendData<
-      ThirdPartyAuthenticationRequest,
-      AuthenticationResponse
-    >(
-      "https://magnetouat.acibadem.com.tr/anicetus-service/api/third-party-authentication",
-      RequestType.Post,
-      { accessToken: accessToken, userId: userId }
-    );
-
-    if (!response.isSuccess) {
-      return false;
-    }
-
-    const decodedToken = jwtDecode(response.value.accessToken) as AnicetusToken;
-
-    const auths = await fetchData<AuthorizationResponseDto>(
-      `https://magnetouat.acibadem.com.tr/anicetus-service/api/authorizations`,
-      { userId: decodedToken.UserId }
     );
 
     if (!auths.isSuccess) return false;
@@ -135,7 +95,6 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
     currentUser,
     authenticateUser,
     logoutUser,
-    authenticateThirdParty,
   };
 
   return (

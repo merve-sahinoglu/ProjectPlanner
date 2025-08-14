@@ -1,7 +1,7 @@
 import { AppShell } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Navbar } from "./navbar/Navbar";
-import { Header } from "./header/Header";
+import AppHeader from "./header/AppHeader";
+import AppNavbar from "./navbar/AppNavbar";
 
 interface MainProps {
   children?: React.ReactNode;
@@ -22,15 +22,15 @@ function Main({ children }: MainProps) {
         padding="md"
       >
         <AppShell.Header>
-          <Header
+          <AppHeader
             mobileOpened={mobileOpened}
             desktopOpened={desktopOpened}
             toggleMobile={toggleMobile}
             toggleDesktop={toggleDesktop}
-          ></Header>
+          ></AppHeader>
         </AppShell.Header>
-        <AppShell.Navbar mt={5} h={"%100"}>
-          <Navbar></Navbar>
+        <AppShell.Navbar mt={18} h={"%100"}>
+          <AppNavbar></AppNavbar>
         </AppShell.Navbar>
         <AppShell.Main>{children}</AppShell.Main>
       </AppShell>

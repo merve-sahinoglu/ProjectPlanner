@@ -1,0 +1,35 @@
+/* Pastel temel tema ayarları */
+.ag-theme-quartz.kids {
+  --ag-foreground-color: #1f2937;
+  --ag-background-color: #ffffff;
+  --ag-header-background-color: #f8fafc;
+  --ag-header-foreground-color: #334155;
+  --ag-odd-row-background-color: #f9fafb;
+  --ag-row-hover-color: rgba(99,102,241,0.06);
+
+  --ag-borders: solid 1px;
+  --ag-border-color: #ececf2;
+
+  --ag-font-size: 14px;
+  --ag-header-height: 44px;
+  --ag-row-height: 40px;
+
+  /* seçili odak rengi */
+  --ag-range-selection-border-color: #7c3aed;
+  --ag-selected-row-background-color: rgba(124,58,237,0.12);
+}
+
+[data-mantine-color-scheme="dark"] .ag-theme-quartz.kids {
+  --ag-background-color: #16161a;
+  --ag-foreground-color: #e5e7eb;
+  --ag-header-background-color: #1b1b21;
+  --ag-header-foreground-color: #e5e7eb;
+  --ag-odd-row-background-color: #181821;
+  --ag-row-hover-color: rgba(168,85,247,0.1);
+  --ag-border-color: #2a2a35;
+}
+
+/* header yazısı */
+.ag-theme-quartz.kids .ag-header-cell-label {
+  font-weight: 700;
+}

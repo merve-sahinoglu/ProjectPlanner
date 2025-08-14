@@ -10,7 +10,6 @@ import {
 } from "@ag-grid-community/core";
 import { AgGridReact } from "@ag-grid-community/react";
 import { useEffect, useRef, useState } from "react";
-import "./DataTable.css";
 import {
   AG_GRID_LOCALE_EN,
   AG_GRID_LOCALE_TR,
@@ -19,6 +18,8 @@ import Language from "../../enum/language.ts";
 import useUserPreferences from "../../hooks/useUserPreferenceStore.tsx";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
+import "../../components/DataTable/ag-theme-kids-extras.css";
+import "../../components/DataTable/ag-theme-kids.css"; // bu dosya (ek süslemeler)
 
 ModuleRegistry.registerModules([ClientSideRowModelModule]);
 
@@ -31,8 +32,13 @@ interface DataTableProps<T extends TableEntity> {
   columns: (ColDef<T> | ColGroupDef<T>)[];
   isFetching: boolean;
   h?: number | string;
+  rowHeight?: number;
   onRowClicked?(data: T): void;
   hasPagination?: boolean;
+  className?: string;
+  quickFilterText?: string;
+  onApiReady?(api: GridApi<T>): void;
+  paginationPageSize?: number;
 }
 
 function DataTable<T extends TableEntity>({
@@ -42,6 +48,11 @@ function DataTable<T extends TableEntity>({
   isFetching,
   onRowClicked,
   hasPagination = true,
+  rowHeight,
+  className,
+  quickFilterText,
+  onApiReady,
+  paginationPageSize = 250,
 }: DataTableProps<T>) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gridRef = useRef<GridApi<any> | null>(null);
@@ -50,6 +61,7 @@ function DataTable<T extends TableEntity>({
 
   const onGridReady = (params: GridReadyEvent) => {
     gridRef.current = params.api;
+    onApiReady?.(params.api as GridApi<T>);
   };
 
   const language = useUserPreferences((state) => state.language);
@@ -66,14 +78,18 @@ function DataTable<T extends TableEntity>({
   }, [language]);
 
   return isReady ? (
-    <div className={"ag-theme-quartz"} style={{ width: "100%", height: h }}>
+    <div
+      className={`ag-theme-quartz kids ${className ?? ""}`}
+      style={{ width: "100%", height: h }}
+    >
       <AgGridReact
         rowData={records}
         columnDefs={columns}
         rowModelType="clientSide"
         pagination={hasPagination}
+        rowHeight={rowHeight}
         getRowId={getRowId}
-        paginationPageSize={250} // Number of rows per page
+        paginationPageSize={paginationPageSize} // Number of rows per page
         paginationPageSizeSelector={[50, 150, 250, 500]}
         defaultColDef={{
           wrapHeaderText: true,
@@ -83,6 +99,7 @@ function DataTable<T extends TableEntity>({
         }}
         tooltipShowDelay={0}
         loading={isFetching}
+        quickFilterText={quickFilterText}
         localeText={
           language === Language.Turkish ? AG_GRID_LOCALE_TR : AG_GRID_LOCALE_EN
         }

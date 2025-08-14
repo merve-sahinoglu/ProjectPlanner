@@ -231,22 +231,24 @@ const UserOverview: React.FC = () => {
       </Grid.Col>
       <Grid.Col span={{ xs: 12, sm: 12, md: 9 }}>
         {selectedItem && (
-          <CardGridDetail>
-            <UserDetail
-              key={selectedItem?.id}
-              selectedUser={selectedItem}
-              handleDeleteItem={handleDeleteItems}
-              handleUpdateItem={handleUpdateItems}
-              canAddItem={canAddItem}
-              setCanAddItem={setCanAddItem}
-              createdItemGuid={createdUserGuid.current}
-              disabled={isDisabled}
-              setDisabled={setIsDisabled}
-              changeCreatedItemGuid={changeCreatedItemGuid}
-              handleUpdateItemWithId={handleUpdateItemWithId}
-              changeSelectedItem={changeSelectedItem}
-            />
-          </CardGridDetail>
+          <>
+            <CardGridDetail>
+              <UserDetail
+                key={selectedItem?.id}
+                selectedUser={selectedItem}
+                handleDeleteItem={handleDeleteItems}
+                handleUpdateItem={handleUpdateItems}
+                canAddItem={canAddItem}
+                setCanAddItem={setCanAddItem}
+                createdItemGuid={createdUserGuid.current}
+                disabled={isDisabled}
+                setDisabled={setIsDisabled}
+                changeCreatedItemGuid={changeCreatedItemGuid}
+                handleUpdateItemWithId={handleUpdateItemWithId}
+                changeSelectedItem={changeSelectedItem}
+              />
+            </CardGridDetail>
+          </>
         )}
       </Grid.Col>
     </Grid>

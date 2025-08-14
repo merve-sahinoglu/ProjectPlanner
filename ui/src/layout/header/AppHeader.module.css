@@ -1,0 +1,87 @@
+.header {
+  /* tam genişlik bar */
+  width: 100%;
+}
+
+.bar {
+  width: 100%;
+  background: linear-gradient(90deg, #ffffff80, #ffffffaa);
+  backdrop-filter: blur(6px);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+
+.ribbon {
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, #f472b6, #8b5cf6);
+}
+
+.inner {
+  /* Sıralamayı flex ile kontrol et */
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+}
+
+/* SOL GRUP: SOLA YAPIŞSIN */
+.left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-right: auto; /* <- kritik */
+}
+
+/* SAĞ GRUP: sağa yasla (gerekirse) */
+.right {
+  margin-left: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* Avatar için gradient ring */
+.logoWrap {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #f472b6, #8b5cf6);
+  box-shadow: 0 4px 14px rgba(168, 85, 247, 0.25);
+}
+
+.logoAvatar {
+  border-radius: 9999px;
+}
+
+.brandText .title {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.badge {
+  margin-top: 2px;
+}
+
+.spark {
+  display: inline-flex;
+  transform: translateY(1px);
+}
+
+:global([data-mantine-color-scheme="dark"]) .bar {
+  background: linear-gradient(90deg, #14141a80, #14141aaa);
+  border-bottom-color: rgba(255,255,255,.06);
+}
+
+:global([data-mantine-color-scheme="dark"]) .logoWrap {
+  box-shadow: 0 4px 14px rgba(139, 92, 246, 0.25);
+}
+
+/* küçük ekranlarda spacing ayarı */
+@media (max-width: 640px) {
+  .brandText .title {
+    font-size: 15px;
+  }
+}

@@ -8,30 +8,36 @@ import Link from "@tiptap/extension-link";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import { nameof } from "../../helpers/name-of";
+import { useRef } from "react";
 
 // Projendeki gerçek import yoluna göre düzelt:
 
-export type AddNoteFormValues = {
+export type EditNoteFormValues = {
+  id: string; // Not ID'si, düzenleme için gerekli
   date: Date | null;
   childId: string;
+  childName?: string; // Çocuğun adı, opsiyonel
   therapistId: string;
   noteHtml: string;
+  childProfilePicture: Blob | number[];
 };
 
 type Props = {
-  therapistId: string;
-  childId?: string;
-  onSave: (values: AddNoteFormValues) => void;
+  data: EditNoteFormValues;
+  onSave: (values: EditNoteFormValues) => void;
   onCancel: () => void;
 };
 
-export default function AddNoteForm({ onSave, onCancel, therapistId, childId }: Props) {
-  const form = useForm<AddNoteFormValues>({
+export default function EditNoteForm({ data, onSave, onCancel }: Props) {
+  const form = useForm<EditNoteFormValues>({
     initialValues: {
-      date: new Date(),
-      childId: childId ?? "",
-      therapistId: therapistId,
-      noteHtml: "",
+      id: data.id ?? "",
+      date: data.date ?? new Date(),
+      childId: data.childId ?? "",
+      childName: data.childName ?? "",
+      therapistId: data.therapistId ?? "",
+      noteHtml: data.noteHtml ?? "",
+      childProfilePicture: data.childProfilePicture ?? null,
     },
     validate: {
       date: (v) => (v ? null : "Tarih seçiniz"),
@@ -40,6 +46,8 @@ export default function AddNoteForm({ onSave, onCancel, therapistId, childId }: 
       noteHtml: (v) => (v.trim() ? null : "Not boş olamaz"),
     },
   });
+
+  const initialValues = useRef<EditNoteFormValues>(form.values);
 
   // RichTextEditor – form ile senkron
   const editor = useEditor({
@@ -60,27 +68,6 @@ export default function AddNoteForm({ onSave, onCancel, therapistId, childId }: 
 
   return (
     <Stack gap="md">
-      <Group align="flex-end" wrap="wrap" gap="md">
-        <DateInput
-          label="Date"
-          placeholder="Pick date"
-          value={form.values.date}
-          {...form.getInputProps(nameof<AddNoteFormValues>("date"))}
-          w={220}
-        />
-
-        <FormAutocomplete
-          searchInputLabel="Child ID"
-          placeholder="Child ID"
-          description=""
-          apiUrl={createRequestUrl(apiUrl.userUrl)}
-          form={form}
-          formInputProperty="childId"
-          {...form.getInputProps(nameof<AddNoteFormValues>("childId"))}
-          clearValue={clearChildId}
-        />
-      </Group>
-
       <div>
         <RichTextEditor editor={editor}>
           <RichTextEditor.Toolbar sticky stickyOffset={60}>

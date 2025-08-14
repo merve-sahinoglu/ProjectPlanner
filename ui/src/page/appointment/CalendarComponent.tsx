@@ -102,7 +102,7 @@ const CalendarComponent = () => {
 
   const form = useForm<SearchSchema>({
     initialValues: {
-      chieldId: undefined,
+      childId: undefined,
       therapistId: undefined,
       startDate: moment(new Date()).startOf("day").format("DD.MMM.YYYY HH:mm"),
       endDate: moment(new Date()).add(1, "days").format("DD.MMM.YYYY HH:mm"),
@@ -161,7 +161,7 @@ const CalendarComponent = () => {
 
   const fetchAppointments = async () => {
     const request: { [key: string]: any } = {
-      chieldId: form.values.chieldId,
+      chieldId: form.values.childId,
       therapistId: IdFromUrl ?? form.values.therapistId,
       startDate: form.values.startDate,
       endDate: form.values.endDate,
@@ -486,8 +486,8 @@ const CalendarComponent = () => {
                   description=""
                   apiUrl={createRequestUrl(apiUrl.userUrl)}
                   form={form}
-                  {...form.getInputProps(nameof<SearchSchema>("chieldId"))}
-                  formInputProperty="chieldId"
+                  {...form.getInputProps(nameof<SearchSchema>("childId"))}
+                  formInputProperty="childId"
                   clearValue={clearChieldId}
                 />
                 <FormAutocomplete

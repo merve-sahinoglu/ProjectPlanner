@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { IconChevronRight } from "@tabler/icons-react";
+import { useId, useState } from "react";
 import {
   Box,
   Collapse,
@@ -8,6 +7,7 @@ import {
   ThemeIcon,
   UnstyledButton,
 } from "@mantine/core";
+import { IconChevronRight } from "@tabler/icons-react";
 import classes from "./NavbarLinksGroup.module.css";
 
 interface Link {
@@ -23,6 +23,10 @@ interface LinksGroupProps {
   additionalInfo?: string;
   initiallyOpened?: boolean;
   links?: Link[];
+
+  // highlighting & navigation
+  activeParent?: string;
+  activePath?: string;
   handleMenuItemSelect: (link: string) => void;
   handleActiveLink: (link: string, additionalInfo?: string) => void;
 }
@@ -34,68 +38,109 @@ export function LinksGroup({
   additionalInfo,
   initiallyOpened,
   links,
+  activeParent,
+  activePath,
   handleMenuItemSelect,
   handleActiveLink,
 }: LinksGroupProps) {
-  const hasLinks = Array.isArray(links);
+  const hasLinks = Array.isArray(links) && links.length > 0;
   const [opened, setOpened] = useState(initiallyOpened || false);
+  const collapseId = useId();
 
-  const handleClick = (event: React.MouseEvent, link: Link) => {
-    handleMenuItemSelect(link.label);
-    handleActiveLink(link.link, link.additionalInfo);
-    event.preventDefault();
+  // parent & leaf aktiflik
+  const isParentActive = activeParent === label;
+  const isLeafActive = (path?: string) => !!path && activePath === path;
+
+  const onParentClick = (e: React.MouseEvent) => {
+    if (hasLinks) {
+      setOpened((o) => !o);
+    } else if (link) {
+      handleMenuItemSelect(label);
+      handleActiveLink(link, additionalInfo);
+    }
+    e.preventDefault();
   };
 
-  const handleBoxClick = (event: React.MouseEvent) => {
-  if (!hasLinks && link) {
+  const onLeafClick = (e: React.MouseEvent, l: Link) => {
     handleMenuItemSelect(label);
-    handleActiveLink(link, additionalInfo);
-    event.preventDefault();
-  }
-    
+    handleActiveLink(l.link, l.additionalInfo);
+    e.preventDefault();
   };
-
-  const items = (hasLinks ? links : []).map((link) => (
-    <Text<"a">
-      component="a"
-      className={classes.link}
-      href={link.link}
-      key={link.label}
-      onClick={(event) => handleClick(event, link)}
-    >
-      {link.label}
-    </Text>
-  ));
 
   return (
     <>
       <UnstyledButton
-        onClick={() => setOpened((o) => !o)}
-        className={classes.control}
+        onClick={onParentClick}
+        className={`${classes.control} ${
+          isParentActive ? classes.controlActive : ""
+        }`}
+        data-opened={opened || undefined}
       >
-        <Group justify="space-between" gap={0}>
-          <Box
-            style={{ display: "flex", alignItems: "center" }}
-            onClick={(event) => handleBoxClick(event)}
-          >
-            <ThemeIcon variant="light" size={30}>
+        {/* solda renk aksanı */}
+        <span
+          className={`${classes.accent} ${
+            isParentActive ? classes.accentActive : ""
+          }`}
+        />
+
+        <Group justify="space-between" gap={8} wrap="nowrap">
+          <Group gap="sm" wrap="nowrap">
+            <ThemeIcon
+              radius="md"
+              size={34}
+              variant={isParentActive ? "gradient" : "light"}
+              gradient={{ from: "pink", to: "violet", deg: 35 }}
+              color="grape"
+              className={classes.icon}
+            >
               <Icon size={18} />
             </ThemeIcon>
-            <Box ml="md">{label}</Box>
-          </Box>
+
+            <Box className={classes.labelWrap}>
+              <Text fw={600} fz="sm" className={classes.label}>
+                {label}
+              </Text>
+              {hasLinks && (
+                <Text fz={11} c="dimmed" className={classes.subhint}>
+                  {opened ? "Kapat" : "Aç"} • {links!.length} link
+                </Text>
+              )}
+            </Box>
+          </Group>
+
           {hasLinks && (
             <IconChevronRight
-              className={classes.chevron}
-              stroke={1.5}
               size={16}
-              style={{ transform: opened ? "rotate(-90deg)" : "none" }}
+              stroke={1.6}
+              className={`${classes.chevron} ${
+                opened ? classes.chevronOpened : ""
+              }`}
+              aria-hidden
             />
           )}
         </Group>
       </UnstyledButton>
-      {hasLinks ? <Collapse in={opened}>{items}</Collapse> : null}
+
+      {hasLinks ? (
+        <Collapse in={opened} id={collapseId}>
+          <div className={classes.links}>
+            {links!.map((l) => (
+              <a
+                key={l.label}
+                href={l.link}
+                className={`${classes.link} ${
+                  isLeafActive(l.link) ? classes.linkActive : ""
+                }`}
+                onClick={(e) => onLeafClick(e, l)}
+              >
+                {/* aktif yaprak için küçük nokta */}
+                <span className={classes.dot} />
+                <span>{l.label}</span>
+              </a>
+            ))}
+          </div>
+        </Collapse>
+      ) : null}
     </>
   );
 }
-
-
