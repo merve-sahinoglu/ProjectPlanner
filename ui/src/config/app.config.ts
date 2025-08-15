@@ -7,6 +7,7 @@ export interface ServiceUrls {
   appointmentRoomsUrl: string;
   appointmentPlayGroupUrl: string;
   noteUrl: string; // Notlar için eklenebilir
+  profileGroupUsersUrl: string; // Profil Grupları için eklenebilir
   profileGroupUrl: string; // Profil Grupları için eklenebilir
 }
 
@@ -22,6 +23,7 @@ interface Endpoints {
   room: string;
   playGroup: string;
   note: string;
+  profileGroupUsers: string;
   profileGroup: string;
 }
 
@@ -42,7 +44,8 @@ export const endpoints: Endpoints = {
   playGroup: "playGroups",
   note: "notes", // Notlar için eklenebilir
   authorizations: "authorizations",
-  profileGroup: "profileGroups",
+  profileGroupUsers: "profile-group-users",
+  profileGroup: "profile-group",
 } as const;
 
 export const services: ServiceAddress = {
@@ -63,6 +66,7 @@ export const apiUrl: ServiceUrls = {
   appointmentPlayGroupUrl: `${services.appointmentService}/${endpoints.playGroup}`,
   noteUrl: `${services.noteService}/${endpoints.note}`,
   profileGroupUrl: `${services.userService}/${endpoints.profileGroup}`,
+  profileGroupUsersUrl: `${services.userService}/${endpoints.profileGroupUsers}`,
 };
 
 export function createRequestUrl(

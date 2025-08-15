@@ -271,5 +271,20 @@
     "speechTherapy": "Speech Therapy",
     "psychologicalTherapy": "Psychological Therapy",
     "gameGroups": "Game Groups"
+  },
+  "profileGroup": {
+    "cardTitle": "Profile Group List",
+    "profileName": "Profile Name",
+    "profileGroupId": "Profile Group ID",
+    "profileGroupName": "Profile Group Name",
+    "profileGroupDescription": "Profile Group Description",
+    "profileGroupValidation": {
+      "profileNameMinimum": "Profile name is required.",
+      "profileNameMaximum": "Profile name must be less than or equal to 128.",
+      "profileGroupIdRequired": "Profile group ID is required.",
+      "profileGroupNameMinimum": "Profile group name is required.",
+      "profileGroupNameMaximum": "Profile group name must be less than or equal to 128.",
+      "profileGroupDescriptionMaximum": "Profile group description must be less than or equal to 256."
+    }
   }
 }

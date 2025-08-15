@@ -19,11 +19,10 @@
 
 .links {
   flex: 1;
-  padding: var(--mantine-spacing-sm);
+  padding: var(--mantine-spacing-sm); 
 }
 
 .linksInner {
-  padding-top: var(--mantine-spacing-md);
   padding-bottom: var(--mantine-spacing-xl);
 }
 

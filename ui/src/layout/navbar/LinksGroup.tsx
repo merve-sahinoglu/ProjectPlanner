@@ -23,7 +23,7 @@ interface LinksGroupProps {
   additionalInfo?: string;
   initiallyOpened?: boolean;
   links?: Link[];
-
+  hidden?: boolean;
   // highlighting & navigation
   activeParent?: string;
   activePath?: string;
@@ -40,6 +40,7 @@ export function LinksGroup({
   links,
   activeParent,
   activePath,
+  hidden,
   handleMenuItemSelect,
   handleActiveLink,
 }: LinksGroupProps) {
@@ -70,6 +71,7 @@ export function LinksGroup({
   return (
     <>
       <UnstyledButton
+        hidden={hidden}
         onClick={onParentClick}
         className={`${classes.control} ${
           isParentActive ? classes.controlActive : ""
@@ -83,7 +85,7 @@ export function LinksGroup({
           }`}
         />
 
-        <Group justify="space-between" gap={8} wrap="nowrap">
+        <Group hidden={hidden} justify="space-between" gap={8} wrap="nowrap">
           <Group gap="sm" wrap="nowrap">
             <ThemeIcon
               radius="md"

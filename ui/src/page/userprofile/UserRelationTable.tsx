@@ -3,8 +3,6 @@ import { useMemo } from "react";
 import { ActionIcon, Avatar, Badge, Group, Tooltip } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import type {
-  ColDef,
-  ColGroupDef,
   ICellRendererParams,
 } from "ag-grid-community";
 import UserRelationProps from "./types";
@@ -26,13 +24,13 @@ const UserCell: React.FC<ICellRendererParams<UserRelationProps>> = ({
   data,
 }) => {
   if (!data) return null;
-  const initials = (data.userId?.[0] ?? "?").toUpperCase();
+  const initials = (data.userFullName?.[0] ?? "?").toUpperCase();
   return (
     <Group gap={8}>
       <Avatar size="sm" radius="xl" color="grape">
         {initials}
       </Avatar>
-      <span style={{ fontWeight: 600 }}>{data.userId}</span>
+      <span style={{ fontWeight: 600 }}>{data.userFullName}</span>
     </Group>
   );
 };
@@ -43,7 +41,7 @@ const GroupCell: React.FC<ICellRendererParams<UserRelationProps>> = ({
   if (!data) return null;
   return (
     <Badge variant="light" color="indigo">
-      {data.profileGroupId}
+      {data.profileGroupName}
     </Badge>
   );
 };
@@ -86,11 +84,8 @@ export default function UserRelationTable({
   quickFilter,
   onApiReady,
 }: Props) {
-  const columns = useMemo<
-    (ColDef<UserRelationProps> | ColGroupDef<UserRelationProps>)[]
-  >(
+  const columns = useMemo(
     () => [
-      { headerName: "ID", field: "id", minWidth: 220, flex: 1 },
       {
         headerName: "User",
         field: "userId",
@@ -108,11 +103,12 @@ export default function UserRelationTable({
         field: "id",
         cellRenderer: ActionsRenderer as any,
         cellRendererParams: { onEdit, onDelete },
-        minWidth: 140,
+        minWidth: 50,
         pinned: "right",
         sortable: false,
         filter: false,
         suppressMenu: true,
+        maxWidth: 100,
       },
     ],
     [onEdit, onDelete]

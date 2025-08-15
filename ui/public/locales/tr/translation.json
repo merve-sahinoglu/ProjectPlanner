@@ -245,5 +245,20 @@
     "speechTherapy": "Konuşma Terapisi",
     "psychologicalTherapy": "Psikolojik Terapi",
     "gameGroups": "Oyun Grupları"
+  },
+  "profileGroup" :{
+    "cardTitle": "Profil Grubu Listesi",
+    "profileName": "Profil Adı",
+    "profileGroupId": "Profil Grubu ID",
+    "profileGroupName": "Profil Grubu Adı",
+    "profileGroupDescription": "Profil Grubu Açıklaması",
+    "profileGroupValidation": {
+      "profileNameMinimum": "Profil adı gereklidir.",
+      "profileNameMaximum": "Profil adı 128 karakterden az olmalıdır.",
+      "profileGroupIdRequired": "Profil grubu ID'si gereklidir.",
+      "profileGroupNameMinimum": "Profil grubu adı gereklidir.",
+      "profileGroupNameMaximum": "Profil grubu adı 128 karakterden az olmalıdır.",
+      "profileGroupDescriptionMaximum": "Profil grubu açıklaması 256 karakterden az olmalıdır."
+    }
   }
 }

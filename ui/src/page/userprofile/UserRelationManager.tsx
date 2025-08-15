@@ -1,63 +1,127 @@
 // src/features/user-relation/UserRelationManager.tsx
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Button,
   Group,
   Modal,
   Paper,
-  SegmentedControl,
   Select,
   Stack,
   TextInput,
   Title,
 } from "@mantine/core";
-import { IconDownload, IconPlus, IconSearch } from "@tabler/icons-react";
+import { IconPlus, IconSearch } from "@tabler/icons-react";
 import type { GridApi } from "ag-grid-community";
-import type { UserRelationProps } from "./types";
 import UserRelationTable from "./UserRelationTable";
 import UserRelationEditor from "./UserRelationEditor";
+import UserRelationProps, { UserRelationFormValues } from "./types";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import RequestType from "../../enum/request-type";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import toast from "react-hot-toast";
+import formatSearchQuery from "../../helpers/trim-search-query";
+
+let den = 0;
 
 export default function UserRelationManager() {
-  const initialData = useMemo<UserRelationProps[]>(
-    () => [
-      { id: "rel-1", userId: "user-1", profileGroupId: "group-a" },
-      { id: "rel-2", userId: "user-2", profileGroupId: "group-b" },
-    ],
-    []
-  );
+  const { fetchData, sendData } = useRequestHandler();
 
-  const [rows, setRows] = useState<UserRelationProps[]>(initialData);
+  const [rows, setRows] = useState<UserRelationProps[]>([]);
   const [editOpened, setEditOpened] = useState(false);
   const [editingRow, setEditingRow] = useState<UserRelationProps | null>(null);
   const [isFetching, setIsFetching] = useState(false);
-
-  const [quick, setQuick] = useState("");
-  const [density, setDensity] = useState<"compact" | "regular" | "spacious">(
-    "regular"
-  );
-
-
-
   const [pageSize, setPageSize] = useState<string | null>("250");
-
   const apiRef = useRef<GridApi<UserRelationProps> | null>(null);
 
-  const rowHeight =
-    density === "compact" ? 36 : density === "spacious" ? 56 : 44;
+  const loadList = async (searchText?: string) => {
+    setIsFetching(true);
+    try {
+      const request: { [key: string]: any } = {
+        searchText: searchText ? formatSearchQuery(searchText) : undefined,
+      };
 
-  const handleAdd = (data: UserRelationProps) =>
-    setRows((prev) => [data, ...prev]);
-  const handleEditOpen = (row: UserRelationProps) => {
-    setEditingRow(row);
-    setEditOpened(true);
+      if (request.searchText === undefined) {
+        delete request.searchText;
+      }
+
+      const res = await fetchData<UserRelationProps[]>(
+        createRequestUrl(apiUrl.profileGroupUsersUrl),
+        request
+      );
+      if (res.isSuccess) setRows(res.value);
+      else toast.error(res.error);
+    } finally {
+      setIsFetching(false);
+    }
   };
-  const handleUpdate = (data: UserRelationProps) => {
-    setRows((prev) => prev.map((r) => (r.id === data.id ? data : r)));
+
+  const handleAddSubmit = async (vals: UserRelationFormValues) => {
+    const res = await sendData<UserRelationFormValues, UserRelationProps>(
+      createRequestUrl(apiUrl.profileGroupUsersUrl),
+      RequestType.Post,
+      vals
+    );
+    if (!res.isSuccess) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success("İlişki eklendi");
     setEditOpened(false);
     setEditingRow(null);
+    await loadList();
   };
-  const handleDelete = (id: string) =>
-    setRows((prev) => prev.filter((r) => r.id !== id));
+
+  const handleQuickSearch = (value: string) => {
+    if (value.length == 0 || value.length > 1) {
+      loadList(value);
+    }
+  };
+
+  const handleUpdateSubmit = async (vals: UserRelationFormValues) => {
+    if (!editingRow) return;
+    // önce sil
+    const del = await sendData<null, null>(
+      createRequestUrl(apiUrl.profileGroupUsersUrl, editingRow.id),
+      RequestType.Delete,
+      null as any
+    );
+    if (!del.isSuccess) {
+      toast.error(del.error ?? "Güncelleme başarısız (silme)");
+      return;
+    }
+    // sonra ekle
+    const add = await sendData<UserRelationFormValues, UserRelationProps>(
+      createRequestUrl(apiUrl.profileGroupUsersUrl),
+      RequestType.Post,
+      vals
+    );
+    if (!add.isSuccess) {
+      toast.error(add.error ?? "Güncelleme başarısız (ekleme)");
+      return;
+    }
+    toast.success("İlişki güncellendi");
+    setEditOpened(false);
+    setEditingRow(null);
+    await loadList();
+  };
+
+  const handleDelete = async (id: string) => {
+    const res = await sendData<null, null>(
+      createRequestUrl(apiUrl.profileGroupUsersUrl, id),
+      RequestType.Delete,
+      null as any
+    );
+    if (!res.isSuccess) {
+      toast.error(res.error);
+      return;
+    }
+    toast.success("İlişki silindi");
+    await loadList();
+  };
+
+  useEffect(() => {
+    loadList();
+  }, []);
 
   return (
     <Stack gap="lg">
@@ -78,8 +142,7 @@ export default function UserRelationManager() {
 
           <Group wrap="wrap" gap="sm">
             <TextInput
-              value={quick}
-              onChange={(e) => setQuick(e.currentTarget.value)}
+              onChange={(e) => handleQuickSearch(e.currentTarget.value)}
               placeholder="Ara (ID, User, Group)"
               leftSection={<IconSearch size={16} />}
               radius="md"
@@ -95,7 +158,10 @@ export default function UserRelationManager() {
             />
             <Button
               leftSection={<IconPlus size={16} />}
-              onClick={() => setEditOpened(true)}
+              onClick={() => {
+                setEditingRow(null);
+                setEditOpened(true);
+              }}
             >
               Yeni Ekle
             </Button>
@@ -104,17 +170,14 @@ export default function UserRelationManager() {
 
         <UserRelationTable
           records={rows}
-          onEdit={handleEditOpen}
+          onEdit={(row) => {
+            setEditingRow(row);
+            setEditOpened(true);
+          }}
           onDelete={handleDelete}
           isFetching={isFetching}
           height={520}
-          rowHeight={rowHeight}
-          quickFilter={quick}
-          onApiReady={(api) => {
-            apiRef.current = api;
-            // page size değişimi
-            api.paginationSetPageSize(Number(pageSize ?? "250"));
-          }}
+          rowHeight={44}
         />
       </Paper>
 
@@ -134,8 +197,8 @@ export default function UserRelationManager() {
             setEditOpened(false);
             setEditingRow(null);
           }}
-          onSubmit={(data) => {
-            editingRow ? handleUpdate(data) : handleAdd(data);
+          onSubmit={(vals) => {
+            editingRow ? handleUpdateSubmit(vals) : handleAddSubmit(vals);
           }}
         />
       </Modal>

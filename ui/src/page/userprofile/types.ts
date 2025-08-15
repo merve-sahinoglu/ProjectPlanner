@@ -6,4 +6,6 @@ interface UserRelationProps {
   profileGroupName: string;
 }
 
+export type UserRelationFormValues = { userId: string; profileGroupId: string };
+
 export default UserRelationProps;

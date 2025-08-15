@@ -35,6 +35,7 @@ interface AuthorizationResponseDto {
   userId: string;
   name: string;
   surname: string;
+  right: string[];
 }
 
 interface AuthenticationProviderProps {
@@ -46,7 +47,7 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
 
   const currentUser = useCurrentUser();
 
-  const { setCurrentUser } = useCredentialActions();
+  const { setCurrentUser, setCurrentUserFunctions } = useCredentialActions();
 
   const { setAccessToken } = useTokenActions();
 
@@ -83,6 +84,8 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
     });
 
     setAccessToken(response.value.accessToken);
+
+    setCurrentUserFunctions(auths.value.right);
 
     return true;
   };

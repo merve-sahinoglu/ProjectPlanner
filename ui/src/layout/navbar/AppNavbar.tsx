@@ -11,12 +11,14 @@ import routes from "../../constants/routes";
 import { useNavigate } from "react-router-dom";
 import { LinksGroup } from "./LinksGroup";
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
+import { useCredentialActions } from "../../authentication/store/useCredentialsStore";
 
 export function AppNavbar() {
   const [activeParent, setActiveParent] = useState<string>("My Page");
   const [activePath, setActivePath] = useState<string>("");
   const auth = useAuthenticationContext();
   const navigate = useNavigate();
+  const { checkIfUserHasFunctionAuthorization } = useCredentialActions();
 
   const handleMenuItemSelect = (parentLabel: string) => {
     setActiveParent(parentLabel);
@@ -51,15 +53,18 @@ export function AppNavbar() {
         icon: IconCalendarStats,
         label: "Appointment",
         link: routes.appointment,
+        hidden: !checkIfUserHasFunctionAuthorization("Randevu"),
       },
       {
         icon: IconNotebook,
         label: "Note",
         link: routes.notes,
+        hidden: !checkIfUserHasFunctionAuthorization("Not"),
       },
       {
         icon: IconSettings,
         label: "Settings",
+        hidden: !checkIfUserHasFunctionAuthorization("Ayarlar"),
         links: [
           { label: "User", link: routes.user },
           { label: "User Relation", link: routes.userRelation },
@@ -73,13 +78,13 @@ export function AppNavbar() {
 
   return (
     <nav className={classes.navbar}>
-      
       <ScrollArea className={classes.links} type="auto" scrollbarSize={8}>
         <div className={classes.linksInner}>
           {data.map((item) => (
             <LinksGroup
               key={item.label}
               {...item}
+              hidden={item.hidden || false}
               activeParent={activeParent}
               activePath={activePath}
               handleActiveLink={handleActiveLink}

@@ -687,5 +687,7 @@ abstract class Dictionary {
       "appointmentType.psychologicalTherapy";
     static readonly GAME_GROUPS = "appointmentType.gameGroups";
   };
+
+
 }
 export default Dictionary;

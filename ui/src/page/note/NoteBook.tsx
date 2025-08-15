@@ -115,7 +115,7 @@ export default function NoteBook() {
     };
 
     const response = await sendData<NoteItem, GridNoteItem>(
-      createRequestUrl(apiUrl.noteUrl),
+      createRequestUrl(apiUrl.profileGroupUsersUrl),
       RequestType.Post,
       newItem
     );
@@ -132,7 +132,7 @@ export default function NoteBook() {
     const handleUpdate = async (value: EditNoteFormValues) => {
 
       const response = await sendData<EditNoteFormValues, GridNoteItem>(
-        createRequestUrl(apiUrl.noteUrl, value.id),
+        createRequestUrl(apiUrl.profileGroupUsersUrl, value.id),
         RequestType.Put,
         value
       );
@@ -171,7 +171,7 @@ export default function NoteBook() {
     }
 
     const response = await fetchData<GridNoteItem[]>(
-      createRequestUrl(apiUrl.noteUrl),
+      createRequestUrl(apiUrl.profileGroupUsersUrl),
       request
     );
 

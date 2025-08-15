@@ -1,6 +1,5 @@
 import { MantineProvider } from "@mantine/core";
 import { ModalsProvider } from "@mantine/modals";
-import { StrictMode } from "react";
 import { mantineTheme } from "./assets/theme";
 import AppRouter from "./AppRouter";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -11,7 +10,7 @@ import { AuthenticationProvider } from "./authentication/AuthenticationContext";
 
 function App() {
   return (
-    <StrictMode>
+
       <AuthenticationProvider>
         <MantineProvider theme={mantineTheme}>
           <MantineEmotionProvider>
@@ -23,7 +22,6 @@ function App() {
           </MantineEmotionProvider>
         </MantineProvider>
       </AuthenticationProvider>
-    </StrictMode>
   );
 }
 
