@@ -11,6 +11,7 @@ import NoteBook from "./page/note/NoteBook";
 import { RequireAuthentication } from "./authentication/AuthenticationContext";
 import UserRelationManager from "./page/userprofile/UserRelationManager";
 import Login from "./page/login/Login";
+import MyProfile from "./page/myprofile/MyProfile";
 
 const AppRouter = () => {
   return (
@@ -41,6 +42,16 @@ const AppRouter = () => {
             <RequireAuthentication>
               <Main>
                 <CalendarComponent />
+              </Main>
+            </RequireAuthentication>
+          }
+        />
+        <Route
+          path={routes.profile}
+          element={
+            <RequireAuthentication>
+              <Main>
+                <MyProfile />
               </Main>
             </RequireAuthentication>
           }

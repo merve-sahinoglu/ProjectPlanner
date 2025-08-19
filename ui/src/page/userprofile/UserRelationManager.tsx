@@ -133,6 +133,7 @@ export default function UserRelationManager() {
           background: "var(--app-surface, #fff)",
           borderColor: "var(--app-border, #ececf2)",
           boxShadow: "0 8px 28px rgba(76, 29, 149, .08)",
+          padding: "1rem",
         }}
       >
         <Group justify="space-between" mb="sm" wrap="wrap">

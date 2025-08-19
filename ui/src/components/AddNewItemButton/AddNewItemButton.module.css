@@ -1,0 +1,26 @@
+.add {
+  --btn-from: var(--mantine-color-grape-5);
+  --btn-to: var(--mantine-color-indigo-5);
+
+  background: linear-gradient(135deg, var(--btn-from), var(--btn-to));
+  color: white;
+  box-shadow:
+    0 10px 30px rgba(76, 29, 149, 0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.2);
+  letter-spacing: .2px;
+  font-weight: 700;
+  transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.add:hover:not([data-disabled]) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 36px rgba(76, 29, 149, 0.32),
+    inset 0 0 0 1px rgba(255,255,255,0.35);
+  filter: saturate(1.05);
+}
+
+.add[data-disabled] {
+  opacity: .6;
+  filter: grayscale(.25);
+}

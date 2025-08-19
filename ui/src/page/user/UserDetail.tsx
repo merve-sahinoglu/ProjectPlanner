@@ -12,8 +12,11 @@ import {
   Image,
   Avatar,
   Divider,
+  Badge,
+  Switch,
 } from "@mantine/core";
 import { Dispatch, SetStateAction, useRef, useState } from "react";
+import globalStyles from "../../assets/global.module.css";
 import styles from "./UserDetail.module.css";
 import { UserRowProps, UserResponse } from "./props/UserTypes";
 import { useTranslation } from "react-i18next";
@@ -26,15 +29,12 @@ import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enum/request-type";
 import { nameof } from "../../helpers/name-of";
 import { RiInformationLine } from "react-icons/ri";
-import { BsBoxes } from "react-icons/bs";
-import { DatePickerInput } from "@mantine/dates";
-import useUserPreferences from "../../hooks/useUserPreferenceStore";
-import globalStyles from "../../assets/global.module.css";
 import useRequestHandler from "../../hooks/useRequestHandler";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import { DateInput } from "@mantine/dates";
+import { IconCheck, IconX } from "@tabler/icons-react";
 
 interface ItemDetailProps {
   selectedUser: UserRowProps;
@@ -95,12 +95,23 @@ function UserDetail({
   const schema = z.object({
     userName: z
       .string()
-      .min(1, { message: `${t(Dictionary.Item.Validation.CODE_MIN)}` })
-      .max(16, { message: `${t(Dictionary.Item.Validation.CODE_MAX)}` }),
-    email: z
+      .min(1, { message: `${t(Dictionary.User.Validation.USERNAME_MIN)}` })
+      .max(16, { message: `${t(Dictionary.User.Validation.USERNAME_MAX)}` }),
+    name: z
       .string()
-      .min(1, { message: `${t(Dictionary.Item.Validation.NAME_MIN)}` })
-      .max(128, { message: `${t(Dictionary.Item.Validation.NAME_MAX)}` }),
+      .min(1, { message: `${t(Dictionary.User.Validation.NAME_MIN)}` })
+      .max(128, { message: `${t(Dictionary.User.Validation.NAME_MAX)}` }),
+    surname: z
+      .string()
+      .min(1, { message: `${t(Dictionary.User.Validation.SURNAME_MIN)}` })
+      .max(128, { message: `${t(Dictionary.User.Validation.SURNAME_MAX)}` }),
+    title: z
+      .string()
+      .min(1, { message: `${t(Dictionary.User.Validation.TITLE_MIN)}` })
+      .max(128, { message: `${t(Dictionary.User.Validation.TITLE_MAX)}` }),
+    gender: z
+      .string()
+      .min(1, { message: `${t(Dictionary.User.Validation.GENDER_MIN)}` }),
   });
 
   const form = useForm<UserRowProps>({
@@ -331,19 +342,12 @@ function UserDetail({
             >
               {t(Dictionary.User.TITLE)}
             </Tabs.Tab>
-            {/* <Tabs.Tab
-              disabled={!canAddItem}
-              leftSection={<BsBoxes size="1rem" />}
-              value="itemProperty"
-            >
-              {t(Dictionary.Item.ITEM_FACILITY_PROPERTIES)}
-            </Tabs.Tab> */}
           </Tabs.List>
         </Card.Section>
         <Tabs.Panel value="item">
           <Grid grow>
             <Grid.Col span={5}>
-              <Group>
+              <Group style={{ alignItems: "space-between" }}>
                 <Avatar src={preview} size={90} />
                 <FileInput
                   clearable={!disabled}
@@ -364,6 +368,23 @@ function UserDetail({
                       setPreview(null);
                     }
                   }}
+                />
+
+                <Switch
+                  className={styles.switchGlow}
+                  size="md"
+                  disabled={disabled}
+                  color="teal"
+                  onLabel="Aktif"
+                  offLabel="Pasif"
+                  thumbIcon={
+                    form.values.isActive ? (
+                      <IconCheck size={12} />
+                    ) : (
+                      <IconX size={12} />
+                    )
+                  }
+                  {...form.getInputProps("isActive", { type: "checkbox" })}
                 />
               </Group>
 
@@ -459,13 +480,13 @@ function UserDetail({
                   {...form.getInputProps(nameof<UserRowProps>("cardNumber"))}
                 />
 
-                <Checkbox
+                {/* <Checkbox
                   mt={25}
                   disabled={disabled}
                   className={styles.input}
                   label={t(Dictionary.General.STATUS)}
                   {...form.getInputProps("isActive", { type: "checkbox" })}
-                />
+                /> */}
               </Group>
             </Grid.Col>
           </Grid>

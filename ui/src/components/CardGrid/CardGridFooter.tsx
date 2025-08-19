@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { BsArrowClockwise } from "react-icons/bs";
 import Dictionary from "../../constants/dictionary";
-
+import classes from "./Card.module.css";
 interface CardGridFooterProps {
   totalItemCount: number;
   currentItemCount: number;
@@ -38,7 +38,7 @@ function CardGridFooter({
   }, []);
 
   return (
-    <Group justify="apart">
+    <Group justify="space-between">
       <Text size="sm" c="dimmed">
         {`${t(Dictionary.DataGrid.PAGINATION, {
           pageSize: currentItemCount,
@@ -49,8 +49,8 @@ function CardGridFooter({
         <Indicator color={seconds <= 60 ? "green" : "red"} size={12} processing>
           <ActionIcon
             onClick={(e) => handleRefreshClick(e)}
-            color="blue"
             size="md"
+            className={classes.add}
             radius="xl"
             variant="filled"
           >

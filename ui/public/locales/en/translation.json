@@ -119,7 +119,8 @@
       "cardMaximum": "Card number must be less than or equal to 8.",
       "passMinimum": "Password is required.",
       "passMaximum": "Password must be less than or equal to 128.",
-      "passwordsDontMatch": "Passwords don't match"
+      "passwordsDontMatch": "Passwords don't match.",
+      "genderMinimum": "Gender is required."
     },
     "inputValidation": {
       "min": "This field is required.",

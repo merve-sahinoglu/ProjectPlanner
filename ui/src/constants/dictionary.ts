@@ -121,6 +121,8 @@ abstract class Dictionary {
 
       static readonly PASSWORDS_DONT_MATCH =
         "validation.user.passwordsDontMatch";
+
+      static readonly GENDER_MIN = "validation.user.genderMinimum";
     };
   };
 
@@ -687,7 +689,5 @@ abstract class Dictionary {
       "appointmentType.psychologicalTherapy";
     static readonly GAME_GROUPS = "appointmentType.gameGroups";
   };
-
-
 }
 export default Dictionary;

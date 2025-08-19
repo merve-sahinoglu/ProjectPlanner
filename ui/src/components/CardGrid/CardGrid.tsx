@@ -29,15 +29,15 @@ const useStyles = createStyles((theme) => ({
   card: {
     backgroundColor:
       theme.primaryColor === "dark"
-        ? theme.colors.dark[6]
-        : theme.colors.gray[1],
+        ? theme.colors.pink[5]
+        : theme.colors.indigo[1],
   },
 
   headerCardSection: {
     backgroundColor:
       theme.primaryColor === "dark"
-        ? theme.colors.dark[6]
-        : theme.colors.gray[0],
+        ? theme.colors.dark[5]
+        : theme.colors.indigo[1],
   },
 }));
 
@@ -180,7 +180,7 @@ function CardGrid({
         inheritPadding
         py="xs"
       >
-        <Group justify="apart">
+        <Group justify="space-between">
           <Text fw={500} fz={17}>
             {title}
           </Text>

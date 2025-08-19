@@ -1,0 +1,47 @@
+/* Sayfanın tamamı (header düşülmüş tam viewport yüksekliği) */
+.page {
+  /* Header yüksekliğini projendeki değere göre ayarla */
+  --app-header-h: 64px;
+  block-size: calc(100dvh - var(--app-header-h));
+  padding: 2px;
+}
+
+/* Grid kolonları aynı yükseklikte tutmak için esnet ve iç scroll’a izin ver */
+.col {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;         /* overflow: auto'nin çalışması için şart */
+  padding-top: 1rem;
+}
+
+/* Panel kolonun tamamını doldursun */
+.panel {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;      /* dışarı taşmayı engelle */
+  /* İstersen arkaplan/çerçeve uyumu: */
+  background: var(--app-surface, var(--mantine-color-body));
+  border: 1px solid var(--app-border, transparent);
+  border-radius: var(--mantine-radius-md);
+ 
+}
+
+/* Panel içi asıl içerik; burada scroll açılır */
+.panelBody {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: auto;
+}
+
+/* (Opsiyonel) Sol taraftaki CardGrid’in toolbar’ını genişletmek için */
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.search {
+  flex: 1 1 320px;
+  min-inline-size: 220px;
+}

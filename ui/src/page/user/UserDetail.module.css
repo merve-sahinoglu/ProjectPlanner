@@ -24,3 +24,51 @@
   padding-left: 0px;
   padding-right: 0px;
 }
+
+.switchGlow {
+  --switch-h: 28px;
+  padding-top: 35px;
+  justify-items: end;
+}
+
+.switchGlow :global(.mantine-Switch-track) {
+  height: var(--switch-h);
+  border-radius: 999px;
+  border: 1px solid rgba(32, 201, 151, 0.35);
+  background: var(--mantine-color-gray-1);
+  transition: background .2s ease, border-color .2s ease, box-shadow .2s ease;
+}
+
+.switchGlow[data-checked] :global(.mantine-Switch-track) {
+  background: linear-gradient(90deg, var(--mantine-color-teal-5), var(--mantine-color-green-5));
+  border-color: transparent;
+  box-shadow: 0 6px 20px rgba(32, 201, 151, 0.25);
+}
+
+.switchGlow :global(.mantine-Switch-thumb) {
+  width: 22px;
+  height: 22px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.18);
+  transition: box-shadow .2s ease, transform .12s ease;
+}
+
+.switchGlow :global(.mantine-Switch-thumb):active {
+  transform: scale(0.94);
+}
+
+.switchGlow[data-checked] :global(.mantine-Switch-thumb) {
+  box-shadow: 0 2px 12px rgba(32, 201, 151, 0.4);
+}
+
+/* Thumb içindeki ikon */
+.switchGlow :global(.mantine-Switch-thumb svg) {
+  opacity: .95;
+}
+
+/* Yanındaki rozet */
+.statusBadge {
+  border-radius: 999px;
+  padding-inline: 10px;
+  font-weight: 600;
+  letter-spacing: .2px;
+}

@@ -10,7 +10,8 @@ const routes = {
   room: "/room",
   playGroups: "/playGroups",
   notes: "/notes",
-  userRelation: "/userRelation"
+  userRelation: "/userRelation",
+  profile: "/profile"
 } as const;
 
 export default routes;

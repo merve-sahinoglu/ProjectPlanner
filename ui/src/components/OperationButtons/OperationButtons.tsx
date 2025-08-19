@@ -55,6 +55,7 @@ function OperationButtons({
         <Button
           variant="outline"
           hidden={!disabled}
+          color="violet"
           fullWidth
           onClick={(e) => handleEdit(e)}
           mt="md"

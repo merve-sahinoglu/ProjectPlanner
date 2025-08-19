@@ -38,6 +38,10 @@ export function AppNavbar() {
         initiallyOpened: true,
         links: [
           {
+            label: "My Profile",
+            link: routes.profile
+          },
+          {
             label: "My Notes",
             link: routes.notes,
             additionalInfo: auth.currentUser?.userId,

@@ -46,11 +46,11 @@
   /* disable browser handling of all panning and zooming gestures on touch devices */
   touch-action: none;
   padding: 2px;
-  background: var(--blackA6);
+  background: var(--pinkA3);
   transition: background 160ms ease-out;
 }
 .ScrollAreaScrollbar:hover {
-  background: var(--blackA8);
+  background: var(--pinkA3);
 }
 .ScrollAreaScrollbar[data-orientation="vertical"] {
   width: var(--scrollbar-size);
@@ -62,7 +62,7 @@
 
 .ScrollAreaThumb {
   flex: 1;
-  background: var(--mauve10);
+  background: var(--pinkA3);
   border-radius: var(--scrollbar-size);
   position: relative;
 }
@@ -80,21 +80,48 @@
 }
 
 .ScrollAreaCorner {
-  background: var(--blackA8);
+  background: var(--pinkA3);
 }
 
 .Text {
-  color: var(--violet11);
+  color: var(--pinkA3);
   font-size: 15px;
   line-height: 18px;
   font-weight: 500;
 }
 
 .Tag {
-  color: var(--mauve12);
+  color: var(--pinkA3);
   font-size: 13px;
   line-height: 18px;
   margin-top: 10px;
-  border-top: 1px solid var(--mauve6);
+  border-top: 1px solid var(--pinkA3);
   padding-top: 10px;
+}
+
+.add {
+  --btn-from: var(--mantine-color-grape-5);
+  --btn-to: var(--mantine-color-indigo-5);
+
+  background: linear-gradient(135deg, var(--btn-from), var(--btn-to));
+  color: white;
+  box-shadow:
+    0 10px 30px rgba(76, 29, 149, 0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.2);
+  letter-spacing: .2px;
+  font-weight: 700;
+  transition: transform .15s ease, box-shadow .2s ease, filter .2s ease;
+}
+
+.add:hover:not([data-disabled]) {
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 36px rgba(76, 29, 149, 0.32),
+    inset 0 0 0 1px rgba(255,255,255,0.35);
+  filter: saturate(1.05);
+}
+
+.add[data-disabled] {
+  opacity: .6;
+  filter: grayscale(.25);
 }

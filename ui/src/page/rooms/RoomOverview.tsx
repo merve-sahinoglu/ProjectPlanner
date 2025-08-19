@@ -15,6 +15,7 @@ import PaginationMetadata from "../../types/pagination-metadata";
 import { RoomRowProps, RoomType } from "./props/RoomRowProps";
 import RoomDetail from "./RoomDetail";
 import useRooms from "./hooks/useRooms";
+import styles from "./RoomOverview.module.css";
 
 const RoomOverview: React.FC = () => {
   const { t } = useTranslation();
@@ -203,7 +204,7 @@ const RoomOverview: React.FC = () => {
 
   return (
     <Grid justify="center" align="stretch">
-      <Grid.Col span={{ xs: 12, sm: 12, md: 3 }}>
+      <Grid.Col span={{ xs: 12, sm: 12, md: 3 }} className={styles.col}>
         <CardGrid
           title={t(Dictionary.Room.CARD_TITLE)}
           cards={itemCards}
@@ -225,25 +226,29 @@ const RoomOverview: React.FC = () => {
           fetchNextPage={fetchNextPage}
         />
       </Grid.Col>
-      <Grid.Col span={{ xs: 12, sm: 12, md: 9 }}>
-        {selectedItem && (
-          <CardGridDetail>
-            <RoomDetail
-              key={selectedItem?.id}
-              selectedRoom={selectedItem}
-              handleDeleteItem={handleDeleteItems}
-              handleUpdateItem={handleUpdateItems}
-              canAddItem={canAddItem}
-              setCanAddItem={setCanAddItem}
-              createdItemGuid={createdRoomGuid.current}
-              disabled={isDisabled}
-              setDisabled={setIsDisabled}
-              changeCreatedItemGuid={changeCreatedItemGuid}
-              handleUpdateItemWithId={handleUpdateItemWithId}
-              changeSelectedItem={changeSelectedItem}
-            />
-          </CardGridDetail>
-        )}
+      <Grid.Col span={{ xs: 12, sm: 12, md: 9 }} className={styles.col}>
+        <div className={styles.panel}>
+          {selectedItem && (
+            <div className={styles.panelBody}>
+              <CardGridDetail>
+                <RoomDetail
+                  key={selectedItem?.id}
+                  selectedRoom={selectedItem}
+                  handleDeleteItem={handleDeleteItems}
+                  handleUpdateItem={handleUpdateItems}
+                  canAddItem={canAddItem}
+                  setCanAddItem={setCanAddItem}
+                  createdItemGuid={createdRoomGuid.current}
+                  disabled={isDisabled}
+                  setDisabled={setIsDisabled}
+                  changeCreatedItemGuid={changeCreatedItemGuid}
+                  handleUpdateItemWithId={handleUpdateItemWithId}
+                  changeSelectedItem={changeSelectedItem}
+                />
+              </CardGridDetail>
+            </div>
+          )}
+        </div>
       </Grid.Col>
     </Grid>
   );

@@ -39,7 +39,6 @@ const useCredentialStore = create<CurrentUserState>()(
         },
         checkIfUserHasFunctionAuthorization: (functionCode: string) => {
           const userFunctions = get().currentUserFunctions;
-debugger;
           if (userFunctions.find((x) => x === functionCode)) {
             return true;
           }

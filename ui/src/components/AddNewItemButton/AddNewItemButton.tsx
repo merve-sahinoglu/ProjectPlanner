@@ -1,6 +1,7 @@
 import { ActionIcon } from "@mantine/core";
 import React from "react";
 import { AiOutlinePlus } from "react-icons/ai";
+import classes from "./AddNewItemButton.module.css";
 
 interface AddNewItemButtonProps {
   disabled: boolean;
@@ -12,6 +13,7 @@ function AddNewItemButton({ disabled, handleAdd }: AddNewItemButtonProps) {
       disabled={disabled}
       color="blue"
       variant="filled"
+      className={classes.add}
       onClick={(e) => handleAdd(e)}
     >
       <AiOutlinePlus />

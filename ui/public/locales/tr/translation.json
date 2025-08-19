@@ -105,7 +105,8 @@
       "cardMaximum": "Kart numarası 8 karakterden fazla olamaz.",
       "passMinimum": "Parola boş bırakılamaz.",
       "passMaximum": "Parola 128 karakterden fazla olamaz.",
-      "passwordsDontMatch": "Parola uyuşmamakta."
+      "passwordsDontMatch": "Parola uyuşmamakta.",
+      "genderMinimum": "Cinsiyet boş bırakılamaz."
     }
   },
   "button": {
