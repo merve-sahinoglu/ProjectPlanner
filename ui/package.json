@@ -45,7 +45,7 @@
     "ag-grid-react": "^34.1.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.4.2",
-    "i18next": "^24.2.2",
+    "i18next": "^25.5.3",
     "i18next-browser-languagedetector": "^8.1.0",
     "i18next-http-backend": "^3.0.2",
     "jwt-decode": "^4.0.0",
