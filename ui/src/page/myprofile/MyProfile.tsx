@@ -1,13 +1,9 @@
 // src/features/profile/MyProfile.tsx
 import {
-  Card,
-  Checkbox,
-  FileInput,
   Grid,
   Group,
   PasswordInput,
   Select,
-  Tabs,
   Text,
   TextInput,
   Avatar,
@@ -18,10 +14,8 @@ import {
   rem,
   Tooltip,
   Box,
-  Switch,
 } from "@mantine/core";
 import { useEffect, useRef, useState } from "react";
-import globalStyles from "../../assets/global.module.css";
 import styles from "./MyProfile.module.css"; // proje içindeki mevcut input sınıfları
 import { useTranslation } from "react-i18next";
 import Dictionary from "../../constants/dictionary";
@@ -33,25 +27,16 @@ import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enum/request-type";
 import { nameof } from "../../helpers/name-of";
 import useRequestHandler from "../../hooks/useRequestHandler";
-import OperationButtons from "../../components/OperationButtons/OperationButtons";
-import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
-import fieldStyles from "../myprofile/MyProfile.module.css";
 import { DateInput } from "@mantine/dates";
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
 import { UserResponse, UserRowProps } from "../user/props/UserTypes";
-import { IconCamera, IconCheck, IconDeviceFloppy, IconEdit, IconX } from "@tabler/icons-react";
+import { IconCamera, IconDeviceFloppy, IconEdit, IconX } from "@tabler/icons-react";
 
 const genders = [
   { value: "0", label: "Unknown" },
   { value: "1", label: "Male" },
   { value: "2", label: "Female" },
   { value: "3", label: "Other" },
-];
-
-const userType = [
-  { value: "0", label: "Teacher" },
-  { value: "1", label: "Chield" },
-  { value: "2", label: "Relative" },
 ];
 
 const schema = z.object({
