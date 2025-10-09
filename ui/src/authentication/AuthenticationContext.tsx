@@ -57,7 +57,6 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
       AuthenticationResponseDto
     >(createRequestUrl(apiUrl.coreUrl), RequestType.Post, user);
 
-      debugger;
 
     if (!response.isSuccess) {
       return false;

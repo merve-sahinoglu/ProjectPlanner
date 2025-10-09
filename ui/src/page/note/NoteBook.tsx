@@ -65,8 +65,6 @@ export default function NoteBook() {
     },
   });
 
-
-
   const columns = useMemo<ColDef<GridNoteItem>[]>(
     () => [
       {
@@ -105,7 +103,7 @@ export default function NoteBook() {
     []
   );
 
-  const handleCreate = async (values: AddNoteFormValues) => {    
+  const handleCreate = async (values: AddNoteFormValues) => {
     const newItem: NoteItem = {
       id: crypto.randomUUID(),
       date: values.date!, // validate sayesinde Date garantili
@@ -115,7 +113,7 @@ export default function NoteBook() {
     };
 
     const response = await sendData<NoteItem, GridNoteItem>(
-      createRequestUrl(apiUrl.profileGroupUsersUrl),
+      createRequestUrl(apiUrl.noteUrl),
       RequestType.Post,
       newItem
     );
@@ -129,24 +127,39 @@ export default function NoteBook() {
     }
   };
 
-    const handleUpdate = async (value: EditNoteFormValues) => {
+  const handleUpdate = async (value: EditNoteFormValues) => {
+    const response = await sendData<EditNoteFormValues, GridNoteItem>(
+      createRequestUrl(apiUrl.profileGroupUsersUrl, value.id),
+      RequestType.Put,
+      value
+    );
 
-      const response = await sendData<EditNoteFormValues, GridNoteItem>(
-        createRequestUrl(apiUrl.profileGroupUsersUrl, value.id),
-        RequestType.Put,
-        value
+    if (!response.isSuccess) return;
+
+    if (response.isSuccess) {
+      const updated = notes.map((note) =>
+        note.id === response.value.id ? response.value : note
       );
+      setNotes(updated);
+      setEditOpened(false);
+    }
+  };
 
-      if (!response.isSuccess) return;
+  const handleDelete = async (value: EditNoteFormValues) => {
+    const response = await sendData<EditNoteFormValues, GridNoteItem>(
+      createRequestUrl(apiUrl.profileGroupUsersUrl, value.id),
+      RequestType.Delete,
+      value
+    );
 
-      if (response.isSuccess) {
-        const updated = notes.map((note) =>
-          note.id === response.value.id ? response.value : note
-        );
-        setNotes(updated);
-        setEditOpened(false);
-      }
-    };
+    if (!response.isSuccess) return;
+
+    if (response.isSuccess) {
+      const newList = notes.filter((note) => note.id !== value.id);
+      setNotes(newList);
+      setEditOpened(false);
+    }
+  };
 
   const fetchNotes = async () => {
     const request: { [key: string]: any } = {
@@ -156,6 +169,7 @@ export default function NoteBook() {
       dateTo: undefined,
     };
 
+    
     if (request.chieldId === undefined) {
       delete request.chieldId;
     }
@@ -171,7 +185,7 @@ export default function NoteBook() {
     }
 
     const response = await fetchData<GridNoteItem[]>(
-      createRequestUrl(apiUrl.profileGroupUsersUrl),
+      createRequestUrl(apiUrl.noteUrl),
       request
     );
 
@@ -186,7 +200,6 @@ export default function NoteBook() {
   const clearTherapistId = () => {
     form.setFieldValue("therapistId", "");
   };
-
 
   useEffect(() => {
     fetchNotes();
@@ -224,9 +237,10 @@ export default function NoteBook() {
           </Grid.Col>
         )}
         <Grid.Col span={{ xs: IdFromUrl === undefined ? 10 : 12 }}>
-          <Group justify="end" p="md">
+
+          {IdFromUrl !== undefined && (<Group justify="end" p="md">
             <Button onClick={() => setCreateOpened(true)}>Add note</Button>
-          </Group>
+          </Group>)}
 
           <DataTable<GridNoteItem>
             records={notes}
@@ -269,8 +283,8 @@ export default function NoteBook() {
             >
               <EditNoteForm
                 data={selectedNote}
-                onCancel={() => setEditOpened(false)}
                 onSave={handleUpdate}
+                onDelete={handleDelete}
               />
             </Modal>
           )}

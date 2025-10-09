@@ -25,10 +25,10 @@ export type EditNoteFormValues = {
 type Props = {
   data: EditNoteFormValues;
   onSave: (values: EditNoteFormValues) => void;
-  onCancel: () => void;
+  onDelete: (values: EditNoteFormValues) => void;
 };
 
-export default function EditNoteForm({ data, onSave, onCancel }: Props) {
+export default function EditNoteForm({ data, onSave, onDelete }: Props) {
   const form = useForm<EditNoteFormValues>({
     initialValues: {
       id: data.id ?? "",
@@ -64,7 +64,9 @@ export default function EditNoteForm({ data, onSave, onCancel }: Props) {
     editor?.commands.setContent(""); // editörü temizle
   };
 
-  const clearChildId = () => form.setFieldValue("childId", "");
+  const handleDeleteClick = () => {
+    onDelete(form.values); // parent'a değerleri gönder
+  };
 
   return (
     <Stack gap="md">
@@ -103,9 +105,13 @@ export default function EditNoteForm({ data, onSave, onCancel }: Props) {
         )}
       </div>
 
-      <Group justify="flex-end" gap="sm">
-        <Button variant="light" onClick={onCancel} type="button">
-          Cancel
+      <Group justify="space-between" gap="sm">
+        <Button
+          style={{ backgroundColor: "red", color: "white" }}
+          onClick={handleDeleteClick}
+          type="button"
+        >
+          Delete
         </Button>
         <Button onClick={handleSaveClick} type="button">
           Save
