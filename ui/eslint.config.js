@@ -1,37 +1,54 @@
 import js from "@eslint/js";
 import globals from "globals";
+import tseslint from "typescript-eslint";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
-import tseslint from "typescript-eslint";
 
 export default tseslint.config(
-  { ignores: ["dist"] },
+  // Global ignore
   {
-    extends: [js.configs.recommended, ...tseslint.configs.recommended],
+    ignores: ["dist", "build", "node_modules"],
+  },
+
+  // TS + React config
+  {
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
-      ecmaVersion: 2020,
+      ecmaVersion: "latest",
       sourceType: "module",
       globals: globals.browser,
     },
+
+    // Plugins
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
-      // typescript-eslint için ekstra plugin tanımlamana gerek yok,
-      // tseslint.configs zaten onu ekliyor
     },
+
+    // Extend (recommended TS rules)
+    extends: [
+      js.configs.recommended,
+      ...tseslint.configs.recommended,
+    ],
+
+    // Rules
     rules: {
+      // React hooks rules (güncel React 19 uyumlu)
       ...reactHooks.configs.recommended.rules,
+
+      // React Fast Refresh only export components rule
+      "react-refresh/only-export-components": [
+        "warn",
+        { allowConstantExport: true },
+      ],
+
+      // TS unused vars rule (doğru isim bu!)
       "@typescript-eslint/no-unused-vars": [
         "warn",
         {
           argsIgnorePattern: "^_",
           varsIgnorePattern: "^_",
         },
-      ],
-      "react-refresh/only-export-components": [
-        "warn",
-        { allowConstantExport: true },
       ],
     },
   }
