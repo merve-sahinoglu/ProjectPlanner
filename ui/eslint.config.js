@@ -11,15 +11,24 @@ export default tseslint.config(
     files: ["**/*.{ts,tsx}"],
     languageOptions: {
       ecmaVersion: 2020,
+      sourceType: "module",
       globals: globals.browser,
     },
     plugins: {
       "react-hooks": reactHooks,
       "react-refresh": reactRefresh,
+      // typescript-eslint için ekstra plugin tanımlamana gerek yok,
+      // tseslint.configs zaten onu ekliyor
     },
     rules: {
       ...reactHooks.configs.recommended.rules,
-      "typescript/no-unused-vars": "warn",
+      "@typescript-eslint/no-unused-vars": [
+        "warn",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+        },
+      ],
       "react-refresh/only-export-components": [
         "warn",
         { allowConstantExport: true },

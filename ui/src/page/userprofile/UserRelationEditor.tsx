@@ -1,6 +1,6 @@
 // src/features/user-relation/UserRelationEditor.tsx
 import { useEffect, useRef } from "react";
-import { Button, Group, Stack, TextInput } from "@mantine/core";
+import { Button, Group, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import UserRelationProps from "./types";
 import { nameof } from "../../helpers/name-of";
