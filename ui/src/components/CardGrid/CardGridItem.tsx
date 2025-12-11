@@ -3,6 +3,7 @@ import React from "react";
 import { Card, Flex } from "@mantine/core";
 
 import { LEFT_SECTION_FLEX_GAP } from "@constants/constants";
+// eslint-disable-next-line import/order
 import styles from "./Card.module.css";
 
 interface MinimumCardGridItemProps {

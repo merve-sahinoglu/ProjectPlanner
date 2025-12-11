@@ -1,6 +1,8 @@
-import { useDebouncedValue } from "@mantine/hooks";
-import { useInfiniteQuery } from "@tanstack/react-query";
 import { useEffect, useReducer, useState } from "react";
+
+import { useDebouncedValue } from "@mantine/hooks";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
+
 import { apiUrl, createRequestUrl } from "../../../config/app.config";
 import ReducerActions from "../../../enums/reducer-action.enum";
 import useRequestHandler, {
@@ -41,7 +43,6 @@ const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function handleDeleteItems(itemId: string) {
     dispatch({
       type: ReducerActions.Delete,
@@ -134,9 +135,11 @@ const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
       queryKey: ["users"],
       queryFn: fetchItems,
       initialPageParam: 1,
-      getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+      placeholderData: keepPreviousData,
+      getNextPageParam: (lastPage) => getNextPageParam(lastPage!),
       refetchOnWindowFocus: false,
       staleTime: 0,
+      enabled: true,
     });
 
   useEffect(() => {
@@ -158,6 +161,7 @@ const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
     handleReplaceItems,
     handleDeleteItems,
     handleUpdateItemWithId,
+    totalRecordCount,
   };
 };
 

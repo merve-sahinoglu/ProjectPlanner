@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import {
   Avatar,
@@ -23,6 +23,7 @@ import { useTranslation } from "react-i18next";
 import { RiInformationLine } from "react-icons/ri";
 import { z } from "zod";
 
+import { PageState } from "@shared/types/page.types";
 import globalStyles from "../../assets/global.module.css";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import CircleDot from "../../components/CircleDot/CircleDot";
@@ -38,16 +39,12 @@ import styles from "./UserDetail.module.css";
 
 interface ItemDetailProps {
   selectedUser: UserRowProps;
+  changeSelectedItem(item: UserRowProps | null): void;
   handleDeleteItem(itemId: string): void;
   handleUpdateItem(item: UserRowProps): void;
-  canAddItem: boolean;
-  setCanAddItem: Dispatch<SetStateAction<boolean>>;
-  createdItemGuid: string;
-  disabled: boolean;
-  setDisabled: Dispatch<SetStateAction<boolean>>;
-  changeCreatedItemGuid(id: string): void;
   handleUpdateItemWithId(item: UserRowProps, id: string): void;
-  changeSelectedItem(item: UserRowProps | null): void;
+  mode: PageState;
+  changeMode: (value: PageState) => void;
 }
 
 const genders = [
@@ -70,19 +67,15 @@ const genders = [
 ];
 
 function UserDetail({
-  canAddItem,
-  setCanAddItem,
+  selectedUser,
   handleDeleteItem,
   handleUpdateItem,
-  createdItemGuid,
-  disabled,
-  setDisabled,
-  selectedUser,
-  changeCreatedItemGuid,
   handleUpdateItemWithId,
   changeSelectedItem,
+  mode,
+  changeMode,
 }: ItemDetailProps) {
-  const { sendData } = useRequestHandler();
+  const { isPending, sendData } = useRequestHandler();
 
   const { t } = useTranslation();
 
@@ -167,6 +160,8 @@ function UserDetail({
       const base64 = await readFileAsBase64(
         form.values["profilePicture"] as File
       );
+
+      // eslint-disable-next-line react-hooks/immutability
       form.values.profilePicture = base64ToByteArray(base64);
     }
 
@@ -178,9 +173,10 @@ function UserDetail({
 
     if (!response.isSuccess) return;
 
-    if (response.isSuccess) {
-      setDisabled(true);
+    changeMode("view");
+    const createdItemGuid = response.value.id;
 
+    if (response.isSuccess) {
       const retval = {
         ...response.value,
         birthDate: response.value.birthDate
@@ -198,13 +194,9 @@ function UserDetail({
 
       form.resetDirty();
 
-      setCanAddItem(!canAddItem);
-
       handleUpdateItemWithId(retval, createdItemGuid);
 
       changeSelectedItem(retval);
-
-      changeCreatedItemGuid("");
 
       toast.success(`${t(Dictionary.Success.POSITIVE)}`);
     }
@@ -267,13 +259,11 @@ function UserDetail({
     );
 
     if (response.isSuccess) {
-      setDisabled(true);
+      changeMode("view");
 
       form.resetDirty();
 
       initialValues.current = form.values;
-
-      setCanAddItem(true);
 
       handleUpdateItem(form.values);
 
@@ -286,30 +276,31 @@ function UserDetail({
 
     form.validate();
 
-    if (!form.isValid()) return;
-
-    if (!form.isDirty()) return;
-
-    if (createdItemGuid === form.values.id) {
-      sendPostRequestForCreatedItem();
+    if (!form.isValid() || !form.isDirty()) {
       return;
     }
 
-    sendPatchRequestForModifiedItem();
+    if (mode === "create") {
+      await sendPostRequestForCreatedItem();
+      return;
+    }
+
+    await sendPatchRequestForModifiedItem();
   };
 
   const handleEdit = (event: React.MouseEvent) => {
     event.preventDefault();
-    setDisabled(false);
+
+    changeMode("edit");
   };
 
   const handleCancel = (event: React.MouseEvent) => {
     event.preventDefault();
 
-    if (createdItemGuid === form.values.id) {
-      setCanAddItem(!canAddItem);
+    changeMode("view");
+
+    if (mode === "create") {
       handleDeleteItem(form.values.id);
-      setDisabled(true);
       form.reset();
       form.setFieldValue(nameof<UserRowProps>("id"), "");
       changeSelectedItem(null);
@@ -317,12 +308,13 @@ function UserDetail({
     }
 
     form.setValues(initialValues.current);
-    setDisabled(true);
   };
 
   const clearRelativeId = () => {
     form.setFieldValue("relativeId", "");
   };
+
+  const isDisabled = isPending || mode === "view";
 
   return (
     <>
@@ -350,8 +342,8 @@ function UserDetail({
               <Group style={{ alignItems: "space-between" }}>
                 <Avatar src={preview} size={90} />
                 <FileInput
-                  clearable={!disabled}
-                  disabled={disabled}
+                  clearable={!isDisabled}
+                  disabled={isDisabled}
                   accept="image/jpeg"
                   label="Attach your picture"
                   {...form.getInputProps(
@@ -373,7 +365,7 @@ function UserDetail({
                 <Switch
                   className={styles.switchGlow}
                   size="md"
-                  disabled={disabled}
+                  disabled={isDisabled}
                   color="teal"
                   onLabel="Aktif"
                   offLabel="Pasif"
@@ -390,12 +382,12 @@ function UserDetail({
 
               <TextInput
                 className={styles.input}
-                disabled={disabled}
+                disabled={isDisabled}
                 label={`${t(Dictionary.User.USERNAME)}`}
                 {...form.getInputProps(nameof<UserRowProps>("userName"))}
               />
               <PasswordInput
-                disabled={disabled}
+                disabled={isDisabled}
                 mt={15}
                 label={t(Dictionary.Login.PASSWORD)}
                 {...form.getInputProps(nameof<UserRowProps>("password"))}
@@ -403,13 +395,13 @@ function UserDetail({
               <Group grow>
                 <TextInput
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.User.NAME)}
                   {...form.getInputProps(nameof<UserRowProps>("name"))}
                 />
                 <TextInput
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.User.SURNAME)}
                   {...form.getInputProps(nameof<UserRowProps>("surname"))}
                 />
@@ -417,7 +409,7 @@ function UserDetail({
               <Group grow>
                 <Select
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   {...form.getInputProps(nameof<UserRowProps>("typeId"))}
                   label={t(Dictionary.User.USER_TITLE)}
                   data={userType}
@@ -427,12 +419,12 @@ function UserDetail({
                   searchInputLabel={t(Dictionary.User.RELATIVE)}
                   placeholder={t(Dictionary.User.RELATIVE)}
                   description=""
-                  disabled={disabled}
+                  disabled={isDisabled}
                   apiUrl={createRequestUrl(apiUrl.userUrl)}
                   form={form}
                   clearValue={clearRelativeId}
                   formInputProperty="relativeId"
-                  additionalQueries={"&typeId=2&isActive=true"}
+                  additionalParameters={{ typeId: 2, isActive: true }}
                   initialData={[
                     {
                       value:
@@ -451,7 +443,7 @@ function UserDetail({
                 />
                 <DateInput
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.User.BIRTH_DATE)}
                   mx="auto"
                   {...form.getInputProps(nameof<UserRowProps>("birthDate"))}
@@ -460,14 +452,14 @@ function UserDetail({
               <Group grow>
                 <Select
                   mt={15}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   {...form.getInputProps(nameof<UserRowProps>("gender"))}
                   label={t(Dictionary.User.GENDER)}
                   data={genders}
                 />
                 <TextInput
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.User.EMAIL)}
                   {...form.getInputProps(nameof<UserRowProps>("email"))}
                 />
@@ -475,7 +467,7 @@ function UserDetail({
               <Group grow>
                 <TextInput
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.User.CARD_NUMBER)}
                   {...form.getInputProps(nameof<UserRowProps>("cardNumber"))}
                 />
@@ -491,7 +483,7 @@ function UserDetail({
             </Grid.Col>
           </Grid>
           <OperationButtons
-            disabled={disabled}
+            disabled={isDisabled}
             isDirty={form.isDirty()}
             handleSave={handleSave}
             handleEdit={handleEdit}

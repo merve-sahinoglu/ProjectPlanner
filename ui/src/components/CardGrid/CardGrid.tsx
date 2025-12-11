@@ -17,6 +17,7 @@ import { BsChevronDown, BsSearch } from "react-icons/bs";
 import CardGridFooter from "@components/CardGrid/components/CardGridFooter";
 import CardGridItemSkeletonGroup from "@components/CardGrid/skeleton/CardGridItemSkeletonGroup";
 import Dictionary from "@helpers/translation/dictionary/dictionary";
+// eslint-disable-next-line import/order
 import classes from "./CardGrid.module.css";
 
 /** Scroll to next için scrollHeight - scrollTop === clientHeight hesaplamasında mouse wheel ile kaydırıldığında hesaplama bazen doğru

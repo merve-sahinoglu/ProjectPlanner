@@ -1,6 +1,8 @@
-import { ActionIcon } from "@mantine/core";
 import React from "react";
+
+import { ActionIcon } from "@mantine/core";
 import { AiOutlinePlus } from "react-icons/ai";
+
 import classes from "./AddNewItemButton.module.css";
 
 interface AddNewItemButtonProps {

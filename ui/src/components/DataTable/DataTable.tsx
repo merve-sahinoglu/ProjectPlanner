@@ -17,10 +17,10 @@ import {
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 
+import Language from "@enums/language.enum";
 import "./DataTable.css";
 import { TableEntity } from "./types/table-entity";
 
-import Language from "@enums/language.enum";
 import useUserPreferences from "@hooks/useUserPreferences";
 
 ModuleRegistry.registerModules([AllCommunityModule, ClientSideRowModelModule]);
@@ -43,9 +43,13 @@ function DataTable<T extends TableEntity>({
 }: DataTableProps<T>) {
   const gridRef = useRef<AgGridReact<T>>(null);
 
-  const language = useUserPreferences((state) => state.language);
+  const language = useUserPreferences(
+    (state: { language: Language }) => state.language
+  );
 
-  const theme = useUserPreferences((state) => state.colorScheme);
+  const theme = useUserPreferences(
+    (state: { colorScheme: "dark" | "light" }) => state.colorScheme
+  );
 
   const lightTheme = themeQuartz.withParams({
     fontSize: "12px",

@@ -57,7 +57,7 @@ export default tseslint.config(
       "import/no-named-as-default-member": "warn",
       "import/no-named-as-default": "error",
       "import/order": [
-        "error",
+        "warn",
         {
           groups: [
             ["builtin", "external"],

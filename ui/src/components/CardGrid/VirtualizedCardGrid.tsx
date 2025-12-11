@@ -2,6 +2,7 @@ import React, { useRef, useState } from "react";
 
 import { Card, Flex, Loader, ScrollArea, Text } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
+// eslint-disable-next-line import/no-unresolved
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "framer-motion";
 
@@ -9,6 +10,7 @@ import CardGridFooter from "@components/CardGrid/components/CardGridFooter";
 import CardGridHeader from "@components/CardGrid/components/CardGridHeader";
 import CardGridItemSkeletonGroup from "@components/CardGrid/skeleton/CardGridItemSkeletonGroup";
 import Dictionary from "@helpers/translation/dictionary/dictionary";
+// eslint-disable-next-line import/order
 import classes from "./CardGrid.module.css";
 
 const CARD_GRID_SCROLL_AREA_HEIGHT = 330;

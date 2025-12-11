@@ -20,4 +20,24 @@ type UserResponse = Omit<UserRowProps, "typeId"> & {
   typeId: number;
 };
 
+const getNewItem = (): UserRowProps => {
+  const id = crypto.randomUUID();
+  return {
+    id: id,
+    userName: "",
+    email: "",
+    password: null,
+    cardNumber: null,
+    searchText: "",
+    name: "",
+    surname: "",
+    birthDate: null,
+    gender: "",
+    isActive: true,
+    relativeId: "",
+  };
+};
+
 export type { UserResponse, UserRowProps };
+
+export { getNewItem };

@@ -15,12 +15,14 @@ import RequestType from "../../enums/request-type";
 import { nameof } from "../../helpers/name-of";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
 import useRequestHandler from "../../hooks/useRequestHandler";
-import styles from "./Appointment.module.css";
+// eslint-disable-next-line import/order
 import {
   Appointment,
   AppointmentType,
   SelectedDates,
 } from "./types/Appointment";
+// eslint-disable-next-line import/order
+import styles from "./Appointment.module.css";
 
 const appointmentStatus = [
   {
