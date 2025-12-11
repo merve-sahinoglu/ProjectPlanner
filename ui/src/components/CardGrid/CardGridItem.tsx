@@ -1,6 +1,8 @@
-import { ActionIcon, Card, Grid } from "@mantine/core";
-import { BsPencil } from "react-icons/bs";
-import CircleDot from "../CircleDot/CircleDot";
+import React from "react";
+
+import { Card, Flex } from "@mantine/core";
+
+import { LEFT_SECTION_FLEX_GAP } from "@constants/constants";
 import styles from "./Card.module.css";
 
 interface MinimumCardGridItemProps {
@@ -11,57 +13,46 @@ interface MinimumCardGridItemProps {
 interface CardGridItemProps<T extends MinimumCardGridItemProps> {
   entity: T;
   selectedEntity?: T | undefined | null;
-  handleCardItemClick?(event: React.MouseEvent, entity: T): void;
-  children: React.ReactNode | React.ReactNode[];
-  showEditButton?: boolean;
-  buttonIcon?: React.ReactNode;
-  openEditModal?({ ...props }: T): void;
-  handleOptionalButton?(event: React.MouseEvent, { ...props }): void;
+  onCardClick?(event: React.MouseEvent, entity: T): void;
+  text: React.ReactNode;
+  subText?: React.ReactNode;
+  leftSection?: React.ReactNode;
+  rightSection?: React.ReactNode;
+  h?: number;
 }
 
 function CardGridItem<T extends MinimumCardGridItemProps>({
   entity,
   selectedEntity,
-  handleCardItemClick,
-  children,
-  showEditButton = false,
-  openEditModal,
-  handleOptionalButton,
-  buttonIcon = <BsPencil size="0.8rem" />,
+  onCardClick,
+  leftSection,
+  text,
+  subText,
+  rightSection,
+  h,
 }: CardGridItemProps<T>) {
   return (
     <Card
       className={
         selectedEntity?.id === entity.id ? styles.cardActive : styles.card
       }
-      onClick={(e) => handleCardItemClick && handleCardItemClick(e, entity)}
+      onClick={(e) => onCardClick && onCardClick(e, entity)}
       key={entity.id}
+      h={h}
       padding="lg"
       radius="md"
       withBorder
     >
-      <Grid align="center">
-        <Grid.Col span={10}>
-          {entity.isActive && <CircleDot isActive={entity.isActive} />}
-          {children}
-        </Grid.Col>
-        <Grid.Col span={2}>
-          {showEditButton ? (
-            <ActionIcon
-              onClick={(e) =>
-                openEditModal
-                  ? openEditModal(entity)
-                  : handleOptionalButton && handleOptionalButton(e, entity)
-              }
-              className={styles.cardEditButton}
-              radius="xl"
-              variant="outline"
-            >
-              {buttonIcon}
-            </ActionIcon>
-          ) : null}
-        </Grid.Col>
-      </Grid>
+      <Flex justify="space-between" align="center" h="100%">
+        <Flex direction="column">
+          <Flex direction={"row"} align={"center"} gap={LEFT_SECTION_FLEX_GAP}>
+            {leftSection}
+            {text}
+          </Flex>
+          <div>{subText}</div>
+        </Flex>
+        {rightSection}
+      </Flex>
     </Card>
   );
 }

@@ -1,4 +1,4 @@
-import ReducerActions from "../../enum/reducer-action.enum";
+import ReducerActions from "../../enums/reducer-action.enum";
 
 interface MinEntity {
   id: string;

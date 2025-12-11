@@ -1,18 +1,18 @@
-import { Grid, Group, Highlight, Text, Title } from "@mantine/core";
-import React, { useMemo, useRef, useState } from "react";
+import { Grid, Highlight, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
-import Dictionary from "../../constants/dictionary";
-import { useTranslation } from "react-i18next";
-import { UserRowProps } from "./props/UserTypes";
-import { BsExclamationDiamondFill } from "react-icons/bs";
 import { motion } from "framer-motion";
-import useUsers from "./hooks/useUsers";
-import UserDetail from "./UserDetail";
-import CardGridItem from "../../components/CardGrid/CardGridItem";
-import CardGrid from "../../components/CardGrid/CardGrid";
+import React, { useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { BsExclamationDiamondFill } from "react-icons/bs";
 import AddNewItemButton from "../../components/AddNewItemButton/AddNewItemButton";
-import CardGridDetail from "../../components/CardGrid/CardGridDetail";
+import CardGrid from "../../components/CardGrid/CardGrid";
+import CardGridItem from "../../components/CardGrid/CardGridItem";
+import CardGridDetail from "../../components/CardGrid/components/CardGridHeader";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
 import PaginationMetadata from "../../types/pagination-metadata";
+import useUsers from "./hooks/useUsers";
+import { UserRowProps } from "./props/UserTypes";
+import UserDetail from "./UserDetail";
 /* YENİ */
 import styles from "./UserOverview.module.css";
 

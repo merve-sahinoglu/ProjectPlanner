@@ -1,34 +1,35 @@
+import { Dispatch, SetStateAction, useRef } from "react";
+
 import {
+  Avatar,
   Card,
   Checkbox,
   Divider,
   Grid,
   Group,
   NumberInput,
-  Avatar,
   Tabs,
   Text,
   TextInput,
-  Textarea,
 } from "@mantine/core";
-import { Dispatch, SetStateAction, useRef } from "react";
-import styles from "./PlayGroupDetail.module.css";
-import { useTranslation } from "react-i18next";
-import Dictionary from "../../constants/dictionary";
-import { z } from "zod";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm } from "@mantine/form";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import toast from "react-hot-toast";
-import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import RequestType from "../../enum/request-type";
-import { nameof } from "../../helpers/name-of";
+import { useTranslation } from "react-i18next";
 import { RiInformationLine } from "react-icons/ri";
+import { z } from "zod";
+
 import globalStyles from "../../assets/global.module.css";
-import useRequestHandler from "../../hooks/useRequestHandler";
 import CircleDot from "../../components/CircleDot/CircleDot";
-import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import RequestType from "../../enums/request-type";
+import { nameof } from "../../helpers/name-of";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
 import ExecutiveAutocomplete from "./ExecutiveAutocomplete";
+import styles from "./PlayGroupDetail.module.css";
 import {
   PlayGroupResponse,
   PlayGroupRowProps,
@@ -47,17 +48,6 @@ interface PlayGroupDetailProps {
   handleUpdateItemWithId(item: PlayGroupRowProps, id: string): void;
   changeSelectedItem(item: PlayGroupRowProps | null): void;
 }
-
-const PlayGroupType = [
-  {
-    value: "0",
-    label: "Single",
-  },
-  {
-    value: "1",
-    label: "Double",
-  },
-];
 
 function PlayGroupDetail({
   canAddItem,
@@ -87,7 +77,7 @@ function PlayGroupDetail({
     initialValues: {
       ...selectedPlayGroup,
     },
-    validate: zodResolver(schema),
+    validate: zod4Resolver(schema),
   });
 
   const initialValues = useRef<PlayGroupRowProps>(form.values);

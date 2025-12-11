@@ -1,95 +1,89 @@
-import { ClientSideRowModelModule } from "@ag-grid-community/client-side-row-model";
-import {
-  ColDef,
-  ColGroupDef,
-  GetRowIdParams,
-  GridApi,
-  GridReadyEvent,
-  ModuleRegistry,
-  RowClickedEvent,
-} from "@ag-grid-community/core";
-import { AgGridReact } from "@ag-grid-community/react";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
+
 import {
   AG_GRID_LOCALE_EN,
   AG_GRID_LOCALE_TR,
 } from "@ag-grid-community/locale";
-import Language from "../../enum/language.ts";
-import useUserPreferences from "../../hooks/useUserPreferenceStore.tsx";
-import "ag-grid-community/styles/ag-grid.css";
-import "ag-grid-community/styles/ag-theme-quartz.css";
-import "../../components/DataTable/ag-theme-kids-extras.css";
-import "../../components/DataTable/ag-theme-kids.css"; // bu dosya (ek süslemeler)
+import {
+  AllCommunityModule,
+  ClientSideRowModelModule,
+  ColDef,
+  ColGroupDef,
+  colorSchemeDark,
+  GetRowIdParams,
+  ModuleRegistry,
+  RowClickedEvent,
+  themeQuartz,
+} from "ag-grid-community";
+import { AgGridReact } from "ag-grid-react";
 
-ModuleRegistry.registerModules([ClientSideRowModelModule]);
+import "./DataTable.css";
+import { TableEntity } from "./types/table-entity";
 
-export interface TableEntity {
-  id: string;
-}
+import Language from "@enums/language.enum";
+import useUserPreferences from "@hooks/useUserPreferences";
+
+ModuleRegistry.registerModules([AllCommunityModule, ClientSideRowModelModule]);
 
 interface DataTableProps<T extends TableEntity> {
   records: T[];
   columns: (ColDef<T> | ColGroupDef<T>)[];
   isFetching: boolean;
-  h?: number | string;
-  rowHeight?: number;
+  h?: number;
   onRowClicked?(data: T): void;
   hasPagination?: boolean;
-  className?: string;
-  quickFilterText?: string;
-  onApiReady?(api: GridApi<T>): void;
-  paginationPageSize?: number;
 }
-
 function DataTable<T extends TableEntity>({
   records,
   columns,
-  h = 400,
+  h = 300,
   isFetching,
   onRowClicked,
   hasPagination = true,
-  rowHeight,
-  className,
-  quickFilterText,
-  onApiReady,
-  paginationPageSize = 250,
 }: DataTableProps<T>) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const gridRef = useRef<GridApi<any> | null>(null);
-
-  const [isReady, setIsReady] = useState(true);
-
-  const onGridReady = (params: GridReadyEvent) => {
-    gridRef.current = params.api;
-    onApiReady?.(params.api as GridApi<T>);
-  };
+  const gridRef = useRef<AgGridReact<T>>(null);
 
   const language = useUserPreferences((state) => state.language);
 
-  // const theme = useUserPreferences(state => state.colorScheme);
+  const theme = useUserPreferences((state) => state.colorScheme);
+
+  const lightTheme = themeQuartz.withParams({
+    fontSize: "12px",
+    fontFamily: "Inter",
+  });
+
+  const darkTheme = themeQuartz.withPart(colorSchemeDark).withParams({
+    fontSize: "12px",
+    fontFamily: "Inter",
+    foregroundColor: "#b3b3b7",
+    backgroundColor: "#25262B",
+    headerBackgroundColor: "#34353a",
+    oddRowBackgroundColor: "#1a1b1e",
+    headerColumnResizeHandleColor: "#25262B",
+  });
 
   const getRowId = (params: GetRowIdParams<T>) => params.data.id;
 
-  useEffect(() => {
-    if (gridRef.current) {
-      setIsReady(false);
-      setTimeout(() => setIsReady(true), 0);
-    }
-  }, [language]);
-
-  return isReady ? (
-    <div
-      className={`ag-theme-quartz kids ${className ?? ""}`}
-      style={{ width: "100%", height: h }}
-    >
+  return (
+    <div style={{ width: "100%", height: h, minHeight: 200 }}>
       <AgGridReact
+        theme={theme === "dark" ? darkTheme : lightTheme}
+        ref={gridRef}
         rowData={records}
         columnDefs={columns}
         rowModelType="clientSide"
         pagination={hasPagination}
-        rowHeight={rowHeight}
         getRowId={getRowId}
-        paginationPageSize={paginationPageSize} // Number of rows per page
+        gridOptions={{
+          columnDefs: [
+            {
+              cellStyle: {
+                alignContent: "center",
+              },
+            },
+          ],
+        }}
+        paginationPageSize={250} // Number of rows per page
         paginationPageSizeSelector={[50, 150, 250, 500]}
         defaultColDef={{
           wrapHeaderText: true,
@@ -97,9 +91,9 @@ function DataTable<T extends TableEntity>({
           flex: 1,
           lockVisible: true,
         }}
+        enableCellTextSelection
         tooltipShowDelay={0}
         loading={isFetching}
-        quickFilterText={quickFilterText}
         localeText={
           language === Language.Turkish ? AG_GRID_LOCALE_TR : AG_GRID_LOCALE_EN
         }
@@ -107,11 +101,8 @@ function DataTable<T extends TableEntity>({
         onRowClicked={(event: RowClickedEvent) =>
           onRowClicked && onRowClicked(event.data)
         }
-        onGridReady={onGridReady}
       />
     </div>
-  ) : (
-    <div />
   );
 }
 

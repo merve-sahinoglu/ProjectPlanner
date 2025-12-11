@@ -4,7 +4,7 @@ import { IconX } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { AiOutlineSearch } from "react-icons/ai";
-import Dictionary from "../../../constants/dictionary";
+import Dictionary from "../../../helpers/translation/dictionary/dictionary";
 
 interface AutocompleteOption {
   value: string;

@@ -1,36 +1,44 @@
 // src/features/profile/MyProfile.tsx
+import { useEffect, useRef, useState } from "react";
+
 import {
+  ActionIcon,
+  Avatar,
+  Badge,
+  Box,
+  Divider,
   Grid,
   Group,
+  LoadingOverlay,
   PasswordInput,
+  rem,
   Select,
   Text,
   TextInput,
-  Avatar,
-  Divider,
-  LoadingOverlay,
-  ActionIcon,
-  Badge,
-  rem,
   Tooltip,
-  Box,
 } from "@mantine/core";
-import { useEffect, useRef, useState } from "react";
-import styles from "./MyProfile.module.css"; // proje içindeki mevcut input sınıfları
-import { useTranslation } from "react-i18next";
-import Dictionary from "../../constants/dictionary";
-import { z } from "zod";
-import { useForm, zodResolver } from "@mantine/form";
-import toast from "react-hot-toast";
-import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import RequestType from "../../enum/request-type";
-import { nameof } from "../../helpers/name-of";
-import useRequestHandler from "../../hooks/useRequestHandler";
 import { DateInput } from "@mantine/dates";
+import { useForm } from "@mantine/form";
+import {
+  IconCamera,
+  IconDeviceFloppy,
+  IconEdit,
+  IconX,
+} from "@tabler/icons-react";
+import { zod4Resolver } from "mantine-form-zod-resolver";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
+
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import RequestType from "../../enums/request-type";
+import { nameof } from "../../helpers/name-of";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
 import { UserResponse, UserRowProps } from "../user/props/UserTypes";
-import { IconCamera, IconDeviceFloppy, IconEdit, IconX } from "@tabler/icons-react";
+import styles from "./MyProfile.module.css"; // proje içindeki mevcut input sınıfları
 
 const genders = [
   { value: "0", label: "Unknown" },
@@ -133,58 +141,57 @@ export default function MyProfile() {
   };
 
   const form = useForm<UserRowProps>({
+    mode: "controlled",
     initialValues: empty,
-    validate: zodResolver(schema),
+    validate: zod4Resolver(schema),
   });
 
   const initialValues = useRef<UserRowProps>(form.values);
 
-
-   const fetchItems = async () => {
-     const userId = currentUser?.userId;
-      setLoading(true);
-      const res = await fetchData<UserResponse>(
-        createRequestUrl(apiUrl.userUrl, userId)
-      );
-      if (!res.isSuccess) {
-        setLoading(false);
-        toast.error(res.error || "Kullanıcı bilgileri alınamadı.");
-        return;
-      }
-
-      const v = res.value;
-      const mapped: UserRowProps = {
-        ...v,
-        id: v.id,
-        userName: v.userName,
-        email: v.email ?? "",
-        password: null, // güvenlik gereği boş getiriyoruz
-        cardNumber: v.cardNumber ?? null,
-        searchText: v.searchText ?? "",
-        name: v.name ?? "",
-        surname: v.surname ?? "",
-        birthDate: v.birthDate ? new Date(v.birthDate) : null,
-        gender: String(v.gender ?? ""),
-        isActive: v.isActive,
-        relativeId: v.relativeId ?? "",
-        typeId: String(v.typeId ?? "0"),
-        // backend’den base64 gelirse file’a çevir
-        profilePicture: v.profilePicture
-          ? base64ToBlob(v.profilePicture as unknown as string, "image/jpeg")
-          : undefined,
-      };
-
-      initialValues.current = mapped;
-      form.setValues(mapped);
-      form.resetDirty();
-      setPreview(
-        mapped.profilePicture instanceof File
-          ? URL.createObjectURL(mapped.profilePicture)
-          : null
-      );
+  const fetchItems = async () => {
+    const userId = currentUser?.userId;
+    setLoading(true);
+    const res = await fetchData<UserResponse>(
+      createRequestUrl(apiUrl.userUrl, userId)
+    );
+    if (!res.isSuccess) {
       setLoading(false);
+      toast.error(res.error || "Kullanıcı bilgileri alınamadı.");
+      return;
+    }
 
-   }
+    const v = res.value;
+    const mapped: UserRowProps = {
+      ...v,
+      id: v.id,
+      userName: v.userName,
+      email: v.email ?? "",
+      password: null, // güvenlik gereği boş getiriyoruz
+      cardNumber: v.cardNumber ?? null,
+      searchText: v.searchText ?? "",
+      name: v.name ?? "",
+      surname: v.surname ?? "",
+      birthDate: v.birthDate ? new Date(v.birthDate) : null,
+      gender: String(v.gender ?? ""),
+      isActive: v.isActive,
+      relativeId: v.relativeId ?? "",
+      typeId: String(v.typeId ?? "0"),
+      // backend’den base64 gelirse file’a çevir
+      profilePicture: v.profilePicture
+        ? base64ToBlob(v.profilePicture as unknown as string, "image/jpeg")
+        : undefined,
+    };
+
+    initialValues.current = mapped;
+    form.setValues(mapped);
+    form.resetDirty();
+    setPreview(
+      mapped.profilePicture instanceof File
+        ? URL.createObjectURL(mapped.profilePicture)
+        : null
+    );
+    setLoading(false);
+  };
   // Profilimi getir
   useEffect(() => {
     const userId = currentUser?.userId;
@@ -193,8 +200,7 @@ export default function MyProfile() {
       toast.error("Kullanıcı bulunamadı.");
       return;
     }
-      fetchItems();
-
+    fetchItems();
   }, []);
 
   const handleSave = async (e: React.MouseEvent) => {
@@ -258,170 +264,170 @@ export default function MyProfile() {
     setPreview(pic instanceof File ? URL.createObjectURL(pic) : null);
   };
 
- return (
-   <Box className={styles.wrapperFluid} pos="relative">
-     <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
+  return (
+    <Box className={styles.wrapperFluid} pos="relative">
+      <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
 
-     {/* HERO / HEADER */}
-     <div className={styles.header}>
-       <div className={styles.hero}>
-         <div className={styles.avatarWrap}>
-           <Avatar src={preview ?? undefined} size={96} radius="xl" />
-           <Tooltip
-             label={disabled ? "Düzenle ile etkinleştir" : "Fotoğraf değiştir"}
-           >
-             <ActionIcon
-               className={styles.cam}
-               variant="filled"
-               radius="xl"
-               size="md"
-               onClick={() => !disabled && fileRef.current?.click()}
-               aria-label="change photo"
-             >
-               <IconCamera size={16} />
-             </ActionIcon>
-           </Tooltip>
-           <input
-             ref={fileRef}
-             type="file"
-             accept="image/jpeg,image/png"
-             style={{ display: "none" }}
-             onChange={(e) => {
-               const file = e.target.files?.[0];
-               form.setFieldValue("profilePicture", file ?? undefined);
-               if (file) {
-                 const r = new FileReader();
-                 r.onload = () => setPreview(r.result as string);
-                 r.readAsDataURL(file);
-               } else {
-                 setPreview(null);
-               }
-             }}
-           />
-         </div>
+      {/* HERO / HEADER */}
+      <div className={styles.header}>
+        <div className={styles.hero}>
+          <div className={styles.avatarWrap}>
+            <Avatar src={preview ?? undefined} size={96} radius="xl" />
+            <Tooltip
+              label={disabled ? "Düzenle ile etkinleştir" : "Fotoğraf değiştir"}
+            >
+              <ActionIcon
+                className={styles.cam}
+                variant="filled"
+                radius="xl"
+                size="md"
+                onClick={() => !disabled && fileRef.current?.click()}
+                aria-label="change photo"
+              >
+                <IconCamera size={16} />
+              </ActionIcon>
+            </Tooltip>
+            <input
+              ref={fileRef}
+              type="file"
+              accept="image/jpeg,image/png"
+              style={{ display: "none" }}
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                form.setFieldValue("profilePicture", file ?? undefined);
+                if (file) {
+                  const r = new FileReader();
+                  r.onload = () => setPreview(r.result as string);
+                  r.readAsDataURL(file);
+                } else {
+                  setPreview(null);
+                }
+              }}
+            />
+          </div>
 
-         <div className={styles.idBlock}>
-           <Group gap="xs" wrap="wrap">
-             <Text fw={800} fz={rem(22)} className={styles.titleText}>
-               {form.values.name} {form.values.surname}
-             </Text>
-             <Badge
-               variant="light"
-               color={form.values.isActive ? "teal" : "gray"}
-               size="sm"
-             >
-               {form.values.isActive ? "Active" : "Inactive"}
-             </Badge>
-           </Group>
-           <Text fz="sm" className={styles.subText}>
-             @{form.values.userName || "username"}
-           </Text>
-         </div>
+          <div className={styles.idBlock}>
+            <Group gap="xs" wrap="wrap">
+              <Text fw={800} fz={rem(22)} className={styles.titleText}>
+                {form.values.name} {form.values.surname}
+              </Text>
+              <Badge
+                variant="light"
+                color={form.values.isActive ? "teal" : "gray"}
+                size="sm"
+              >
+                {form.values.isActive ? "Active" : "Inactive"}
+              </Badge>
+            </Group>
+            <Text fz="sm" className={styles.subText}>
+              @{form.values.userName || "username"}
+            </Text>
+          </div>
 
-         <div className={styles.headerActions}>
-           <Group gap="xs">
-             {disabled ? (
-               <ActionIcon
-                 variant="light"
-                 size="lg"
-                 onClick={handleEdit}
-                 aria-label="edit"
-               >
-                 <IconEdit size={18} />
-               </ActionIcon>
-             ) : (
-               <>
-                 <ActionIcon
-                   color="red"
-                   variant="light"
-                   size="lg"
-                   onClick={handleCancel}
-                   aria-label="cancel"
-                 >
-                   <IconX size={18} />
-                 </ActionIcon>
-                 <ActionIcon
-                   color="grape"
-                   variant="filled"
-                   size="lg"
-                   onClick={handleSave}
-                   aria-label="save"
-                 >
-                   <IconDeviceFloppy size={18} />
-                 </ActionIcon>
-               </>
-             )}
-           </Group>
-         </div>
-       </div>
-     </div>
+          <div className={styles.headerActions}>
+            <Group gap="xs">
+              {disabled ? (
+                <ActionIcon
+                  variant="light"
+                  size="lg"
+                  onClick={handleEdit}
+                  aria-label="edit"
+                >
+                  <IconEdit size={18} />
+                </ActionIcon>
+              ) : (
+                <>
+                  <ActionIcon
+                    color="red"
+                    variant="light"
+                    size="lg"
+                    onClick={handleCancel}
+                    aria-label="cancel"
+                  >
+                    <IconX size={18} />
+                  </ActionIcon>
+                  <ActionIcon
+                    color="grape"
+                    variant="filled"
+                    size="lg"
+                    onClick={handleSave}
+                    aria-label="save"
+                  >
+                    <IconDeviceFloppy size={18} />
+                  </ActionIcon>
+                </>
+              )}
+            </Group>
+          </div>
+        </div>
+      </div>
 
-     {/* CONTENT */}
-     <div className={styles.section}>
-       <Text fw={700} fz="sm">
-         {t(Dictionary.User.TITLE)}
-       </Text>
-       <Divider my="sm" />
+      {/* CONTENT */}
+      <div className={styles.section}>
+        <Text fw={700} fz="sm">
+          {t(Dictionary.User.TITLE)}
+        </Text>
+        <Divider my="sm" />
 
-       <Grid gutter="md">
-         <Grid.Col span={{ base: 12, md: 6 }}>
-           <TextInput
-             disabled={disabled}
-             label={t(Dictionary.User.USERNAME)}
-             {...form.getInputProps(nameof<UserRowProps>("userName"))}
-           />
-         </Grid.Col>
+        <Grid gutter="md">
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+              disabled={disabled}
+              label={t(Dictionary.User.USERNAME)}
+              {...form.getInputProps(nameof<UserRowProps>("userName"))}
+            />
+          </Grid.Col>
 
-         <Grid.Col span={{ base: 12, md: 6 }}>
-           <PasswordInput
-             disabled={disabled}
-             label={t(Dictionary.Login.PASSWORD)}
-             {...form.getInputProps(nameof<UserRowProps>("password"))}
-           />
-         </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <PasswordInput
+              disabled={disabled}
+              label={t(Dictionary.Login.PASSWORD)}
+              {...form.getInputProps(nameof<UserRowProps>("password"))}
+            />
+          </Grid.Col>
 
-         <Grid.Col span={{ base: 12, md: 6 }}>
-           <TextInput
-             disabled={disabled}
-             label={t(Dictionary.User.NAME)}
-             {...form.getInputProps(nameof<UserRowProps>("name"))}
-           />
-         </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+              disabled={disabled}
+              label={t(Dictionary.User.NAME)}
+              {...form.getInputProps(nameof<UserRowProps>("name"))}
+            />
+          </Grid.Col>
 
-         <Grid.Col span={{ base: 12, md: 6 }}>
-           <TextInput
-             disabled={disabled}
-             label={t(Dictionary.User.SURNAME)}
-             {...form.getInputProps(nameof<UserRowProps>("surname"))}
-           />
-         </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+              disabled={disabled}
+              label={t(Dictionary.User.SURNAME)}
+              {...form.getInputProps(nameof<UserRowProps>("surname"))}
+            />
+          </Grid.Col>
 
-         <Grid.Col span={{ base: 12, md: 6 }}>
-           <DateInput
-             disabled={disabled}
-             label={t(Dictionary.User.BIRTH_DATE)}
-             {...form.getInputProps(nameof<UserRowProps>("birthDate"))}
-           />
-         </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <DateInput
+              disabled={disabled}
+              label={t(Dictionary.User.BIRTH_DATE)}
+              {...form.getInputProps(nameof<UserRowProps>("birthDate"))}
+            />
+          </Grid.Col>
 
-         <Grid.Col span={{ base: 12, md: 6 }}>
-           <Select
-             disabled={disabled}
-             {...form.getInputProps(nameof<UserRowProps>("gender"))}
-             label={t(Dictionary.User.GENDER)}
-             data={genders}
-           />
-         </Grid.Col>
-         <Grid.Col span={{ base: 12, md: 6 }}>
-           <TextInput
-             //   className={fieldStyles.input}
-             disabled={disabled}
-             label={t(Dictionary.User.EMAIL)}
-             {...form.getInputProps(nameof<UserRowProps>("email"))}
-           />
-         </Grid.Col>
-       </Grid>
-     </div>
-   </Box>
- );
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <Select
+              disabled={disabled}
+              {...form.getInputProps(nameof<UserRowProps>("gender"))}
+              label={t(Dictionary.User.GENDER)}
+              data={genders}
+            />
+          </Grid.Col>
+          <Grid.Col span={{ base: 12, md: 6 }}>
+            <TextInput
+              //   className={fieldStyles.input}
+              disabled={disabled}
+              label={t(Dictionary.User.EMAIL)}
+              {...form.getInputProps(nameof<UserRowProps>("email"))}
+            />
+          </Grid.Col>
+        </Grid>
+      </div>
+    </Box>
+  );
 }

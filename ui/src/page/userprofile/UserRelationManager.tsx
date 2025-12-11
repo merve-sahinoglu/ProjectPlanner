@@ -1,5 +1,4 @@
 // src/features/user-relation/UserRelationManager.tsx
-import { useEffect, useMemo, useRef, useState } from "react";
 import {
   Button,
   Group,
@@ -12,14 +11,15 @@ import {
 } from "@mantine/core";
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import type { GridApi } from "ag-grid-community";
-import UserRelationTable from "./UserRelationTable";
-import UserRelationEditor from "./UserRelationEditor";
-import UserRelationProps, { UserRelationFormValues } from "./types";
-import useRequestHandler from "../../hooks/useRequestHandler";
-import RequestType from "../../enum/request-type";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import RequestType from "../../enums/request-type";
 import formatSearchQuery from "../../helpers/trim-search-query";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import UserRelationEditor from "./UserRelationEditor";
+import UserRelationTable from "./UserRelationTable";
+import UserRelationProps, { UserRelationFormValues } from "./types";
 
 let den = 0;
 

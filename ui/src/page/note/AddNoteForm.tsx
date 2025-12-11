@@ -70,8 +70,8 @@ export default function AddNoteForm({ onSave, onCancel, therapistId, childId }: 
         />
 
         <FormAutocomplete
-          searchInputLabel="Child ID"
-          placeholder="Child ID"
+          searchInputLabel="Child"
+          placeholder="Child"
           description=""
           apiUrl={createRequestUrl(apiUrl.userUrl)}
           form={form}

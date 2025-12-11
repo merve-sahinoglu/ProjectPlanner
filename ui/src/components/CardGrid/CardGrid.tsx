@@ -1,3 +1,5 @@
+import React, { useCallback, useRef, useState } from "react";
+
 import {
   Card,
   Group,
@@ -8,108 +10,80 @@ import {
   TextInput,
   UnstyledButton,
 } from "@mantine/core";
-import { createStyles } from "@mantine/emotion";
 import { useViewportSize } from "@mantine/hooks";
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
 import { useTranslation } from "react-i18next";
 import { BsChevronDown, BsSearch } from "react-icons/bs";
-import CardGridFooter from "./CardGridFooter";
-import CardGridItemSkeletonGroup from "./skeleton/CardGridItemSkeletonGroup";
-import Dictionary from "../../constants/dictionary";
 
-const useStyles = createStyles((theme) => ({
-  card: {
-    backgroundColor:
-      theme.primaryColor === "dark"
-        ? theme.colors.pink[5]
-        : theme.colors.indigo[1],
-  },
-
-  headerCardSection: {
-    backgroundColor:
-      theme.primaryColor === "dark"
-        ? theme.colors.dark[5]
-        : theme.colors.indigo[1],
-  },
-}));
+import CardGridFooter from "@components/CardGrid/components/CardGridFooter";
+import CardGridItemSkeletonGroup from "@components/CardGrid/skeleton/CardGridItemSkeletonGroup";
+import Dictionary from "@helpers/translation/dictionary/dictionary";
+import classes from "./CardGrid.module.css";
 
 /** Scroll to next için scrollHeight - scrollTop === clientHeight hesaplamasında mouse wheel ile kaydırıldığında hesaplama bazen doğru
  * çalışmadığı için === yerine <= kullanılıp - 25 verilerek en aşağıya gelmeden bir scrolledToBottom'un true olmasına yardımcı oluyor.
  */
 const SCROLL_EXTRA_HEIGHT = 25;
 
-const CARD_GRID_SCROLL_AREA_HEIGHT = 350;
+const CARD_GRID_SCROLL_AREA_HEIGHT = 330;
 
-const CARD_GRID_SCROLL_AREA_HEIGHT_WITH_ADDITIONAL = 390;
+const CARD_GRID_SCROLL_AREA_HEIGHT_WITH_ADDITIONAL = 370;
 
 interface CardGridProps {
-  /** Card'ın sol üst tarafında gösterilecek title */
-  title: string;
+  /** Card'ın sol üst tarafında gösterilecek headerTitle */
+  headerTitle: string;
   /** Card'ın ortasında scrollable olacak şekilde sıralanacak künyeler */
-  cards: JSX.Element[];
+  cards: React.ReactNode[];
   /** Card'da buton fonksiyonu gerektiği durumda buton child component olarak
    * verildiğinde sağ yukarı eklenecek olan buton.
    */
-  addButton?: React.ReactElement;
+  headerRightComponent?: React.ReactNode;
   /** Card Grid search bar için kullanılacak setState değeri */
-  searchInput: string;
+  searchQuery: string;
   /** Card Grid search bar için kullanılacak setState değerinin SetStateAction'ı */
-  setSearchInput: Dispatch<SetStateAction<string>>;
+  onSearchChange: (value: string) => void;
   /** Card Grid'de listenilecek toplam item sayısı */
-  totalItemCount: number;
+  totalCount: number;
   /** Card Grid'de şu an görüntülenen item sayısı */
   currentItemCount: number;
   /** True olduğunda Card Grid içinde skeleton item gösterir */
-  isLoading: boolean;
+  isFetching: boolean;
   /** Eklendiğinde sağ aşağıdaki butona tıklandığında çağrılacak fonksiyon */
-  refreshData?(): void;
+  onRefresh?(): Promise<unknown>;
   /** True olduğunda Card Grid'in footer kısmındaki refresh özelliğini kaldırır */
   disableRefresh?: boolean;
   /** Card Grid scroll area içinde en aşağıya scroll atıldığında eğer var ise bir sonraki
    * item'ları fetchler.
    */
-  fetchNextPage(): void;
-  /** Arama yapıldığında servisten cevap döneseye kadar sağ tarafta loading bar çıkmasını sağlar. */
-  isSearching?: boolean;
+  onLoadMore?(): Promise<unknown>;
   /** True olduğu durumda filtreleme butonu ekler. */
-  showFilter?: boolean;
+  showFilterMenu?: boolean;
   /** True ve false (isActive) şeklinde çalışacak olan filtre durumu  */
   filterStatus?: boolean;
   /** Filtre değerini toggle edecek fonksiyon */
-  filterFunction?(): void;
-  additionalSearchChildren?: React.ReactNode | React.ReactNode[];
-  searchPlaceHolder?: string;
+  onFilterToggle?(): void;
+  additionalSearchComponents?: React.ReactNode;
+  searchPlaceholder?: string;
 }
 
 function CardGrid({
-  title,
+  headerTitle,
   cards,
-  addButton,
-  filterFunction,
+  headerRightComponent,
+  onFilterToggle,
   filterStatus,
-  searchInput,
-  setSearchInput,
-  totalItemCount,
+  searchQuery,
+  onSearchChange,
+  totalCount,
   currentItemCount,
-  refreshData,
-  isLoading,
-  fetchNextPage,
+  onRefresh,
+  isFetching,
+  onLoadMore,
   disableRefresh = false,
-  isSearching = false,
-  showFilter = true,
-  additionalSearchChildren,
-  searchPlaceHolder = Dictionary.CardGrid.SEARCH_INPUT,
+  showFilterMenu = true,
+  additionalSearchComponents,
+  searchPlaceholder = Dictionary.CardGrid.SEARCH_INPUT,
 }: CardGridProps) {
   const { t } = useTranslation();
-  const { classes } = useStyles();
   const { height } = useViewportSize();
   const [scrollPosition, onScrollPositionChange] = useState({ x: 0, y: 0 });
   const scrollBarViewportRef = useRef<HTMLDivElement>(null);
@@ -129,46 +103,34 @@ function CardGrid({
     );
   };
 
-  /** Scroll değeri değiştiği zaman hesaplama yaparak isScrolledToBottom
-   * boolean değerini günceller.
-   */
-  const isScrolledToBottom = useMemo(
-    () => calculateIfScrolledToBottom(),
-    [
-      scrollBarViewportRef.current?.scrollHeight,
-      scrollBarViewportRef.current?.scrollTop,
-    ]
-  );
-
-  /** Eğer isScrolledToBottom boolean değeri true ise bir sonraki
-   * datayı fetch eder.
-   */
-  const handleScrollToBottomFetching = useCallback(() => {
+  const handleScrollToBottomFetching = async () => {
     /** ScrolledToBottom sayfa açılışında, refresh durumunda veya filtreleme
      * kısımlarında sağlıklı çalışmayabiliyor, o yüzden scrollPosition y ekseninde
      * 0'sada sonraki sayfaya GET edilmesi engelleniyor.
      */
-    if (isScrolledToBottom === false || scrollPosition.y === 0) return;
-    fetchNextPage();
-  }, [isScrolledToBottom]);
+
+    if (isFetching) return;
+
+    const isScrolledToBottom = calculateIfScrolledToBottom();
+
+    if (!isScrolledToBottom || scrollPosition.y === 0) return;
+
+    if (onLoadMore) await onLoadMore();
+  };
 
   const handleFilterClick = useCallback(
     (event: React.MouseEvent) => {
       event.preventDefault();
-      if (!filterFunction) return;
+      if (!onFilterToggle) return;
 
-      filterFunction();
+      onFilterToggle();
     },
-    [filterFunction]
+    [onFilterToggle]
   );
-
-  useEffect(() => {
-    handleScrollToBottomFetching();
-  }, [isScrolledToBottom]);
 
   return (
     <Card
-      style={{ height: height - 130 }}
+      style={{ height: height - 110 }}
       className={classes.card}
       shadow="sm"
       radius="md"
@@ -182,33 +144,33 @@ function CardGrid({
       >
         <Group justify="space-between">
           <Text fw={500} fz={17}>
-            {title}
+            {headerTitle}
           </Text>
-          {addButton}
+          {headerRightComponent}
         </Group>
       </Card.Section>
       <Card.Section withBorder inheritPadding py="xs">
         <TextInput
-          value={searchInput}
-          onChange={(event) => setSearchInput(event.currentTarget.value)}
-          placeholder={`${t(searchPlaceHolder)}`}
-          rightSection={isSearching && <Loader size="xs" />}
+          value={searchQuery}
+          onChange={(event) => onSearchChange(event.currentTarget.value)}
+          placeholder={`${t(searchPlaceholder)}`}
+          rightSection={isFetching && <Loader size="xs" />}
           radius="lg"
-          leftSection={<BsSearch size="0.8rem" />}
+          leftSection={<BsSearch size="13px" />}
         />
-        {additionalSearchChildren}
+        {additionalSearchComponents}
       </Card.Section>
       <Card.Section withBorder inheritPadding py="xs">
-        <Group justify="apart">
-          <Text fz="sm" color="dimmed">
+        <Group justify="space-between">
+          <Text size="sm" c="dimmed">
             {t(Dictionary.CardGrid.RESULTS)}
           </Text>
-          {showFilter && (
+          {showFilterMenu && (
             <Menu shadow="md" width={200}>
               <Menu.Target>
                 <UnstyledButton>
                   <Group>
-                    <Text fz="sm" color="dimmed" pr={-5} mr={-10}>
+                    <Text size="sm" c="dimmed" pr={-5} mr={-10}>
                       {t(Dictionary.CardGrid.FILTER)}
                     </Text>
                     <BsChevronDown />
@@ -227,37 +189,31 @@ function CardGrid({
           )}
         </Group>
       </Card.Section>
-
-      <Card.Section
-        color="dimmed"
-        style={{ color: "gray" }}
-        inheritPadding
-        py="xs"
-      >
+      <Card.Section c="dimmed" withBorder style={{ color: "gray" }} py="xs">
         <ScrollArea
           h={
-            !additionalSearchChildren
+            !additionalSearchComponents
               ? height - CARD_GRID_SCROLL_AREA_HEIGHT
               : height - CARD_GRID_SCROLL_AREA_HEIGHT_WITH_ADDITIONAL
           }
           type="scroll"
           offsetScrollbars
+          scrollbars={"y"}
           px={2}
+          onBottomReached={handleScrollToBottomFetching}
           scrollbarSize={8}
           onScrollPositionChange={onScrollPositionChange}
           viewportRef={scrollBarViewportRef}
         >
-          {!isLoading ? cards : <CardGridItemSkeletonGroup />}
+          {!isFetching ? cards : <CardGridItemSkeletonGroup />}
         </ScrollArea>
       </Card.Section>
-      <Card.Section withBorder inheritPadding py="xs">
-        <CardGridFooter
-          totalItemCount={totalItemCount}
-          currentItemCount={currentItemCount}
-          refreshData={refreshData}
-          disableRefresh={disableRefresh}
-        />
-      </Card.Section>
+      <CardGridFooter
+        totalItemCount={totalCount}
+        currentItemCount={currentItemCount}
+        refreshData={onRefresh}
+        disableRefresh={disableRefresh}
+      />
     </Card>
   );
 }

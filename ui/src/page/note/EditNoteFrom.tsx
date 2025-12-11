@@ -1,14 +1,9 @@
 import { Button, Group, Stack } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { RichTextEditor } from "@mantine/tiptap";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import Link from "@tiptap/extension-link";
-import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import { nameof } from "../../helpers/name-of";
-import { useRef } from "react";
 
 // Projendeki gerçek import yoluna göre düzelt:
 
@@ -46,8 +41,6 @@ export default function EditNoteForm({ data, onSave, onDelete }: Props) {
       noteHtml: (v) => (v.trim() ? null : "Not boş olamaz"),
     },
   });
-
-  const initialValues = useRef<EditNoteFormValues>(form.values);
 
   // RichTextEditor – form ile senkron
   const editor = useEditor({

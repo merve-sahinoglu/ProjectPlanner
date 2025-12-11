@@ -1,17 +1,18 @@
-import { useForm, zodResolver } from "@mantine/form";
 import {
-  TextInput,
-  Select,
-  Button,
   Box,
-  Group,
+  Button,
   FileInput,
+  Group,
   Image,
+  Select,
+  TextInput,
 } from "@mantine/core";
-import { z } from "zod";
-import { BsSave, BsTrash } from "react-icons/bs";
-import { Instructor } from "../types/instructer-types";
+import { useForm } from "@mantine/form";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
+import { BsSave, BsTrash } from "react-icons/bs";
+import { z } from "zod";
+import { Instructor } from "../types/instructer-types";
 
 const InstructorSchema = z.object({
   id: z.string().uuid(),
@@ -58,7 +59,7 @@ export default function InstructorEdit({
       type: instructor.type ?? "",
       profilePicture: instructor.profilePicture ?? null,
     },
-    validate: zodResolver(InstructorSchema),
+    validate: zod4Resolver(InstructorSchema),
   });
 
   function saveInstructor(instructor: Instructor) {

@@ -1,23 +1,26 @@
 import { Dispatch, SetStateAction, useRef } from "react";
+
 import { Grid, Group, Select, Textarea, TextInput } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { zod4Resolver } from "mantine-form-zod-resolver";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
+
+import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
+import DateTimeSelector from "../../components/DateTimeSelector/DateTimeSelector";
+import OperationButtons from "../../components/OperationButtons/OperationButtons";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import RequestType from "../../enums/request-type";
+import { nameof } from "../../helpers/name-of";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import styles from "./Appointment.module.css";
 import {
   Appointment,
   AppointmentType,
   SelectedDates,
 } from "./types/Appointment";
-import useRequestHandler from "../../hooks/useRequestHandler";
-import { useTranslation } from "react-i18next";
-import { useForm, zodResolver } from "@mantine/form";
-import Dictionary from "../../constants/dictionary";
-import styles from "./Appointment.module.css";
-import { nameof } from "../../helpers/name-of";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
-import OperationButtons from "../../components/OperationButtons/OperationButtons";
-import RequestType from "../../enum/request-type";
-import toast from "react-hot-toast";
-import { z } from "zod";
-import DateTimeSelector from "../../components/DateTimeSelector/DateTimeSelector";
 
 const appointmentStatus = [
   {
@@ -50,17 +53,13 @@ interface AppointmentFormProps {
 const AppointmentModal: React.FC<AppointmentFormProps> = ({
   selectedAppointment,
   closeOnSave,
-  handleAppointments,
   disabled,
   createdItemGuid,
   changeSelectedItem,
-  changeCreatedItemGuid,
-  handleUpdateItemWithId,
   setDisabled,
   handleDeleteItem,
-  handleUpdateItem,
 }) => {
-  const { fetchData, sendData } = useRequestHandler();
+  const { sendData } = useRequestHandler();
 
   const { t } = useTranslation();
 
@@ -77,7 +76,7 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
     initialValues: {
       ...selectedAppointment,
     },
-    validate: zodResolver(schema),
+    validate: zod4Resolver(schema),
   });
 
   const initialValues = useRef<Appointment>(form.values);
@@ -129,10 +128,8 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
 
     if (!form.isDirty()) return;
 
-  
-      sendPostRequestForCreatedItem();
-      return;
- 
+    sendPostRequestForCreatedItem();
+    return;
   };
 
   const handleEdit = (event: React.MouseEvent) => {

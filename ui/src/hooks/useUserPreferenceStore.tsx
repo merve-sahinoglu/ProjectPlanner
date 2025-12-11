@@ -1,11 +1,12 @@
-import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
-import { i18n } from 'i18next';
-import Language from '../enum/language';
+import { i18n } from "i18next";
+import { create } from "zustand";
+import { persist } from "zustand/middleware";
+
+import Language from "../enums/language";
 
 export enum Theme {
-  Light = 'light',
-  Dark = 'dark',
+  Light = "light",
+  Dark = "dark",
 }
 
 interface UserPreferencesState {
@@ -24,7 +25,7 @@ const useUserPreferences = create(
       },
     }),
     {
-      name: 'user-preferences',
+      name: "user-preferences",
     }
   )
 );

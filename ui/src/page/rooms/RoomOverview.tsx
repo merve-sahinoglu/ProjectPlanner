@@ -1,20 +1,18 @@
 import { Grid, Group, Highlight, Text, Title } from "@mantine/core";
-import React, { useMemo, useRef, useState } from "react";
 import { modals } from "@mantine/modals";
-import Dictionary from "../../constants/dictionary";
-import { useTranslation } from "react-i18next";
-import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
-import { useCredentialActions } from "../../authentication/store/useCredentialsStore";
-import { BsExclamationDiamondFill } from "react-icons/bs";
 import { motion } from "framer-motion";
-import CardGridItem from "../../components/CardGrid/CardGridItem";
-import CardGrid from "../../components/CardGrid/CardGrid";
+import React, { useMemo, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { BsExclamationDiamondFill } from "react-icons/bs";
 import AddNewItemButton from "../../components/AddNewItemButton/AddNewItemButton";
-import CardGridDetail from "../../components/CardGrid/CardGridDetail";
+import CardGrid from "../../components/CardGrid/CardGrid";
+import CardGridItem from "../../components/CardGrid/CardGridItem";
+import CardGridDetail from "../../components/CardGrid/components/CardGridHeader";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
 import PaginationMetadata from "../../types/pagination-metadata";
-import { RoomRowProps, RoomType } from "./props/RoomRowProps";
-import RoomDetail from "./RoomDetail";
 import useRooms from "./hooks/useRooms";
+import { RoomRowProps } from "./props/RoomRowProps";
+import RoomDetail from "./RoomDetail";
 import styles from "./RoomOverview.module.css";
 
 const RoomOverview: React.FC = () => {

@@ -1,32 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
-import {
-  Button,
-  Group,
-  Paper,
-  Stack,
-  Title,
-  Divider,
-  Modal,
-  Grid,
-} from "@mantine/core";
-import dayjs from "dayjs";
 import type { ColDef } from "@ag-grid-community/core"; // ← kendi path'ine göre düzelt
-import DataTable from "../../components/DataTable/DataTable";
-import AddNoteForm, { AddNoteFormValues } from "./AddNoteForm";
-import useRequestHandler from "../../hooks/useRequestHandler";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import RequestType from "../../enum/request-type";
+import { Button, Divider, Grid, Group, Modal, Stack } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import dayjs from "dayjs";
+import moment from "moment";
+import { useEffect, useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
-import { SearchSchema } from "../appointment/types/Appointment";
-import Dictionary from "../../constants/dictionary";
+import DataTable from "../../components/DataTable/DataTable";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import RequestType from "../../enums/request-type";
 import { nameof } from "../../helpers/name-of";
-import moment from "moment";
-import { useForm } from "@mantine/form";
-import { useTranslation } from "react-i18next";
-import PictureRenderer from "./PictureRenderer";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import { SearchSchema } from "../appointment/types/Appointment";
+import AddNoteForm, { AddNoteFormValues } from "./AddNoteForm";
 import EditNoteForm, { EditNoteFormValues } from "./EditNoteFrom";
 import { NoteTitleBar } from "./NoteTitleBar";
+import PictureRenderer from "./PictureRenderer";
 
 export type NoteItem = {
   id: string;
@@ -169,7 +160,6 @@ export default function NoteBook() {
       dateTo: undefined,
     };
 
-    
     if (request.chieldId === undefined) {
       delete request.chieldId;
     }
@@ -237,10 +227,11 @@ export default function NoteBook() {
           </Grid.Col>
         )}
         <Grid.Col span={{ xs: IdFromUrl === undefined ? 10 : 12 }}>
-
-          {IdFromUrl !== undefined && (<Group justify="end" p="md">
-            <Button onClick={() => setCreateOpened(true)}>Add note</Button>
-          </Group>)}
+          {IdFromUrl !== undefined && (
+            <Group justify="end" p="md">
+              <Button onClick={() => setCreateOpened(true)}>Add note</Button>
+            </Group>
+          )}
 
           <DataTable<GridNoteItem>
             records={notes}

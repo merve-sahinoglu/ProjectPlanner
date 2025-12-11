@@ -1,7 +1,7 @@
 import toast from "react-hot-toast";
-import RequestType from "../enum/request-type";
-import PaginationMetadata from "../types/pagination-metadata";
+import RequestType from "../enums/request-type";
 import parseResponseErrors from "../helpers/apiErrorParser";
+import PaginationMetadata from "../types/pagination-metadata";
 
 export interface SuccessResponse<T> {
   isSuccess: true;

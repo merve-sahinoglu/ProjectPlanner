@@ -2,9 +2,9 @@ import { Select, SelectItem } from "@mantine/core";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
+import Dictionary from "../../../helpers/translation/dictionary/dictionary";
 import SearchGrid from "../SearchGrid";
 import { SearchGridProps } from "../types/search-grid-props";
-import Dictionary from "../../../constants/dictionary";
 
 interface AutocompleteWithDataProps<T> {
   searchGridProps: SearchGridProps;

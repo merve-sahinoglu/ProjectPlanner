@@ -1,3 +1,5 @@
+import { Dispatch, SetStateAction, useRef } from "react";
+
 import {
   Card,
   Checkbox,
@@ -10,23 +12,24 @@ import {
   TextInput,
   Textarea,
 } from "@mantine/core";
-import { Dispatch, SetStateAction, useRef } from "react";
-import styles from "./RoomDetail.module.css";
-import { useTranslation } from "react-i18next";
-import Dictionary from "../../constants/dictionary";
-import { z } from "zod";
-import { useForm, zodResolver } from "@mantine/form";
+import { useForm } from "@mantine/form";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import toast from "react-hot-toast";
-import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import RequestType from "../../enum/request-type";
-import { nameof } from "../../helpers/name-of";
+import { useTranslation } from "react-i18next";
 import { RiInformationLine } from "react-icons/ri";
+import { z } from "zod";
+
 import globalStyles from "../../assets/global.module.css";
-import useRequestHandler from "../../hooks/useRequestHandler";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import RequestType from "../../enums/request-type";
+import { nameof } from "../../helpers/name-of";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
 import { RoomRowProps } from "./props/RoomRowProps";
+import styles from "./RoomDetail.module.css";
 
 interface RoomDetailProps {
   selectedRoom: RoomRowProps;
@@ -82,7 +85,7 @@ function RoomDetail({
       ...selectedRoom,
       roomTypeId: selectedRoom.roomTypeId,
     },
-    validate: zodResolver(schema),
+    validate: zod4Resolver(schema),
   });
 
   const initialValues = useRef<RoomRowProps>(form.values);

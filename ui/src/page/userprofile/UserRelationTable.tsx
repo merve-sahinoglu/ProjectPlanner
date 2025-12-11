@@ -17,7 +17,7 @@ type Props = {
   rowHeight?: number;
   /** search bar’dan gelen quick filter */
   quickFilter?: string;
-  onApiReady?: (api: any) => void;
+  onApiReady?: (api: unknown) => void;
 };
 
 const UserCell: React.FC<ICellRendererParams<UserRelationProps>> = ({
@@ -88,23 +88,23 @@ export default function UserRelationTable({
     () => [
       {
         headerName: "User",
-        field: "userId",
+        field: "userFullName" as keyof UserRelationProps,
         minWidth: 180,
-        cellRenderer: UserCell as any,
+        cellRenderer: UserCell as unknown,
       },
       {
         headerName: "Profile Group",
-        field: "profileGroupId",
+        field: "profileGroupName" as keyof UserRelationProps,
         minWidth: 160,
-        cellRenderer: GroupCell as any,
+        cellRenderer: GroupCell as unknown,
       },
       {
         headerName: "Actions",
-        field: "id",
-        cellRenderer: ActionsRenderer as any,
+        field: "id" as keyof UserRelationProps,
+        cellRenderer: ActionsRenderer as unknown,
         cellRendererParams: { onEdit, onDelete },
         minWidth: 50,
-        pinned: "right",
+        pinned: 'right' as const,
         sortable: false,
         filter: false,
         suppressMenu: true,

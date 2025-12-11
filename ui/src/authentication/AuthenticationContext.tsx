@@ -1,19 +1,21 @@
-import { Navigate, useLocation } from "react-router-dom";
-import {
-  AuthenticatedUser,
-  AuthenticationRequest
-} from "./types/authentication-types";
 import { createContext, useContext } from "react";
-import RequestType from "../enum/request-type";
+
 import { jwtDecode } from "jwt-decode";
+import { Navigate, useLocation } from "react-router-dom";
+
+import { apiUrl, createRequestUrl } from "../config/app.config";
 import routes from "../constants/routes";
+import RequestType from "../enums/request-type";
+import useRequestHandler from "../hooks/useRequestHandler";
 import {
   useCredentialActions,
   useCurrentUser,
 } from "./store/useCredentialsStore";
 import { useTokenActions } from "./store/useTokensStore";
-import useRequestHandler from "../hooks/useRequestHandler";
-import { apiUrl, createRequestUrl } from "../config/app.config";
+import {
+  AuthenticatedUser,
+  AuthenticationRequest,
+} from "./types/authentication-types";
 
 interface AuthenticationProps {
   currentUser: AuthenticatedUser | null;
@@ -56,7 +58,6 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
       AuthenticationRequest,
       AuthenticationResponseDto
     >(createRequestUrl(apiUrl.coreUrl), RequestType.Post, user);
-
 
     if (!response.isSuccess) {
       return false;
@@ -124,5 +125,6 @@ function RequireAuthentication({ children }: AuthenticationProviderProps) {
 export {
   AuthenticationProvider,
   RequireAuthentication,
+  // eslint-disable-next-line react-refresh/only-export-components
   useAuthenticationContext,
 };

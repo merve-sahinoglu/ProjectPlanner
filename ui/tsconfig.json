@@ -1,19 +1,41 @@
 {
   "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["DOM", "DOM.Iterable", "ESnext"],
+    "types": [
+      "vite/client",
+      "vite-plugin-svgr/client",
+      "@modyfi/vite-plugin-yaml/modules"
+    ],
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": false,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "jsx": "react-jsx",
+    "baseUrl": ".",
+    "paths": {
+      "@shared/types/*": ["src/types/*"],
+      "@components/*": ["src/components/*"],
+      "@hooks/*": ["src/hooks/*"],
+      "@enums/*": ["src/enums/*"],
+      "@constants/*": ["src/constants/*"],
+      "@assets/*": ["src/assets/*"],
+      "@utils/*": ["src/utils/*"],
+      "@helpers/*": ["src/helpers/*"],
+      "@pages/*": ["src/pages/*"],
+      "@features/*": ["src/features/*"]
+    }
   },
-  "files": [],
-  "references": [
-    { "path": "./tsconfig.app.json" },
-    { "path": "./tsconfig.node.json" }
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "build",
-    ".vscode",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-  ]
+  "include": ["src", "src/types.d.ts"],
+  "exclude": ["node_modules", "dist"]
 }

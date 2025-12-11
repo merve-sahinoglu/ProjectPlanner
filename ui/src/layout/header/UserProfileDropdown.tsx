@@ -1,10 +1,10 @@
-import { Avatar, Divider, Group, Menu, Select, Text } from "@mantine/core";
+import { Avatar, Divider, Group, Menu, Select } from "@mantine/core";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import Language from "../../enum/language";
-import useUserPreferences from "../../hooks/useUserPreferenceStore";
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
+import Language from "../../enums/language";
+import useUserPreferences from "../../hooks/useUserPreferenceStore";
 
 const languages = [
   {

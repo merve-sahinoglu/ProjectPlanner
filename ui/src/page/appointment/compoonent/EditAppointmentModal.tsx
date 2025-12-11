@@ -1,28 +1,26 @@
-import { Dispatch, SetStateAction, useEffect, useRef } from "react";
+import { Dispatch, SetStateAction, useRef } from "react";
+
 import { Grid, Group, Select, Textarea, TextInput } from "@mantine/core";
+import { useForm } from "@mantine/form";
+import { zod4Resolver } from "mantine-form-zod-resolver";
+import toast from "react-hot-toast";
+import { useTranslation } from "react-i18next";
+import { z } from "zod";
+
+import FormAutocomplete from "../../../components/Autocomplete/FormAutocomplete";
+import DateTimeSelector from "../../../components/DateTimeSelector/DateTimeSelector";
+import OperationButtons from "../../../components/OperationButtons/OperationButtons";
+import { apiUrl, createRequestUrl } from "../../../config/app.config";
+import RequestType from "../../../enums/request-type";
+import { nameof } from "../../../helpers/name-of";
+import Dictionary from "../../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../../hooks/useRequestHandler";
+import styles from ".././Appointment.module.css";
 import {
   Appointment,
-  AppointmentResponse,
   AppointmentType,
   SelectedDates,
 } from ".././types/Appointment";
-import useRequestHandler from "../../../hooks/useRequestHandler";
-import { useTranslation } from "react-i18next";
-import { useForm, zodResolver } from "@mantine/form";
-import Dictionary from "../../../constants/dictionary";
-import styles from ".././Appointment.module.css";
-import { nameof } from "../../../helpers/name-of";
-import { apiUrl, createRequestUrl } from "../../../config/app.config";
-import FormAutocomplete from "../../../components/Autocomplete/FormAutocomplete";
-import OperationButtons from "../../../components/OperationButtons/OperationButtons";
-import RequestType from "../../../enum/request-type";
-import toast from "react-hot-toast";
-import { z } from "zod";
-import {
-  createJsonPatchDocumentFromDirtyForm,
-  createJsonPatchDocumentFromList,
-} from "../../../services/json-patch-handler/json-patch-document";
-import DateTimeSelector from "../../../components/DateTimeSelector/DateTimeSelector";
 
 const appointmentStatus = [
   {
@@ -69,7 +67,6 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
       }),
   });
 
-
   const form = useForm<Appointment>({
     initialValues: {
       roomId: appointment.roomId || "",
@@ -98,7 +95,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
             end: new Date(date.end),
           })),
     },
-    validate: zodResolver(schema),
+    validate: zod4Resolver(schema),
   });
 
   const initialValues = useRef<Appointment>(form.values);
@@ -123,7 +120,6 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
   ];
 
   const sendPutRequestForModifiedItem = async () => {
-
     const updateAppointment = {
       id: form.values.id,
       appointmenId: form.values.appointmenId,

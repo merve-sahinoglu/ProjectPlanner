@@ -1,14 +1,14 @@
-import { useEffect, useReducer, useState } from "react";
-import customReducer from "../../../services/custom-reducer/customReducer";
-import { UserResponse, UserRowProps } from "../props/UserTypes";
 import { useDebouncedValue } from "@mantine/hooks";
-import ReducerActions from "../../../enum/reducer-action.enum";
-import { apiUrl, createRequestUrl } from "../../../config/app.config";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { useEffect, useReducer, useState } from "react";
+import { apiUrl, createRequestUrl } from "../../../config/app.config";
+import ReducerActions from "../../../enums/reducer-action.enum";
 import useRequestHandler, {
   SuccessResponse,
 } from "../../../hooks/useRequestHandler";
+import customReducer from "../../../services/custom-reducer/customReducer";
 import PaginationMetadata from "../../../types/pagination-metadata";
+import { UserResponse, UserRowProps } from "../props/UserTypes";
 
 interface UseUserProps {
   searchQuery: string;

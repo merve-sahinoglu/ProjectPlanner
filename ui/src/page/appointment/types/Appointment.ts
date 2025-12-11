@@ -19,7 +19,7 @@ interface SearchSchema {
   endDate: string;
 }
 
-interface Appointment {
+type Appointment = {
   id: number;
   appointmenId?: string;
   chieldId: string | null;
@@ -35,7 +35,7 @@ interface Appointment {
   name: string;
   description: string;
   appointmentDays?: SelectedDates[];
-}
+};
 interface CallenderProps extends EventInput {
   appointmenId?: string;
   therapistId?: string;
@@ -72,11 +72,11 @@ interface UserInformationResponse {
 
 export type {
   Appointment,
-  SelectedDates,
-  CallenderProps,
-  UserInformationResponse,
   AppointmentResponse,
+  CallenderProps,
   SearchSchema,
+  SelectedDates,
+  UserInformationResponse,
 };
 
 export { AppointmentType, LineStatus };

@@ -1,4 +1,4 @@
-interface UserRowProps {
+type UserRowProps = {
   id: string;
   relativeId?: string | null | undefined;
   relativeName?: string | null | undefined;
@@ -14,10 +14,10 @@ interface UserRowProps {
   gender: string;
   isActive: boolean;
   profilePicture?: File | null | string | Blob | number[];
-}
+};
 
 type UserResponse = Omit<UserRowProps, "typeId"> & {
   typeId: number;
 };
 
-export type { UserRowProps, UserResponse };
+export type { UserResponse, UserRowProps };

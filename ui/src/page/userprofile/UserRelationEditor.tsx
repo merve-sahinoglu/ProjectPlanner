@@ -1,13 +1,13 @@
 // src/features/user-relation/UserRelationEditor.tsx
-import { useEffect, useRef } from "react";
 import { Button, Group, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import UserRelationProps from "./types";
-import { nameof } from "../../helpers/name-of";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import Dictionary from "../../constants/dictionary";
+import { useEffect, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import { nameof } from "../../helpers/name-of";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import UserRelationProps from "./types";
 
 type Props = {
   initial?: Partial<UserRelationProps>;
@@ -92,11 +92,11 @@ export default function UserRelationEditor({
           ]}
           clearValue={clearUserId}
         />
-        
+
         <FormAutocomplete
           searchInputLabel={t(Dictionary.ProfileGroup.PROFILE_NAME)}
           placeholder={t(Dictionary.ProfileGroup.PROFILE_NAME)}
-          description=""
+          description="AYARLAR,NOT,RANDEVU yetkileri buradan verilir"
           disabled={false}
           apiUrl={createRequestUrl(apiUrl.profileGroupUrl)}
           form={form}

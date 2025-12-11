@@ -1,29 +1,26 @@
-/* eslint-disable react/require-default-props */
+import React, { useCallback, useState } from "react";
+
 import { Loader, OptionsFilter, Select } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconX } from "@tabler/icons-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import useRequestHandler, { ResponseBase } from "../../hooks/useRequestHandler";
-import formatSearchQuery from "../../helpers/trim-search-query";
+import { useDebouncedCallback } from "@mantine/hooks";
+import { BsX } from "react-icons/bs";
+
+import useRequestManager from "@hooks/useRequestManager";
+import { LooseKeys } from "@shared/types/form-loose-keys.types";
+import formatSearchQuery from "@utils/search-query-formatter";
 
 interface AutocompleteOption {
   value: string;
   label: string;
 }
 
-interface AutocompleteResponse {
-  id: string;
-  name: string;
-}
-
 interface FormAutocompleteProps<T> {
   /** Autocomplete input'un sol üst kısmında gösterilecek label  */
   searchInputLabel: string;
   /** Autocomplete'in içinde arama yapılmadığında gösterilecek placeholder */
-  placeholder: string;
+  placeholder?: string;
   /** Autocomplete label altında dimmed şekilde gözükecek açıklama */
-  description: string;
+  description?: string;
   /** Autocomplete ile aratılacak servisin url adresi */
   apiUrl: string;
 
@@ -40,23 +37,32 @@ interface FormAutocompleteProps<T> {
   /** Autocomplete component'ının kullanıcığı ekrandaki useForm ile oluşturulmuş
    * Mantine formu
    */
-  form: UseFormReturnType<T, (values: T) => T>;
+  form: UseFormReturnType<T>;
   /** Form içerisindeki hangi property için Autocomplete kullanılacaksa
    * o property'nin nameof değeri.
    */
-  formInputProperty: keyof T;
+  formInputProperty: LooseKeys<T>;
   /** Bildiğimiz marginTop :) */
   marginTop?: number;
   /** Bildiğimiz paddingTop :) */
   paddingTop?: number;
   /** Autocomplete için kullanılacak serviste search query ihtiyacı varsa kullanılır. */
-  additionalQueries?: string;
+  additionalParameters?: {
+    [key: string]:
+      | string
+      | number
+      | boolean
+      | Array<string | number>
+      | undefined
+      | null;
+  };
+  w?: string | number;
 }
 
 function FormAutocomplete<T>({
   searchInputLabel,
-  placeholder,
-  description,
+  placeholder = "",
+  description = "",
   apiUrl,
   form,
   formInputProperty,
@@ -66,10 +72,12 @@ function FormAutocomplete<T>({
   marginTop = 0,
   paddingTop = 0,
   clearValue,
+  additionalParameters,
+  w,
 }: FormAutocompleteProps<T>) {
-  const { fetchData, sendData } = useRequestHandler();
-
   const [items, setItems] = useState<AutocompleteOption[]>(initialData || []);
+
+  const { fetchData } = useRequestManager();
 
   const [searchValue, setSearchValue] = useState<string>(
     initialSearchValue || ""
@@ -77,12 +85,8 @@ function FormAutocomplete<T>({
 
   const [loading, setLoading] = useState<boolean>(false);
 
-  const [debouncedQuery] = useDebouncedValue(searchValue, 500);
-
-  const componentMounted = useRef<boolean>(false);
-
-  const fetchItems = useCallback(async () => {
-    if (searchValue === "" || searchValue === null) {
+  const fetchItems = async () => {
+    if (searchValue === "" || searchValue == null) {
       setItems([]);
       clearValue();
       return;
@@ -90,32 +94,23 @@ function FormAutocomplete<T>({
 
     if (searchValue.length >= 3) {
       setLoading(true);
-      const query = formatSearchQuery(searchValue);
-      const request: { [key: string]: any } = {
-        searchText: query,
+
+      const parameters = {
+        ...additionalParameters,
+        searchQuery: formatSearchQuery(searchValue),
+        isValueLabel: true,
         isActive: true,
       };
-      const response = await fetchData<AutocompleteResponse[]>(apiUrl, request);
+
+      const response = await fetchData<AutocompleteOption[]>(
+        apiUrl,
+        parameters
+      );
 
       if (response.isSuccess) {
-        const retVal: AutocompleteOption[] = [];
-
-        response.value.forEach((element) => {
-          retVal.push({
-            value: element.id,
-            label: element.name,
-          });
-        });
-
-        setItems(retVal);
+        setItems(response.value);
         setLoading(false);
       }
-    }
-  }, [clearValue, searchValue]);
-
-  const handleSearchChange = (eventValue: string) => {
-    if (eventValue !== searchValue) {
-      setSearchValue(eventValue);
     }
   };
 
@@ -128,23 +123,17 @@ function FormAutocomplete<T>({
     [clearValue]
   );
 
-  useEffect(() => {
-    /** Autocomplete kullanılan ekranlar ilk açıldığında arama yapılmaması
-     * için koyuldu.
-     */
-    if (!componentMounted.current) {
-      componentMounted.current = true;
-      return;
-    }
+  const includeAllFilter: OptionsFilter = ({ options }) => options;
 
-    fetchItems();
-  }, [debouncedQuery]);
+  const handleSearch = useDebouncedCallback(async () => {
+    if (form.values[formInputProperty as unknown as keyof T]) return;
 
-  // TODO: bURASI TRUE ILE GECILMISTI SITEDEN CALDIGIM BURASI KALMALIMI BILMIORUM
-  const optionsFilter: OptionsFilter = ({ options, search }) => {
-    return (options as AutocompleteOption[]).filter((option) => {
-      return true;
-    });
+    await fetchItems();
+  }, 300);
+
+  const handleSearchChange = (value: string) => {
+    setSearchValue(value);
+    handleSearch();
   };
 
   return (
@@ -157,22 +146,23 @@ function FormAutocomplete<T>({
       placeholder={placeholder}
       mt={marginTop}
       pt={paddingTop}
-      comboboxProps={{ withinPortal: true }}
+      w={w}
       description={description}
-      {...form.getInputProps(formInputProperty)}
+      {...form.getInputProps(formInputProperty as LooseKeys<T>)}
+      rightSectionPointerEvents="auto"
       rightSection={
         loading ? (
-          <Loader size="1rem" />
-        ) : searchValue && !disabled ? (
-          <IconX
+          <Loader size="16px" />
+        ) : searchValue.trim() && !disabled ? (
+          <BsX
             size={18}
-            style={{ display: "block", opacity: 0.5, cursor: "pointer" }}
-            onClick={handleClearClick}
+            style={{ display: "block", cursor: "pointer" }}
+            onClick={(event) => handleClearClick(event)}
           />
         ) : null
       }
+      filter={includeAllFilter}
       data={items}
-      filter={optionsFilter}
       searchable
     />
   );

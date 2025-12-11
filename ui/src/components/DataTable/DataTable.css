@@ -1,0 +1,50 @@
+.ag-header-cell-label {
+    justify-content: center !important;
+}
+
+.ag-checkbox-input {
+    width: 18px;
+    height: 18px;
+    vertical-align: center;
+    justify-content: center;
+}
+
+/* Optional: Adjust the font size and letter spacing */
+.ag-header-cell-text {
+    font-size: 12px;
+    /* Adjust the font size */
+    letter-spacing: 1px;
+    /* Optional: Adjust letter spacing */
+}
+
+.ag-cell-value {
+    line-height: 25px !important;
+    word-break: normal;
+    /* prevent words from breaking */
+    padding-top: 3px;
+    /* space top */
+    padding-bottom: 3px;
+    /* space bottom */
+    align-content: center !important;
+}
+
+.ag-cell {
+    align-content: center !important;
+}
+
+.ag-theme-quartz-dark {
+    --ag-foreground-color: #b3b3b7;
+    --ag-background-color: #25262B;
+    --ag-header-foreground-color: #b3b3b7;
+    --ag-header-background-color: #34353a;
+    --ag-odd-row-background-color: #1a1b1e;
+    --ag-header-column-resize-handle-color: #25262B;
+
+    --ag-font-size: 12px !important;
+    --ag-font-family: Inter !important;
+}
+
+.ag-theme-quartz {
+    --ag-font-size: 12px !important;
+    --ag-font-family: Inter !important;
+}

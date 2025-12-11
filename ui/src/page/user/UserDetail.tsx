@@ -1,40 +1,40 @@
+import { Dispatch, SetStateAction, useRef, useState } from "react";
+
 import {
+  Avatar,
   Card,
-  Checkbox,
+  Divider,
   FileInput,
   Grid,
   Group,
   PasswordInput,
   Select,
+  Switch,
   Tabs,
   Text,
   TextInput,
-  Image,
-  Avatar,
-  Divider,
-  Badge,
-  Switch,
 } from "@mantine/core";
-import { Dispatch, SetStateAction, useRef, useState } from "react";
-import globalStyles from "../../assets/global.module.css";
-import styles from "./UserDetail.module.css";
-import { UserRowProps, UserResponse } from "./props/UserTypes";
-import { useTranslation } from "react-i18next";
-import Dictionary from "../../constants/dictionary";
-import { z } from "zod";
-import { useForm, zodResolver } from "@mantine/form";
+import { DateInput } from "@mantine/dates";
+import { useForm } from "@mantine/form";
+import { IconCheck, IconX } from "@tabler/icons-react";
+import { zod4Resolver } from "mantine-form-zod-resolver";
 import toast from "react-hot-toast";
-import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import RequestType from "../../enum/request-type";
-import { nameof } from "../../helpers/name-of";
+import { useTranslation } from "react-i18next";
 import { RiInformationLine } from "react-icons/ri";
-import useRequestHandler from "../../hooks/useRequestHandler";
+import { z } from "zod";
+
+import globalStyles from "../../assets/global.module.css";
+import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
-import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
-import { DateInput } from "@mantine/dates";
-import { IconCheck, IconX } from "@tabler/icons-react";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
+import RequestType from "../../enums/request-type";
+import { nameof } from "../../helpers/name-of";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
+import { UserResponse, UserRowProps } from "./props/UserTypes";
+import styles from "./UserDetail.module.css";
 
 interface ItemDetailProps {
   selectedUser: UserRowProps;
@@ -82,7 +82,7 @@ function UserDetail({
   handleUpdateItemWithId,
   changeSelectedItem,
 }: ItemDetailProps) {
-  const { fetchData, sendData } = useRequestHandler();
+  const { sendData } = useRequestHandler();
 
   const { t } = useTranslation();
 
@@ -116,7 +116,7 @@ function UserDetail({
 
   const form = useForm<UserRowProps>({
     initialValues: { ...selectedUser, gender: selectedUser.gender.toString() },
-    validate: zodResolver(schema),
+    validate: zod4Resolver(schema),
   });
 
   const initialValues = useRef<UserRowProps>(form.values);

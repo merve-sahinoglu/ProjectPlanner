@@ -1,7 +1,7 @@
 import { Button, Group } from "@mantine/core";
 import React from "react";
 import { useTranslation } from "react-i18next";
-import Dictionary from "../../constants/dictionary";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
 interface OperationButtonsProps {
   disabled: boolean;
   isDirty: boolean;

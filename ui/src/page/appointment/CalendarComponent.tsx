@@ -1,23 +1,23 @@
-import { useEffect, useRef, useState } from "react";
-import FullCalendar from "@fullcalendar/react";
 import dayGridPlugin from "@fullcalendar/daygrid";
-import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
+import FullCalendar from "@fullcalendar/react";
+import timeGridPlugin from "@fullcalendar/timegrid";
 import { Button, Grid, Group, Modal, Radio } from "@mantine/core";
-import AppointmentModal from "./AppointmentModal";
+import { useForm } from "@mantine/form";
 import { useDisclosure } from "@mantine/hooks";
-import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import moment from "moment";
-import { Appointment, CallenderProps, SearchSchema } from "./types/Appointment";
+import { useEffect, useRef, useState } from "react";
+import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
-import useRequestHandler from "../../hooks/useRequestHandler";
-import { apiUrl, createRequestUrl } from "../../config/app.config";
-import EditAppointmentModal from "./compoonent/EditAppointmentModal";
 import { useParams } from "react-router-dom";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
-import Dictionary from "../../constants/dictionary";
-import { useForm } from "@mantine/form";
+import { apiUrl, createRequestUrl } from "../../config/app.config";
 import { nameof } from "../../helpers/name-of";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../hooks/useRequestHandler";
+import AppointmentModal from "./AppointmentModal";
+import EditAppointmentModal from "./compoonent/EditAppointmentModal";
+import { Appointment, CallenderProps, SearchSchema } from "./types/Appointment";
 
 interface DateModel {
   date: string;
@@ -181,44 +181,43 @@ const CalendarComponent = () => {
     );
 
     if (response.isSuccess) {
- const calendarEvents: CallenderProps[] = response.value.flatMap(
-   (appointment) => {
-     if (!appointment.appointmentDays) return [];
+      const calendarEvents: CallenderProps[] = response.value.flatMap(
+        (appointment) => {
+          if (!appointment.appointmentDays) return [];
 
-     const color = getColorForTherapist(appointment.therapistId);
-     const textColor = pickTextColor(color);
+          const color = getColorForTherapist(appointment.therapistId);
+          const textColor = pickTextColor(color);
 
-     return appointment.appointmentDays.map((day) => ({
-       id: appointment.id.toString(),
-       title: appointment.name,
-       start: new Date(day.start),
-       end: new Date(day.end),
-       allDay: false,
+          return appointment.appointmentDays.map((day) => ({
+            id: appointment.id.toString(),
+            title: appointment.name,
+            start: new Date(day.start),
+            end: new Date(day.end),
+            allDay: false,
 
-       appointmenId: appointment.appointmenId,
-       therapistId: appointment.therapistId,
-       chieldId: appointment.chieldId || "",
-       typeId: appointment.typeId || "",
-       statusId: appointment.statusId?.toString() ?? "",
-       name: appointment.name || "",
-       description: appointment.description || "",
-       chieldName: appointment.chieldName || "",
-       therapistName: appointment.therapistName || "",
-       appointmentDays: appointment.appointmentDays || [],
-       playgroupId: appointment.playgroupId || "",
-       playgroupName: appointment.playgroupName || "",
-       roomId: appointment.roomId || "",
-       roomName: appointment.roomName || "",
+            appointmenId: appointment.appointmenId,
+            therapistId: appointment.therapistId,
+            chieldId: appointment.chieldId || "",
+            typeId: appointment.typeId || "",
+            statusId: appointment.statusId?.toString() ?? "",
+            name: appointment.name || "",
+            description: appointment.description || "",
+            chieldName: appointment.chieldName || "",
+            therapistName: appointment.therapistName || "",
+            appointmentDays: appointment.appointmentDays || [],
+            playgroupId: appointment.playgroupId || "",
+            playgroupName: appointment.playgroupName || "",
+            roomId: appointment.roomId || "",
+            roomName: appointment.roomName || "",
 
-       // FullCalendar tarafından anlaşılan stil alanları:
-       backgroundColor: color,
-       borderColor: color,
-       textColor: textColor,
-       // color: color, // istersen tek satırda hepsini ayarlayan 'color' da kullanabilirsin
-     }));
-   }
- );
-
+            // FullCalendar tarafından anlaşılan stil alanları:
+            backgroundColor: color,
+            borderColor: color,
+            textColor: textColor,
+            // color: color, // istersen tek satırda hepsini ayarlayan 'color' da kullanabilirsin
+          }));
+        }
+      );
 
       setAgendaListView(response.value);
       setAgendas(calendarEvents);

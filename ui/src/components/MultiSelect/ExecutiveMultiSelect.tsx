@@ -1,10 +1,10 @@
 import { MultiSelect } from "@mantine/core";
 import { IconX } from "@tabler/icons-react";
 import { useEffect, useState } from "react";
-import useRequestHandler from "../../hooks/useRequestHandler";
 import { useTranslation } from "react-i18next";
-import Dictionary from "../../constants/dictionary";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import useRequestHandler from "../../hooks/useRequestHandler";
 
 interface AutocompleteOption {
   value: string; // ID olacak
