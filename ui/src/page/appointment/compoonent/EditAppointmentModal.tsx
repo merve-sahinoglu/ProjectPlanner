@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useRef } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 
 import { Grid, Group, Select, Textarea, TextInput } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -23,19 +23,11 @@ import {
 } from ".././types/Appointment";
 
 const appointmentStatus = [
-  {
-    value: "0",
-    label: "Scheduled",
-  },
-  {
-    value: "1",
-    label: "Completed",
-  },
-  {
-    value: "2",
-    label: "Canceled",
-  },
+  { value: "0", label: "Scheduled" },
+  { value: "1", label: "Completed" },
+  { value: "2", label: "Canceled" },
 ];
+
 interface EditAppointmentFormProps {
   appointment: Appointment;
   closeOnSave: () => void;
@@ -55,7 +47,6 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
   appointment,
 }) => {
   const { sendData } = useRequestHandler();
-
   const { t } = useTranslation();
 
   const schema = z.object({
@@ -98,7 +89,11 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
     validate: zod4Resolver(schema),
   });
 
-  const initialValues = useRef<Appointment>(form.values);
+  // ESKİ: const initialValues = useRef<Appointment>(form.values);
+  // YENİ: başlangıç değerlerini state olarak tutuyoruz
+  const [initialValues, setInitialValues] = useState<Appointment>(
+    () => form.values
+  );
 
   const appointmentTypes = [
     {
@@ -151,13 +146,13 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
 
     if (response.isSuccess) {
       setDisabled(true);
-
       form.resetDirty();
 
-      initialValues.current = form.values;
+      // ESKİ: initialValues.current = form.values;
+      // YENİ:
+      setInitialValues(form.values);
 
       handleUpdateItem(form.values);
-
       toast.success(`${t(Dictionary.Success.POSITIVE)}`);
     }
   };
@@ -168,7 +163,6 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
     form.validate();
 
     if (!form.isValid()) return;
-
     if (!form.isDirty()) return;
 
     sendPutRequestForModifiedItem();
@@ -190,7 +184,9 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
       return;
     }
 
-    form.setValues(initialValues.current);
+    // ESKİ: form.setValues(initialValues.current);
+    // YENİ:
+    form.setValues(initialValues);
     setDisabled(true);
   };
 
@@ -217,6 +213,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               {...form.getInputProps(nameof<Appointment>("name"))}
             />
           </Group>
+
           <Group grow>
             <Select
               disabled={true}
@@ -224,6 +221,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               label={t(Dictionary.Appointment.TYPE_ID)}
               data={appointmentTypes}
             />
+
             <FormAutocomplete
               searchInputLabel={t(Dictionary.Appointment.ROOM_ID)}
               placeholder={t(Dictionary.Appointment.ROOM_ID)}
@@ -235,20 +233,17 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               formInputProperty="roomId"
               initialData={[
                 {
-                  value:
-                    initialValues.current && initialValues.current.roomId
-                      ? initialValues.current.roomId
-                      : "",
-                  label:
-                    initialValues.current && initialValues.current.roomName
-                      ? `${initialValues.current.roomName}`
-                      : "",
+                  value: initialValues.roomId ? initialValues.roomId : "",
+                  label: initialValues.roomName
+                    ? `${initialValues.roomName}`
+                    : "",
                 },
               ]}
               clearValue={clearChieldId}
               {...form.getInputProps(nameof<Appointment>("roomId"))}
             />
           </Group>
+
           <Group grow>
             <FormAutocomplete
               searchInputLabel={t(Dictionary.Appointment.CHIELD_ID)}
@@ -262,18 +257,15 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               {...form.getInputProps(nameof<Appointment>("chieldId"))}
               initialData={[
                 {
-                  value:
-                    initialValues.current && initialValues.current.chieldId
-                      ? initialValues.current.chieldId
-                      : "",
-                  label:
-                    initialValues.current && initialValues.current.chieldName
-                      ? `${initialValues.current.chieldName}`
-                      : "",
+                  value: initialValues.chieldId ? initialValues.chieldId : "",
+                  label: initialValues.chieldName
+                    ? `${initialValues.chieldName}`
+                    : "",
                 },
               ]}
               clearValue={clearChieldId}
             />
+
             <FormAutocomplete
               searchInputLabel={t(Dictionary.Appointment.THERAPIST_ID)}
               placeholder={t(Dictionary.Appointment.THERAPIST_ID)}
@@ -285,19 +277,18 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               {...form.getInputProps(nameof<Appointment>("therapistId"))}
               initialData={[
                 {
-                  value:
-                    initialValues.current && initialValues.current.therapistId
-                      ? initialValues.current.therapistId
-                      : "",
-                  label:
-                    initialValues.current && initialValues.current.therapistName
-                      ? `${initialValues.current.therapistName}`
-                      : "",
+                  value: initialValues.therapistId
+                    ? initialValues.therapistId
+                    : "",
+                  label: initialValues.therapistName
+                    ? `${initialValues.therapistName}`
+                    : "",
                 },
               ]}
               clearValue={clearChieldId}
             />
           </Group>
+
           <Group grow>
             {form.values.typeId == AppointmentType.GAME_GROUPS && (
               <FormAutocomplete
@@ -323,6 +314,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               />
             )}
           </Group>
+
           <Group grow>
             <Textarea
               disabled={disabled}
@@ -330,6 +322,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
               {...form.getInputProps(nameof<Appointment>("description"))}
             />
           </Group>
+
           <Group grow>
             <DateTimeSelector
               onChange={handleDateTimeChange}
@@ -338,6 +331,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
           </Group>
         </Grid.Col>
       </Grid>
+
       <OperationButtons
         disabled={disabled}
         isDirty={form.isDirty()}
@@ -345,8 +339,6 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
         handleEdit={handleEdit}
         handleCancel={handleCancel}
       />
-      {/* </Tabs.Panel>
-      </Tabs> */}
     </>
   );
 };

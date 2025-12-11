@@ -2,9 +2,10 @@ import { Button, Group, Stack } from "@mantine/core";
 import { DateInput } from "@mantine/dates";
 import { useForm } from "@mantine/form";
 import { RichTextEditor } from "@mantine/tiptap";
+import Link from "@tiptap/extension-link";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
+
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import { nameof } from "../../helpers/name-of";
@@ -25,7 +26,12 @@ type Props = {
   onCancel: () => void;
 };
 
-export default function AddNoteForm({ onSave, onCancel, therapistId, childId }: Props) {
+export default function AddNoteForm({
+  onSave,
+  onCancel,
+  therapistId,
+  childId,
+}: Props) {
   const form = useForm<AddNoteFormValues>({
     initialValues: {
       date: new Date(),

@@ -1,9 +1,9 @@
 import { Button, Group, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { RichTextEditor } from "@mantine/tiptap";
+import Link from "@tiptap/extension-link";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import Link from "@tiptap/extension-link";
 
 // Projendeki gerçek import yoluna göre düzelt:
 

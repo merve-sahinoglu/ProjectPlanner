@@ -38,7 +38,7 @@ import Dictionary from "../../helpers/translation/dictionary/dictionary";
 import useRequestHandler from "../../hooks/useRequestHandler";
 import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
 import { UserResponse, UserRowProps } from "../user/props/UserTypes";
-import styles from "./MyProfile.module.css"; // proje içindeki mevcut input sınıfları
+import styles from "./MyProfile.module.css";
 
 const genders = [
   { value: "0", label: "Unknown" },
@@ -118,11 +118,12 @@ export default function MyProfile() {
   const { fetchData, sendData } = useRequestHandler();
   const { currentUser } = useAuthenticationContext();
   const fileRef = useRef<HTMLInputElement | null>(null);
-  const [loading, setLoading] = useState(true);
+
+  // DEĞİŞTİ: loading başlangıcı artık false
+  const [loading, setLoading] = useState(false);
   const [disabled, setDisabled] = useState(true);
   const [preview, setPreview] = useState<string | null>(null);
 
-  // Boş form default’u (sunucu gelmeden önce)
   const empty: UserRowProps = {
     id: "",
     userName: "",
@@ -137,7 +138,6 @@ export default function MyProfile() {
     isActive: true,
     relativeId: "",
     typeId: "0",
-    // opsiyonel alanlar varsa ekleyin
   };
 
   const form = useForm<UserRowProps>({
@@ -151,9 +151,11 @@ export default function MyProfile() {
   const fetchItems = async () => {
     const userId = currentUser?.userId;
     setLoading(true);
+
     const res = await fetchData<UserResponse>(
       createRequestUrl(apiUrl.userUrl, userId)
     );
+
     if (!res.isSuccess) {
       setLoading(false);
       toast.error(res.error || "Kullanıcı bilgileri alınamadı.");
@@ -166,7 +168,7 @@ export default function MyProfile() {
       id: v.id,
       userName: v.userName,
       email: v.email ?? "",
-      password: null, // güvenlik gereği boş getiriyoruz
+      password: null,
       cardNumber: v.cardNumber ?? null,
       searchText: v.searchText ?? "",
       name: v.name ?? "",
@@ -176,7 +178,6 @@ export default function MyProfile() {
       isActive: v.isActive,
       relativeId: v.relativeId ?? "",
       typeId: String(v.typeId ?? "0"),
-      // backend’den base64 gelirse file’a çevir
       profilePicture: v.profilePicture
         ? base64ToBlob(v.profilePicture as unknown as string, "image/jpeg")
         : undefined,
@@ -185,6 +186,7 @@ export default function MyProfile() {
     initialValues.current = mapped;
     form.setValues(mapped);
     form.resetDirty();
+
     setPreview(
       mapped.profilePicture instanceof File
         ? URL.createObjectURL(mapped.profilePicture)
@@ -192,16 +194,20 @@ export default function MyProfile() {
     );
     setLoading(false);
   };
+
   // Profilimi getir
   useEffect(() => {
     const userId = currentUser?.userId;
+
+    // DEĞİŞTİ: burada artık setLoading çağırmıyoruz, sadece toast atıyoruz
     if (!userId) {
-      setLoading(false);
       toast.error("Kullanıcı bulunamadı.");
       return;
     }
+
     fetchItems();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentUser?.userId]);
 
   const handleSave = async (e: React.MouseEvent) => {
     e.preventDefault();
@@ -222,7 +228,7 @@ export default function MyProfile() {
       const picture = {
         op: "replace",
         path: "/profilePicture",
-        value: base64ToByteArray(base64), // Binary olarak saklamak istersen
+        value: base64ToByteArray(base64),
       };
 
       patch.push(picture);
@@ -239,7 +245,6 @@ export default function MyProfile() {
       patch
     );
 
-    debugger;
     if (resp.isSuccess) {
       initialValues.current = form.values;
       form.resetDirty();
@@ -259,7 +264,7 @@ export default function MyProfile() {
     e.preventDefault();
     form.setValues(initialValues.current);
     setDisabled(true);
-    // preview’ı geri al
+
     const pic = initialValues.current.profilePicture;
     setPreview(pic instanceof File ? URL.createObjectURL(pic) : null);
   };
@@ -268,7 +273,7 @@ export default function MyProfile() {
     <Box className={styles.wrapperFluid} pos="relative">
       <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />
 
-      {/* HERO / HEADER */}
+      {/* HEADER */}
       <div className={styles.header}>
         <div className={styles.hero}>
           <div className={styles.avatarWrap}>
@@ -418,9 +423,9 @@ export default function MyProfile() {
               data={genders}
             />
           </Grid.Col>
+
           <Grid.Col span={{ base: 12, md: 6 }}>
             <TextInput
-              //   className={fieldStyles.input}
               disabled={disabled}
               label={t(Dictionary.User.EMAIL)}
               {...form.getInputProps(nameof<UserRowProps>("email"))}

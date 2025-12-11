@@ -1,7 +1,8 @@
 // NoteTitleBar.tsx
-import { Avatar, Badge, Group, Stack, Text, Title, rem } from "@mantine/core";
-import { IconCalendar } from "@tabler/icons-react";
 import React from "react";
+
+import { Avatar, Badge, Group, Stack, Title, rem } from "@mantine/core";
+import { IconCalendar } from "@tabler/icons-react";
 
 type NoteTitleBarProps = {
   name: string; // çocuğun adı veya başlık
@@ -21,13 +22,13 @@ function formatDate(d?: Date | string | null) {
   });
 }
 
-function normalize(raw: any, mime = "image/jpeg"): string {
-    let v: any = raw;
+function normalize(raw: unknown, mime = "image/jpeg"): string {
+  const v: unknown = raw;
 
-    if (typeof v === "string") {
-      const dataUrl = normalizeDataUrl(v, mime);
-      if (dataUrl) return dataUrl;
-    }
+  if (typeof v === "string") {
+    const dataUrl = normalizeDataUrl(v, mime);
+    if (dataUrl) return dataUrl;
+  }
 
   const s = String(raw).trim();
 
@@ -71,7 +72,6 @@ function normalizeDataUrl(raw: string, mime = "image/jpeg"): string {
   // Son çare: base64 gibi davran
   return `data:${mime};base64,${s}`;
 }
-
 
 export function NoteTitleBar({
   name,

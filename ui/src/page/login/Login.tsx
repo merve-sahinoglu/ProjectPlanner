@@ -1,24 +1,30 @@
 // src/pages/LoginPage.tsx
 import { useState } from "react";
+
 import {
-  Paper,
-  TextInput,
-  PasswordInput,
-  Button,
-  Text,
-  Group,
-  Stack,
   Alert,
-  LoadingOverlay,
-  Divider,
   Anchor,
   Box,
+  Button,
+  Divider,
+  Group,
+  LoadingOverlay,
+  Paper,
+  PasswordInput,
+  Stack,
+  Text,
+  TextInput,
 } from "@mantine/core";
 import { useForm } from "@mantine/form";
-import { IconAlertTriangle, IconArrowRight, IconFaceId } from "@tabler/icons-react";
+import {
+  IconAlertTriangle,
+  IconArrowRight,
+  IconFaceId,
+} from "@tabler/icons-react";
 import { useNavigate } from "react-router-dom";
-import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
+
 import KIDS_IMG from "../../assets/images.jpeg";
+import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
 import { AuthenticationRequest } from "../../authentication/types/authentication-types";
 
 export default function Login() {
@@ -43,7 +49,6 @@ export default function Login() {
     try {
       setLoading(true);
       setError(null);
-    debugger;
 
       const isAuthenticated = await auth.authenticateUser(form.values);
 
@@ -92,7 +97,7 @@ export default function Login() {
           {
             background:
               "linear-gradient(135deg, rgba(20,20,26,0.55), rgba(20,20,26,0.35))",
-          } as any
+          } as unknown
         }
       >
         <LoadingOverlay visible={loading} overlayProps={{ blur: 2 }} />

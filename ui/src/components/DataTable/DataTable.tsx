@@ -18,10 +18,9 @@ import {
 import { AgGridReact } from "ag-grid-react";
 
 import Language from "@enums/language.enum";
+import useUserPreferences from "@hooks/useUserPreferenceStore";
 import "./DataTable.css";
 import { TableEntity } from "./types/table-entity";
-
-import useUserPreferences from "@hooks/useUserPreferences";
 
 ModuleRegistry.registerModules([AllCommunityModule, ClientSideRowModelModule]);
 

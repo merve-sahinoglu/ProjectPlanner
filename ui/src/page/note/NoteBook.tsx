@@ -1,11 +1,14 @@
-import type { ColDef } from "@ag-grid-community/core"; // ← kendi path'ine göre düzelt
+import { useEffect, useMemo, useState } from "react";
+
+// ← kendi path'ine göre düzelt
 import { Button, Divider, Grid, Group, Modal, Stack } from "@mantine/core";
 import { useForm } from "@mantine/form";
+import { ColDef } from "ag-grid-community";
 import dayjs from "dayjs";
 import moment from "moment";
-import { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
+
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import DataTable from "../../components/DataTable/DataTable";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
@@ -61,7 +64,9 @@ export default function NoteBook() {
       {
         headerName: "Date",
         field: "date",
-        valueFormatter: (p) => dayjs(p.value).format("DD-MM-YYYY"),
+        valueFormatter: (p: {
+          value: string | number | Date | dayjs.Dayjs | null | undefined;
+        }) => dayjs(p.value).format("DD-MM-YYYY"),
         width: 140,
         sortable: true,
       },
@@ -73,7 +78,7 @@ export default function NoteBook() {
         filter: true,
         cellRenderer: PictureRenderer,
         cellRendererParams: {
-          labelField: "childName", // label'ı data.childName'den al
+          labelField: "childName",
           defaultMime: "image/jpeg",
         },
       },
@@ -82,7 +87,7 @@ export default function NoteBook() {
         field: "therapistProfilePicture",
         flex: 1,
         sortable: true,
-        hide: IdFromUrl === undefined ? false : true, // sadece IdFromUrl varsa göster
+        hide: IdFromUrl === undefined ? false : true,
         filter: true,
         cellRenderer: PictureRenderer,
         cellRendererParams: {
@@ -91,7 +96,7 @@ export default function NoteBook() {
         },
       },
     ],
-    []
+    [IdFromUrl] // ✅ eklendi
   );
 
   const handleCreate = async (values: AddNoteFormValues) => {
@@ -153,6 +158,7 @@ export default function NoteBook() {
   };
 
   const fetchNotes = async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const request: { [key: string]: any } = {
       childId: form.values.childId ?? undefined,
       therapistId: IdFromUrl ?? form.values.therapistId,
@@ -192,6 +198,7 @@ export default function NoteBook() {
   };
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchNotes();
   }, []);
 
@@ -236,13 +243,12 @@ export default function NoteBook() {
           <DataTable<GridNoteItem>
             records={notes}
             columns={columns}
-            rowHeight={46}
             isFetching={false}
             onRowClicked={(data) => {
               setEditOpened(true);
               setSelectedNote(data);
             }}
-            h={"800px"}
+            h={800}
             hasPagination={true}
           />
 

@@ -9,108 +9,35 @@ import useRequestHandler, {
   SuccessResponse,
 } from "../../../hooks/useRequestHandler";
 import customReducer from "../../../services/custom-reducer/customReducer";
-import PaginationMetadata from "../../../types/pagination-metadata";
 import { UserResponse, UserRowProps } from "../props/UserTypes";
 
 interface UseUserProps {
-  searchQuery: string;
-  isActive: boolean;
-  changeMetadata: (value: PaginationMetadata | null) => void;
+  searchQuery?: string;
 }
 
-const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
-  const { fetchData, sendData } = useRequestHandler();
-
-  const [items, dispatch] = useReducer(customReducer<UserRowProps>, []);
-
-  const [selectedItems, setSelectedItems] = useState<UserRowProps[]>([]);
-
-  const [totalRecordCount, setTotalRecords] = useState(0);
+const useItems = ({ searchQuery = "" }: UseUserProps = {}) => {
+  const { fetchData } = useRequestHandler();
 
   const [debouncedQuery] = useDebouncedValue(searchQuery, 500);
 
+  const [items, dispatch] = useReducer(customReducer<UserRowProps>, []);
+  const [selectedItems, setSelectedItems] = useState<UserRowProps[]>([]);
+  const [totalRecordCount, setTotalRecords] = useState<number>(0);
+
   function handleAddItems(item: UserRowProps) {
-    dispatch({
-      type: ReducerActions.Add,
-      payload: item,
-    });
+    dispatch({ type: ReducerActions.Add, payload: item });
   }
 
   function handleUpdateItems(item: UserRowProps) {
-    dispatch({
-      type: ReducerActions.Update,
-      payload: item,
-    });
+    dispatch({ type: ReducerActions.Update, payload: item });
   }
 
   function handleDeleteItems(itemId: string) {
-    dispatch({
-      type: ReducerActions.Delete,
-      payload: itemId,
-    });
+    dispatch({ type: ReducerActions.Delete, payload: itemId });
   }
 
-  function handleReplaceItems(item: UserRowProps[]) {
-    dispatch({
-      type: ReducerActions.Replace,
-      payload: item,
-    });
-  }
-
-  const fetchItems = async ({ pageParam = 1 }) => {
-    const request: { [key: string]: any } = {
-      page: pageParam,
-      searchText: searchQuery,
-    };
-
-    const response = await fetchData<UserResponse[]>(
-      createRequestUrl(apiUrl.userUrl),
-      request
-    );
-
-    if (response.isSuccess) {
-      setTotalRecords(response.metadata?.TotalItemCount || 0);
-
-      const retval = response.value.map((item) => ({
-        ...item,
-        birthDate: item.birthDate ? new Date(item.birthDate) : null,
-        typeId: item.typeId.toString(),
-        relativeName: item.relativeName,
-        profilePicture:
-          item.profilePicture &&
-          base64ToBlob(item.profilePicture as string, "image/jpeg"),
-      }));
-
-      changeMetadata(response.metadata ? response.metadata : null);
-
-      return {
-        isSuccess: true,
-        metadata: response.metadata,
-        value: retval,
-      } as SuccessResponse<UserRowProps[]>;
-    }
-
-    return Promise.reject(new Error(response.error));
-  };
-
-  function base64ToBlob(
-    base64: string,
-    mimeType: "image/jpeg" | "image/png"
-  ): Blob {
-    // Check if base64 contains the data URL prefix
-    const base64Data = base64.split(",")[1] || base64; // Take part after the comma or the entire string if no comma
-
-    const byteCharacters = atob(base64Data); // Decode the base64 string
-    const byteNumbers = new Array(byteCharacters.length);
-
-    for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i); // Convert characters to byte values
-    }
-
-    const byteArray = new Uint8Array(byteNumbers); // Create Uint8Array from byte numbers
-    const blob = new Blob([byteArray], { type: mimeType }); // Create a blob with the correct mime type
-
-    return new File([blob], "image.jpeg", { type: mimeType }); // Return as File
+  function handleReplaceItems(list: UserRowProps[]) {
+    dispatch({ type: ReducerActions.Replace, payload: list });
   }
 
   function handleUpdateItemWithId(item: UserRowProps, id: string) {
@@ -121,25 +48,77 @@ const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
     });
   }
 
+  function base64ToBlob(
+    base64: string,
+    mimeType: "image/jpeg" | "image/png"
+  ): File {
+    const base64Data = base64.split(",")[1] || base64;
+    const byteCharacters = atob(base64Data);
+    const byteNumbers = new Array(byteCharacters.length);
+
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mimeType });
+
+    return new File([blob], "image.jpeg", { type: mimeType });
+  }
+
+  const fetchItems = async ({ pageParam = 1 }) => {
+    const request = {
+      page: pageParam,
+      searchText: debouncedQuery || undefined,
+    };
+
+    const response = await fetchData<UserResponse[]>(
+      createRequestUrl(apiUrl.userUrl),
+      request
+    );
+
+    if (response.isSuccess) {
+      setTotalRecords(response.metadata?.TotalItemCount ?? 0);
+
+      const mappedList: UserRowProps[] = response.value.map((item) => ({
+        ...item,
+        birthDate: item.birthDate ? new Date(item.birthDate) : null,
+        typeId: item.typeId.toString(),
+        relativeName: item.relativeName,
+        profilePicture:
+          item.profilePicture &&
+          base64ToBlob(item.profilePicture as string, "image/jpeg"),
+      }));
+
+      return {
+        isSuccess: true,
+        metadata: response.metadata,
+        value: mappedList,
+      } as SuccessResponse<UserRowProps[]>;
+    }
+
+    return Promise.reject(new Error(response.error));
+  };
+
   const getNextPageParam = (lastPage: SuccessResponse<UserRowProps[]>) => {
     if (!lastPage.metadata) return undefined;
 
-    if (lastPage.metadata?.TotalPageCount > lastPage.metadata?.CurrentPage) {
+    if (lastPage.metadata.TotalPageCount > lastPage.metadata.CurrentPage) {
       return lastPage.metadata.CurrentPage + 1;
     }
+
     return undefined;
   };
 
   const { data, fetchNextPage, isFetching, refetch, hasNextPage } =
     useInfiniteQuery({
-      queryKey: ["users"],
+      queryKey: ["users", debouncedQuery],
       queryFn: fetchItems,
       initialPageParam: 1,
       placeholderData: keepPreviousData,
-      getNextPageParam: (lastPage) => getNextPageParam(lastPage!),
+      getNextPageParam: (lastPage) => getNextPageParam(lastPage),
       refetchOnWindowFocus: false,
       staleTime: 0,
-      enabled: true,
     });
 
   useEffect(() => {
@@ -148,20 +127,20 @@ const useItems = ({ searchQuery, isActive, changeMetadata }: UseUserProps) => {
   }, [data]);
 
   return {
-    setTotalRecords,
     items,
     selectedItems,
     setSelectedItems,
-    isFetching,
-    refetch,
+    totalRecordCount,
     fetchNextPage,
     hasNextPage,
-    handleUpdateItems,
+    isFetching,
+    refetch,
     handleAddItems,
+    handleUpdateItems,
     handleReplaceItems,
     handleDeleteItems,
     handleUpdateItemWithId,
-    totalRecordCount,
+    setTotalRecords,
   };
 };
 
