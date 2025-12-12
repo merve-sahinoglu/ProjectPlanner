@@ -75,7 +75,7 @@
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",
     "@vitejs/plugin-basic-ssl": "^2.1.0",
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^5.1.2",
     "babel-plugin-react-compiler": "^1.0.0",
     "eslint": "^9.37.0",
     "eslint-import-resolver-typescript": "^4.4.4",
