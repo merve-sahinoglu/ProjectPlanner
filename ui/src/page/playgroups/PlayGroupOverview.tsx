@@ -1,36 +1,49 @@
-import { Grid, Group, Highlight, Text, Title } from "@mantine/core";
-import { modals } from "@mantine/modals";
+import React, { useState } from "react";
+
+import { Grid, Highlight, Text } from "@mantine/core";
 import { motion } from "framer-motion";
-import React, { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BsExclamationDiamondFill } from "react-icons/bs";
+
+import useCardGrid from "@components/CardGrid/hooks/useCardGrid";
+import PageDetail from "@components/PageDetail/PageDetail";
 import AddNewItemButton from "../../components/AddNewItemButton/AddNewItemButton";
 import CardGrid from "../../components/CardGrid/CardGrid";
 import CardGridItem from "../../components/CardGrid/CardGridItem";
-import CardGridDetail from "../../components/CardGrid/components/CardGridHeader";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import PaginationMetadata from "../../types/pagination-metadata";
 import usePlayGroup from "./hooks/usePlayGroup";
 import PlayGroupDetail from "./PlayGroupDetail";
 import { PlayGroupRowProps } from "./props/PlayGroupRowProps";
 
+const getNewPlayGroup = (): PlayGroupRowProps => ({
+  id: crypto.randomUUID(),
+  name: "",
+  minAge: 0,
+  maxAge: 0,
+  maxParticipants: 0,
+  playgroupTherapists: [],
+  isActive: false,
+});
+
 const PlayGroupOverview: React.FC = () => {
   const { t } = useTranslation();
 
-  // const { currentUser } = useAuthenticationContext();
+  const [filters, setFilters] = useState({
+    query: "",
+    showActives: true,
+  });
 
-  // const { checkIfUserHasAuthorization } = useCredentialActions();
+  const changeQuery = (query: string) => {
+    setFilters((prev) => ({
+      ...prev,
+      query,
+    }));
+  };
 
-  const createdPlayGroupGuid = useRef<string>(crypto.randomUUID());
-
-  const [playGroupInput, setPlayGroupInput] = useState<string>("");
-
-  const [playGroupStatus, setPlayGroupStatus] = useState<boolean>(true);
-
-  const [metadata, setMetadata] = useState<PaginationMetadata | null>(null);
-
-  const changeMetadata = (value: PaginationMetadata | null) => {
-    setMetadata(value);
+  const toggleFilter = () => {
+    setFilters((prev) => ({
+      ...prev,
+      showActives: !prev.showActives,
+    }));
   };
 
   const {
@@ -42,209 +55,91 @@ const PlayGroupOverview: React.FC = () => {
     handleUpdateItemWithId,
     isFetching,
     fetchNextPage,
+    totalRecordCount,
   } = usePlayGroup({
-    searchQuery: playGroupInput,
-    isActive: playGroupStatus,
-    changeMetadata: changeMetadata,
+    searchQuery: filters.query,
+    isActive: filters.showActives,
   });
 
-  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+  const {
+    mode,
+    selectedEntity,
+    changeSelectedEntity,
+    changeMode,
+    handleClickEntity,
+    handleAddNewEntity,
+  } = useCardGrid<PlayGroupRowProps>({
+    addEntity: handleAddItems,
+    deleteEntity: handleDeleteItems,
+    updateEntity: handleUpdateItems,
+    getNewEntity: getNewPlayGroup,
+  });
 
-  const [canAddItem, setCanAddItem] = useState<boolean>(true);
-
-  const [selectedItem, setSelectedItem] = useState<PlayGroupRowProps>();
-
-  const toggleItemFilter = () => {
-    setPlayGroupStatus(!playGroupStatus);
-  };
-
-  const changeCreatedItemGuid = (id: string) => {
-    createdPlayGroupGuid.current = id;
-  };
-
-  const keepDefinition = (item: PlayGroupRowProps) => {
-    setCanAddItem(!canAddItem);
-    handleDeleteItems(createdPlayGroupGuid.current);
-    createdPlayGroupGuid.current = "";
-
-    if (createdPlayGroupGuid.current !== item.id) {
-      setIsDisabled(true);
-    }
-
-    setSelectedItem(item);
-  };
-
-  const changeSelectedItem = (item: PlayGroupRowProps | null) => {
-    if (item) {
-      setSelectedItem(item);
-    }
-  };
-
-  const handleKeepModifiedItem = (item: PlayGroupRowProps) => {
-    if (selectedItem) {
-      handleUpdateItems(selectedItem);
-    }
-
-    setIsDisabled(true);
-    setSelectedItem(item);
-  };
-
-  const handleClickItem = (
-    event: React.MouseEvent,
-    item: PlayGroupRowProps
-  ) => {
-    event.preventDefault();
-    if (!canAddItem) {
-      modals.openConfirmModal({
-        title: (
-          <Group>
-            <BsExclamationDiamondFill color="red" size="1.5rem" />{" "}
-            <Title order={5}>{t(Dictionary.Popup.NOT_SAVED_TITLE)}</Title>
-          </Group>
-        ),
-        centered: true,
-        children: (
-          <Text fz={14}>{t(Dictionary.Popup.NOT_SAVED_DESCRIPTION)}</Text>
-        ),
-        labels: {
-          cancel: t(Dictionary.Button.NO),
-          confirm: t(Dictionary.Button.YES),
-        },
-        confirmProps: { color: "red", size: "xs" },
-        cancelProps: { size: "xs" },
-        onConfirm: () => keepDefinition(item),
-      });
-      return;
-    }
-
-    if (createdPlayGroupGuid.current !== item.id) {
-      setIsDisabled(true);
-    }
-
-    setSelectedItem(item);
-  };
-
-  const playGroupsCards = useMemo(
-    () =>
-      playGroups.map((item) => (
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 1 }}
-          key={item.id}
-        >
-          <CardGridItem
-            entity={item}
-            selectedEntity={selectedItem}
-            handleCardItemClick={(e) => handleClickItem(e, item)}
-          >
-            <Text lineClamp={2} fz="sm" fw={500}>
-              <Highlight highlight={playGroupInput}>{`${item.name}`}</Highlight>
-            </Text>
-          </CardGridItem>
-        </motion.div>
-      )),
-    [playGroups, selectedItem]
-  );
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!isDisabled) {
-      modals.openConfirmModal({
-        title: (
-          <Group>
-            <BsExclamationDiamondFill color="red" size="1.5rem" />{" "}
-            <Title order={5}>
-              {t(Dictionary.Popup.MODIFICATION_NOT_SAVED_TITLE)}
-            </Title>
-          </Group>
-        ),
-        centered: true,
-        children: (
-          <Text fz={14}>
-            {t(Dictionary.Popup.MODIFICATION_NOT_SAVED_DESCRIPTION)}
+  const playGroupCards = playGroups.map((item) => (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 1 }}
+      key={item.id}
+    >
+      <CardGridItem
+        entity={item}
+        selectedEntity={selectedEntity}
+        onCardClick={(e) => handleClickEntity(e, item)}
+        text={
+          <Text lineClamp={2} fz="sm" fw={500} component="span">
+            <Highlight highlight={filters.query} component="span" unstyled>
+              {item.name}
+            </Highlight>
           </Text>
-        ),
-        labels: {
-          cancel: t(Dictionary.Button.NO),
-          confirm: t(Dictionary.Button.YES),
-        },
-        confirmProps: { color: "red", size: "xs" },
-        cancelProps: { size: "xs" },
-        onConfirm: () => handleAddNewItemAfterEdit(),
-      });
-      return;
-    }
-
-    handleAddNewItemAfterEdit();
-  };
-
-  const handleAddNewItemAfterEdit = () => {
-    if (!canAddItem) return;
-
-    setCanAddItem(false);
-
-    createdPlayGroupGuid.current = crypto.randomUUID();
-
-    const newPlayGroup: PlayGroupRowProps = {
-      id: createdPlayGroupGuid.current,
-      name: "",
-      minAge: 0,
-      maxAge: 0,
-      maxParticipants: 0,
-      playgroupTherapists: [],
-      isActive: false,
-    };
-
-    setSelectedItem(newPlayGroup);
-
-    handleAddItems(newPlayGroup);
-
-    setIsDisabled(false);
-  };
+        }
+      />
+    </motion.div>
+  ));
 
   return (
-    <Grid justify="center" align="stretch">
-      <Grid.Col span={{ xs: 12, sm: 12, md: 3 }}>
+    <Grid align="stretch" gutter="md">
+      <Grid.Col span={3}>
         <CardGrid
-          title={t(Dictionary.PlayGroup.CARD_TITLE)}
-          cards={playGroupsCards}
-          isLoading={isFetching}
-          searchInput={playGroupInput}
-          setSearchInput={setPlayGroupInput}
-          isSearching={isFetching}
-          addButton={
+          headerTitle={t(Dictionary.PlayGroup.CARD_TITLE)}
+          cards={playGroupCards}
+          isFetching={isFetching}
+          searchQuery={filters.query}
+          onSearchChange={changeQuery}
+          headerRightComponent={
             <AddNewItemButton
-              disabled={!canAddItem}
-              handleAdd={(e) => handleAdd(e)}
+              disabled={mode === "create"}
+              handleAdd={(e) => handleAddNewEntity(e)}
             />
           }
-          filterStatus={playGroupStatus}
-          filterFunction={toggleItemFilter}
-          totalItemCount={0}
+          filterStatus={filters.showActives}
           currentItemCount={playGroups.length}
-          refreshData={refetch}
-          fetchNextPage={fetchNextPage}
+          totalCount={totalRecordCount}
+          onRefresh={refetch}
+          onLoadMore={fetchNextPage}
+          showFilterMenu={false}
+          onFilterToggle={toggleFilter}
         />
       </Grid.Col>
-      <Grid.Col span={{ xs: 12, sm: 12, md: 9 }}>
-        {selectedItem && (
-          <CardGridDetail>
+
+      <Grid.Col span={9}>
+        <PageDetail>
+          {selectedEntity ? (
             <PlayGroupDetail
-              key={selectedItem?.id}
-              selectedPlayGroup={selectedItem}
+              key={selectedEntity.id}
+              selectedPlayGroup={selectedEntity}
+              changeSelectedItem={changeSelectedEntity}
               handleDeleteItem={handleDeleteItems}
               handleUpdateItem={handleUpdateItems}
-              canAddItem={canAddItem}
-              setCanAddItem={setCanAddItem}
-              createdItemGuid={createdPlayGroupGuid.current}
-              disabled={isDisabled}
-              setDisabled={setIsDisabled}
-              changeCreatedItemGuid={changeCreatedItemGuid}
               handleUpdateItemWithId={handleUpdateItemWithId}
-              changeSelectedItem={changeSelectedItem}
+              mode={mode}
+              changeMode={changeMode}
             />
-          </CardGridDetail>
-        )}
+          ) : (
+            <Text c="dimmed" ta="center" py="xl">
+              Lütfen bir playgroup seçiniz
+            </Text>
+          )}
+        </PageDetail>
       </Grid.Col>
     </Grid>
   );

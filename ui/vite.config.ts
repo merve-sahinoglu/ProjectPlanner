@@ -1,6 +1,5 @@
 import ViteYaml from "@modyfi/vite-plugin-yaml";
 import eslintPlugin from "@nabla/vite-plugin-eslint";
-import basicSsl from "@vitejs/plugin-basic-ssl";
 import react from "@vitejs/plugin-react";
 import path from "path";
 import { visualizer } from "rollup-plugin-visualizer";
@@ -46,7 +45,6 @@ export default defineConfig({
     eslintPlugin(),
     visualizer({ template: "treemap" }) as PluginOption,
     ViteYaml(),
-    basicSsl(),
   ],
   server: {
     host: "0.0.0.0",

@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useRef } from "react";
+import { useEffect, useRef, type MouseEvent } from "react";
 
 import {
   Avatar,
@@ -20,6 +20,7 @@ import { RiInformationLine } from "react-icons/ri";
 import { z } from "zod";
 
 import useRequestManager from "@hooks/useRequestManager";
+import { PageState } from "@shared/types/page.types";
 import globalStyles from "../../assets/global.module.css";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
@@ -40,33 +41,24 @@ import {
 
 interface PlayGroupDetailProps {
   selectedPlayGroup: PlayGroupRowProps;
+  changeSelectedItem(item: PlayGroupRowProps | null): void;
   handleDeleteItem(itemId: string): void;
   handleUpdateItem(item: PlayGroupRowProps): void;
-  canAddItem: boolean;
-  setCanAddItem: Dispatch<SetStateAction<boolean>>;
-  createdItemGuid: string;
-  disabled: boolean;
-  setDisabled: Dispatch<SetStateAction<boolean>>;
-  changeCreatedItemGuid(id: string): void;
-  handleUpdateItemWithId(item: PlayGroupRowProps, id: string): void;
-  changeSelectedItem(item: PlayGroupRowProps | null): void;
+  handleUpdateItemWithId(item: PlayGroupRowProps, id: string): void; // tempId -> realId
+  mode: PageState;
+  changeMode: (value: PageState) => void;
 }
 
 function PlayGroupDetail({
-  canAddItem,
-  setCanAddItem,
+  selectedPlayGroup,
   handleDeleteItem,
   handleUpdateItem,
-  createdItemGuid,
-  disabled,
-  setDisabled,
-  selectedPlayGroup,
-  changeCreatedItemGuid,
   handleUpdateItemWithId,
   changeSelectedItem,
+  mode,
+  changeMode,
 }: PlayGroupDetailProps) {
-  const { fetchData, sendData } = useRequestManager();
-
+  const { isPending, fetchData, sendData } = useRequestManager();
   const { t } = useTranslation();
 
   const schema = z.object({
@@ -77,15 +69,24 @@ function PlayGroupDetail({
   });
 
   const form = useForm<PlayGroupRowProps>({
-    initialValues: {
-      ...selectedPlayGroup,
-    },
+    initialValues: { ...selectedPlayGroup },
     validate: zod4Resolver(schema),
   });
 
-  const initialValues = useRef<PlayGroupRowProps>(form.values);
+  // Cancel için snapshot
+  const initialValuesRef = useRef<PlayGroupRowProps | null>(null);
+
+  // selectedPlayGroup değişince senkronla
+  useEffect(() => {
+    initialValuesRef.current = selectedPlayGroup;
+    form.setValues(selectedPlayGroup);
+    form.resetDirty();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPlayGroup]);
 
   const sendPostRequestForCreatedItem = async () => {
+    const tempId = form.values.id;
+
     const response = await sendData<PlayGroupRowProps, PlayGroupRowProps>(
       createRequestUrl(apiUrl.appointmentPlayGroupUrl),
       RequestType.Post,
@@ -94,31 +95,28 @@ function PlayGroupDetail({
 
     if (!response.isSuccess) return;
 
-    if (response.isSuccess) {
-      setDisabled(true);
+    // Create sonrası detay GET (senin eski akışın)
+    const retVal = await fetchData<PlayGroupResponse>(
+      createRequestUrl(apiUrl.appointmentPlayGroupUrl, response.value.id)
+    );
 
-      const retVal = await fetchData<PlayGroupResponse>(
-        createRequestUrl(apiUrl.appointmentPlayGroupUrl, response.value.id)
-      );
+    if (!retVal.isSuccess) return;
 
-      if (!retVal.isSuccess) return;
+    changeMode("view");
 
-      initialValues.current = retVal.value;
+    const saved = retVal.value as unknown as PlayGroupRowProps;
 
-      form.setValues(retVal.value);
+    initialValuesRef.current = saved;
 
-      form.resetDirty();
+    form.setValues(saved);
+    form.resetDirty();
 
-      setCanAddItem(!canAddItem);
+    // temp id’li item’ı real id’ye çevir
+    handleUpdateItemWithId(saved, response.value.id);
 
-      handleUpdateItemWithId(retVal.value, createdItemGuid);
+    changeSelectedItem(saved);
 
-      changeSelectedItem(retVal.value);
-
-      changeCreatedItemGuid("");
-
-      toast.success(`${t(Dictionary.Success.POSITIVE)}`);
-    }
+    toast.success(`${t(Dictionary.Success.POSITIVE)}`);
   };
 
   const sendPatchRequestForModifiedItem = async () => {
@@ -129,18 +127,17 @@ function PlayGroupDetail({
         ["playgroupTherapists"]
       );
 
-    if (form.values.playgroupTherapists.length > 0) {
+    // therapistId listesi backend’in beklediği alan adıyla patch’e ekleniyor
+    if (form.values.playgroupTherapists?.length > 0) {
       const updatedTherapists = form.values.playgroupTherapists.map(
-        (therapist) => therapist.therapistId
+        (x) => x.therapistId
       );
 
-      const playGroup = {
+      patchDocument.push({
         op: JsonPatchOperationType.Replace,
         path: "/playgroupTherapistsId",
-        value: updatedTherapists, // Binary olarak saklamak istersen
-      };
-
-      patchDocument.push(playGroup);
+        value: updatedTherapists,
+      });
     }
 
     const response = await sendData(
@@ -149,70 +146,71 @@ function PlayGroupDetail({
       patchDocument
     );
 
-    if (response.isSuccess) {
-      setDisabled(true);
+    if (!response.isSuccess) return;
 
-      form.resetDirty();
+    changeMode("view");
 
-      initialValues.current = form.values;
+    form.resetDirty();
+    initialValuesRef.current = form.values;
 
-      setCanAddItem(true);
+    handleUpdateItem(form.values);
 
-      handleUpdateItem(form.values);
-
-      toast.success(`${t(Dictionary.Success.POSITIVE)}`);
-    }
+    toast.success(`${t(Dictionary.Success.POSITIVE)}`);
   };
 
-  const handleSave = async (event: React.MouseEvent) => {
+  const handleSave = async (event: MouseEvent) => {
     event.preventDefault();
 
-    form.validate();
-
-    if (!form.isValid()) return;
+    const result = form.validate();
+    if (result.hasErrors) return;
 
     if (!form.isDirty()) return;
 
-    if (createdItemGuid === form.values.id) {
-      sendPostRequestForCreatedItem();
+    if (mode === "create") {
+      await sendPostRequestForCreatedItem();
       return;
     }
 
-    sendPatchRequestForModifiedItem();
+    await sendPatchRequestForModifiedItem();
   };
 
-  const handleEdit = (event: React.MouseEvent) => {
+  const handleEdit = (event: MouseEvent) => {
     event.preventDefault();
-    setDisabled(false);
+    changeMode("edit");
   };
 
-  const handleCancel = (event: React.MouseEvent) => {
+  const handleCancel = (event: MouseEvent) => {
     event.preventDefault();
 
-    if (createdItemGuid === form.values.id) {
-      setCanAddItem(!canAddItem);
+    changeMode("view");
+
+    if (mode === "create") {
+      // create iptal: temp kaydı listeden kaldır
       handleDeleteItem(form.values.id);
-      setDisabled(true);
       form.reset();
       form.setFieldValue(nameof<PlayGroupRowProps>("id"), "");
       changeSelectedItem(null);
       return;
     }
 
-    form.setValues(initialValues.current);
-    setDisabled(true);
+    if (initialValuesRef.current) {
+      form.setValues(initialValuesRef.current);
+      form.resetDirty();
+    }
   };
 
+  const isDisabled = isPending || mode === "view";
+
   const handleRemoveTherapist = (therapistId: string) => {
-    if (!disabled) {
-      const updatedTherapists = form.values.playgroupTherapists.filter(
-        (therapist) => therapist.therapistId !== therapistId
-      );
-      form.setFieldValue(
-        nameof<PlayGroupRowProps>("playgroupTherapists"),
-        updatedTherapists
-      );
-    }
+    if (isDisabled) return;
+
+    const updated = form.values.playgroupTherapists.filter(
+      (x) => x.therapistId !== therapistId
+    );
+    form.setFieldValue(
+      nameof<PlayGroupRowProps>("playgroupTherapists"),
+      updated
+    );
   };
 
   const avatars = form.values.playgroupTherapists.map((therapist) => (
@@ -233,7 +231,9 @@ function PlayGroupDetail({
           {form.values.name}
         </Text>
       </Card.Section>
+
       <Divider mb={20} />
+
       <Tabs keepMounted={false} defaultValue="item">
         <Card.Section inheritPadding>
           <Tabs.List>
@@ -245,63 +245,62 @@ function PlayGroupDetail({
             </Tabs.Tab>
           </Tabs.List>
         </Card.Section>
+
         <Tabs.Panel value="item">
           <Grid grow>
             <Grid.Col span={5}>
               <TextInput
                 className={styles.input}
-                disabled={disabled}
-                label={`${t(Dictionary.Room.NAME)}`}
+                disabled={isDisabled}
+                label={t(Dictionary.PlayGroup.NAME)}
                 {...form.getInputProps(nameof<PlayGroupRowProps>("name"))}
               />
+
               <Group grow>
                 <NumberInput
                   className={styles.input}
-                  disabled={disabled}
-                  label={`${t(Dictionary.PlayGroup.MIN_AGE)}`}
+                  disabled={isDisabled}
+                  label={t(Dictionary.PlayGroup.MIN_AGE)}
                   {...form.getInputProps(nameof<PlayGroupRowProps>("minAge"))}
                 />
                 <NumberInput
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.PlayGroup.MAX_AGE)}
                   {...form.getInputProps(nameof<PlayGroupRowProps>("maxAge"))}
                 />
                 <NumberInput
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.PlayGroup.MAX_PARTICIPANTS)}
                   {...form.getInputProps(
                     nameof<PlayGroupRowProps>("maxParticipants")
                   )}
                 />
               </Group>
+
               <Group grow>
                 <ExecutiveAutocomplete
                   searchInputLabel="Terapist Seç"
                   placeholder="Terapist ara..."
                   description=""
-                  disabled={disabled}
+                  disabled={isDisabled}
                   apiUrl={createRequestUrl(apiUrl.userUrl)}
                   additionalQueries={{ typeId: 0, isActive: true }}
-                  selectedTherapists={form.values.playgroupTherapists} // 🎯 Seçilenleri buradan gönderiyoruz
-                  setFieldValue={(
-                    newValue: {
-                      id: string;
-                      therapistId: string;
-                      therapistName: string;
-                    }[]
-                  ) => form.setFieldValue("playgroupTherapists", newValue)} // 🎯 Güncellemeyi buradan yapıyoruz
-                  clearValue={
-                    () => console.log("clearValue") // 🎯 Temizleme işlemi
-                  } // 🎯 Temizleme işlemi
+                  selectedTherapists={form.values.playgroupTherapists}
+                  setFieldValue={(newValue) =>
+                    form.setFieldValue("playgroupTherapists", newValue)
+                  }
+                  clearValue={() => console.log("clearValue")}
                 />
               </Group>
+
               <Group mt={15}>{avatars}</Group>
+
               <Group grow>
                 <Checkbox
                   mt={25}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   className={styles.input}
                   label={t(Dictionary.PlayGroup.IS_ACTIVE)}
                   {...form.getInputProps(
@@ -314,8 +313,9 @@ function PlayGroupDetail({
               </Group>
             </Grid.Col>
           </Grid>
+
           <OperationButtons
-            disabled={disabled}
+            disabled={isDisabled}
             isDirty={form.isDirty()}
             handleSave={handleSave}
             handleEdit={handleEdit}
