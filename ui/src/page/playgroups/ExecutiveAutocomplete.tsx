@@ -1,9 +1,11 @@
-import { Select, Loader } from "@mantine/core";
+import { useEffect, useRef, useState } from "react";
+
+import { Loader, Select } from "@mantine/core";
 import { useDebouncedValue } from "@mantine/hooks";
 import { IconX } from "@tabler/icons-react";
-import { useCallback, useEffect, useRef, useState } from "react";
-import useRequestHandler from "../../hooks/useRequestHandler";
-import formatSearchQuery from "../../helpers/trim-search-query";
+
+import useRequestManager from "@hooks/useRequestManager";
+import formatSearchQuery from "@utils/search-query-formatter";
 
 interface AutocompleteOption {
   value: string;
@@ -15,7 +17,6 @@ interface AutocompleteResponse {
   label: string;
 }
 
-// 🎯 `additionalQueries` eklendi!
 interface ExecutiveAutocompleteProps {
   searchInputLabel: string;
   placeholder: string;
@@ -24,7 +25,7 @@ interface ExecutiveAutocompleteProps {
   disabled?: boolean;
   initialData?: AutocompleteOption[];
   initialSearchValue?: string;
-  additionalQueries?: Record<string, any>; // 🎯 API çağrısına ek parametre olarak gönderilecek.
+  additionalQueries?: Record<string, unknown>;
   clearValue(): void;
   setFieldValue: (
     value: { id: string; therapistId: string; therapistName: string }[]
@@ -48,12 +49,12 @@ function ExecutiveAutocomplete({
   initialSearchValue,
   marginTop = 0,
   paddingTop = 0,
-  additionalQueries, // 🎯 Buraya ekledik
+  additionalQueries,
   clearValue,
   setFieldValue,
   selectedTherapists,
 }: ExecutiveAutocompleteProps) {
-  const { fetchData } = useRequestHandler();
+  const { fetchData } = useRequestManager();
   const [items, setItems] = useState<AutocompleteOption[]>(initialData || []);
   const [searchValue, setSearchValue] = useState<string>(
     initialSearchValue || ""
@@ -63,63 +64,68 @@ function ExecutiveAutocomplete({
   const componentMounted = useRef<boolean>(false);
   const [selectKey, setSelectKey] = useState<number>(0);
 
-  const fetchItems = useCallback(async () => {
-    if (searchValue.length >= 3) {
-      setLoading(true);
-      const query = formatSearchQuery(searchValue);
-
-      // 🎯 API isteğine `additionalQueries` ekleniyor
-      const request: { [key: string]: any } = {
-        searchText: query,
-        isActive: true,
-        ...(additionalQueries && additionalQueries), // Eğer varsa ekliyoruz
-      };
-
-      const response = await fetchData<AutocompleteResponse[]>(apiUrl, request);
-
-      if (response.isSuccess) {
-        setItems(
-          response.value.map((element) => ({
-            value: element.id,
-            label: element.label,
-          }))
-        );
-      }
-      setLoading(false);
-    }
-  }, [searchValue, additionalQueries]); // 🎯 Bağımlılıklara ekledik.
-
+  // ✅ fetchItems'ı useEffect içine taşı - cascading render'ı önle
   useEffect(() => {
     if (!componentMounted.current) {
       componentMounted.current = true;
       return;
     }
+
+    const fetchItems = async () => {
+      if (debouncedQuery.length >= 3) {
+        setLoading(true);
+        const query = formatSearchQuery(debouncedQuery);
+
+        const request = {
+          searchText: query,
+          isActive: true,
+          ...((additionalQueries as Record<
+            string,
+            string | number | boolean | null | undefined
+          >) || {}),
+        };
+
+        const response = await fetchData<AutocompleteResponse[]>(
+          apiUrl,
+          request
+        );
+
+        if (response.isSuccess && response.value) {
+          setItems(
+            response.value.map((element) => ({
+              value: element.id,
+              label: element.label,
+            }))
+          );
+        }
+        setLoading(false);
+      }
+    };
+
     fetchItems();
-  }, [debouncedQuery]);
+  }, [debouncedQuery, additionalQueries, apiUrl, fetchData]); // ✅ debouncedQuery'yi dependency'ye ekle
 
   const handleSearchChange = (eventValue: string) => {
-    if (eventValue !== searchValue) {
-      setSearchValue(eventValue);
-    }
+    setSearchValue(eventValue);
   };
 
   const handleSelectChange = (selectedId: string | null) => {
     if (selectedId) {
-      const newTherapist = {
-        id: crypto.randomUUID(),
-        therapistId: selectedId,
-        therapistName:
-          items.find((item) => item.value === selectedId)?.label || "",
-      };
+      const selectedItem = items.find((item) => item.value === selectedId);
 
-      setFieldValue([...selectedTherapists, newTherapist]);
+      if (selectedItem) {
+        const newTherapist = {
+          id: crypto.randomUUID(),
+          therapistId: selectedId,
+          therapistName: selectedItem.label,
+        };
 
-      setTimeout(() => {
-        setSearchValue(""); // 🎯 Seçimden sonra input'u temizle
+        setFieldValue([...selectedTherapists, newTherapist]);
+
+        setSearchValue("");
         setItems([]);
-      }, 10);
-
-      setSelectKey((prev) => prev + 1);
+        setSelectKey((prev) => prev + 1);
+      }
     }
   };
 
@@ -128,7 +134,7 @@ function ExecutiveAutocomplete({
     setSearchValue("");
     clearValue();
     setItems([]);
-    setSelectKey((prev) => prev + 1); // 🎯 Component'i sıfırla
+    setSelectKey((prev) => prev + 1);
   };
 
   return (

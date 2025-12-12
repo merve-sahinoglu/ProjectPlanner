@@ -1,93 +1,43 @@
 import { useEffect, useReducer, useState } from "react";
 
 import { useDebouncedValue } from "@mantine/hooks";
-import { useInfiniteQuery } from "@tanstack/react-query";
+import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 
+import useRequestManager, { SuccessResponse } from "@hooks/useRequestManager";
 import { apiUrl, createRequestUrl } from "../../../config/app.config";
 import ReducerActions from "../../../enums/reducer-action.enum";
-import useRequestHandler, {
-  SuccessResponse,
-} from "../../../hooks/useRequestHandler";
 import customReducer from "../../../services/custom-reducer/customReducer";
-import PaginationMetadata from "../../../types/pagination-metadata";
 import { RoomResponse, RoomRowProps } from "../props/RoomRowProps";
 
 interface UseRoomProps {
-  searchQuery: string;
-  isActive: boolean;
-  changeMetadata: (value: PaginationMetadata | null) => void;
+  searchQuery?: string;
+  isActive?: boolean;
 }
 
-const useRooms = ({ searchQuery, isActive, changeMetadata }: UseRoomProps) => {
-  const { fetchData, sendData } = useRequestHandler();
-
-  const [items, dispatch] = useReducer(customReducer<RoomRowProps>, []);
-
-  const [selectedItems, setSelectedItems] = useState<RoomRowProps[]>([]);
-
-  const [totalRecordCount, setTotalRecords] = useState(0);
+const useRooms = ({ searchQuery = "", isActive = true }: UseRoomProps = {}) => {
+  const { fetchData } = useRequestManager();
 
   const [debouncedQuery] = useDebouncedValue(searchQuery, 500);
 
+  const [items, dispatch] = useReducer(customReducer<RoomRowProps>, []);
+  const [selectedItems, setSelectedItems] = useState<RoomRowProps[]>([]);
+  const [totalRecordCount, setTotalRecords] = useState<number>(0);
+
   function handleAddItems(item: RoomRowProps) {
-    dispatch({
-      type: ReducerActions.Add,
-      payload: item,
-    });
+    dispatch({ type: ReducerActions.Add, payload: item });
   }
 
   function handleUpdateItems(item: RoomRowProps) {
-    dispatch({
-      type: ReducerActions.Update,
-      payload: item,
-    });
+    dispatch({ type: ReducerActions.Update, payload: item });
   }
 
   function handleDeleteItems(itemId: string) {
-    dispatch({
-      type: ReducerActions.Delete,
-      payload: itemId,
-    });
+    dispatch({ type: ReducerActions.Delete, payload: itemId });
   }
 
-  function handleReplaceItems(item: RoomRowProps[]) {
-    dispatch({
-      type: ReducerActions.Replace,
-      payload: item,
-    });
+  function handleReplaceItems(list: RoomRowProps[]) {
+    dispatch({ type: ReducerActions.Replace, payload: list });
   }
-
-  const fetchItems = async ({ pageParam = 1 }) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const request: { [key: string]: any } = {
-      page: pageParam,
-      searchText: searchQuery,
-    };
-
-    const response = await fetchData<RoomResponse[]>(
-      createRequestUrl(apiUrl.appointmentRoomsUrl),
-      request
-    );
-
-    if (response.isSuccess) {
-      setTotalRecords(response.metadata?.TotalItemCount || 0);
-      changeMetadata(response.metadata ? response.metadata : null);
-      const retVal = response.value;
-
-      const data: RoomRowProps[] = retVal.map((x) => ({
-        ...x,
-        roomTypeId: x.roomTypeId.toString(),
-      }));
-
-      return {
-        isSuccess: true,
-        metadata: response.metadata,
-        value: data,
-      } as SuccessResponse<RoomRowProps[]>;
-    }
-
-    return Promise.reject(new Error(response.error));
-  };
 
   function handleUpdateItemWithId(item: RoomRowProps, id: string) {
     dispatch({
@@ -97,21 +47,54 @@ const useRooms = ({ searchQuery, isActive, changeMetadata }: UseRoomProps) => {
     });
   }
 
+  const fetchItems = async ({ pageParam = 1 }) => {
+    const request = {
+      page: pageParam,
+      searchText: debouncedQuery || undefined,
+      // Backend destekliyorsa:
+      isActive: isActive,
+    };
+
+    const response = await fetchData<RoomResponse[]>(
+      createRequestUrl(apiUrl.appointmentRoomsUrl),
+      request
+    );
+
+    if (response.isSuccess) {
+      setTotalRecords(response.metadata?.TotalItemCount ?? 0);
+
+      const mappedList: RoomRowProps[] = response.value.map((x) => ({
+        ...x,
+        roomTypeId: x.roomTypeId?.toString?.() ?? "0",
+      }));
+
+      return {
+        isSuccess: true,
+        metadata: response.metadata,
+        value: mappedList,
+      } as SuccessResponse<RoomRowProps[]>;
+    }
+
+    return Promise.reject(new Error(response.error));
+  };
+
   const getNextPageParam = (lastPage: SuccessResponse<RoomRowProps[]>) => {
     if (!lastPage.metadata) return undefined;
 
-    if (lastPage.metadata?.TotalPageCount > lastPage.metadata?.CurrentPage) {
+    if (lastPage.metadata.TotalPageCount > lastPage.metadata.CurrentPage) {
       return lastPage.metadata.CurrentPage + 1;
     }
+
     return undefined;
   };
 
   const { data, fetchNextPage, isFetching, refetch, hasNextPage } =
     useInfiniteQuery({
-      queryKey: ["users"],
+      queryKey: ["rooms", debouncedQuery, isActive],
       queryFn: fetchItems,
       initialPageParam: 1,
-      getNextPageParam: (lastPage, pages) => getNextPageParam(lastPage),
+      placeholderData: keepPreviousData,
+      getNextPageParam: (lastPage) => getNextPageParam(lastPage),
       refetchOnWindowFocus: false,
       staleTime: 0,
     });
@@ -122,19 +105,20 @@ const useRooms = ({ searchQuery, isActive, changeMetadata }: UseRoomProps) => {
   }, [data]);
 
   return {
-    setTotalRecords,
     items,
     selectedItems,
     setSelectedItems,
-    isFetching,
-    refetch,
+    totalRecordCount,
     fetchNextPage,
     hasNextPage,
-    handleUpdateItems,
+    isFetching,
+    refetch,
     handleAddItems,
+    handleUpdateItems,
     handleReplaceItems,
     handleDeleteItems,
     handleUpdateItemWithId,
+    setTotalRecords,
   };
 };
 

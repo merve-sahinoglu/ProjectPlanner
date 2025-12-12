@@ -14,11 +14,11 @@ import { OverlayTrigger, Tooltip } from "react-bootstrap";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
+import useRequestManager from "@hooks/useRequestManager";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import { nameof } from "../../helpers/name-of";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import useRequestHandler from "../../hooks/useRequestHandler";
 import AppointmentModal from "./AppointmentModal";
 import EditAppointmentModal from "./compoonent/EditAppointmentModal";
 import { Appointment, CallenderProps, SearchSchema } from "./types/Appointment";
@@ -109,7 +109,7 @@ const CalendarComponent = () => {
     },
   });
 
-  const { fetchData } = useRequestHandler();
+  const { fetchData } = useRequestManager();
   const [opened, { open, close }] = useDisclosure(false);
   const [editopened, { open: editopen, close: editclose }] =
     useDisclosure(false);

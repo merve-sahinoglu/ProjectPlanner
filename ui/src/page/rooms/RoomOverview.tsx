@@ -1,37 +1,47 @@
-import { Grid, Group, Highlight, Text, Title } from "@mantine/core";
-import { modals } from "@mantine/modals";
+import React, { useState } from "react";
+
+import { Grid, Highlight, Text } from "@mantine/core";
 import { motion } from "framer-motion";
-import React, { useMemo, useRef, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { BsExclamationDiamondFill } from "react-icons/bs";
-import AddNewItemButton from "../../components/AddNewItemButton/AddNewItemButton";
-import CardGrid from "../../components/CardGrid/CardGrid";
-import CardGridItem from "../../components/CardGrid/CardGridItem";
-import CardGridDetail from "../../components/CardGrid/components/CardGridHeader";
+
+import AddNewItemButton from "@components/AddNewItemButton/AddNewItemButton";
+import CardGrid from "@components/CardGrid/CardGrid";
+import CardGridItem from "@components/CardGrid/CardGridItem";
+import useCardGrid from "@components/CardGrid/hooks/useCardGrid";
+import PageDetail from "@components/PageDetail/PageDetail";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import PaginationMetadata from "../../types/pagination-metadata";
 import useRooms from "./hooks/useRooms";
 import { RoomRowProps } from "./props/RoomRowProps";
 import RoomDetail from "./RoomDetail";
 import styles from "./RoomOverview.module.css";
 
+const getNewRoom = (): RoomRowProps => ({
+  id: crypto.randomUUID(),
+  name: "",
+  description: "",
+  maxCapacity: 0,
+  isAvailable: false,
+  roomTypeId: "0",
+  amenities: [],
+});
+
 const RoomOverview: React.FC = () => {
   const { t } = useTranslation();
 
-  // const { currentUser } = useAuthenticationContext();
+  const [filters, setFilters] = useState({
+    query: "",
+    showActives: true,
+  });
 
-  // const { checkIfUserHasAuthorization } = useCredentialActions();
+  const changeQuery = (query: string) => {
+    setFilters((prev) => ({ ...prev, query }));
+  };
 
-  const createdRoomGuid = useRef<string>(crypto.randomUUID());
-
-  const [roomInput, setRoomInput] = useState<string>("");
-
-  const [roomStatus, setRoomStatus] = useState<boolean>(true);
-
-  const [metadata, setMetadata] = useState<PaginationMetadata | null>(null);
-
-  const changeMetadata = (value: PaginationMetadata | null) => {
-    setMetadata(value);
+  const toggleFilter = () => {
+    setFilters((prev) => ({
+      ...prev,
+      showActives: !prev.showActives,
+    }));
   };
 
   const {
@@ -43,210 +53,91 @@ const RoomOverview: React.FC = () => {
     handleUpdateItemWithId,
     isFetching,
     fetchNextPage,
+    totalRecordCount,
   } = useRooms({
-    searchQuery: roomInput,
-    isActive: roomStatus,
-    changeMetadata: changeMetadata,
+    searchQuery: filters.query,
+    isActive: filters.showActives,
   });
 
-  const [isDisabled, setIsDisabled] = useState<boolean>(true);
+  const {
+    mode,
+    selectedEntity,
+    changeSelectedEntity,
+    changeMode,
+    handleClickEntity,
+    handleAddNewEntity,
+  } = useCardGrid<RoomRowProps>({
+    addEntity: handleAddItems,
+    deleteEntity: handleDeleteItems,
+    updateEntity: handleUpdateItems,
+    getNewEntity: getNewRoom,
+  });
 
-  const [canAddItem, setCanAddItem] = useState<boolean>(true);
-
-  const [selectedItem, setSelectedItem] = useState<RoomRowProps>();
-
-  const toggleItemFilter = () => {
-    setRoomStatus(!roomStatus);
-  };
-
-  const changeCreatedItemGuid = (id: string) => {
-    createdRoomGuid.current = id;
-  };
-
-  const keepDefinition = (item: RoomRowProps) => {
-    setCanAddItem(!canAddItem);
-    handleDeleteItems(createdRoomGuid.current);
-    createdRoomGuid.current = "";
-
-    if (createdRoomGuid.current !== item.id) {
-      setIsDisabled(true);
-    }
-
-    setSelectedItem(item);
-  };
-
-  const changeSelectedItem = (item: RoomRowProps | null) => {
-    if (item) {
-      setSelectedItem(item);
-    }
-  };
-
-  const handleKeepModifiedItem = (item: RoomRowProps) => {
-    if (selectedItem) {
-      handleUpdateItems(selectedItem);
-    }
-
-    setIsDisabled(true);
-    setSelectedItem(item);
-  };
-
-  const handleClickItem = (event: React.MouseEvent, item: RoomRowProps) => {
-    event.preventDefault();
-    if (!canAddItem) {
-      modals.openConfirmModal({
-        title: (
-          <Group>
-            <BsExclamationDiamondFill color="red" size="1.5rem" />{" "}
-            <Title order={5}>{t(Dictionary.Popup.NOT_SAVED_TITLE)}</Title>
-          </Group>
-        ),
-        centered: true,
-        children: (
-          <Text fz={14}>{t(Dictionary.Popup.NOT_SAVED_DESCRIPTION)}</Text>
-        ),
-        labels: {
-          cancel: t(Dictionary.Button.NO),
-          confirm: t(Dictionary.Button.YES),
-        },
-        confirmProps: { color: "red", size: "xs" },
-        cancelProps: { size: "xs" },
-        onConfirm: () => keepDefinition(item),
-      });
-      return;
-    }
-
-    if (createdRoomGuid.current !== item.id) {
-      setIsDisabled(true);
-    }
-
-    setSelectedItem(item);
-  };
-
-  const itemCards = useMemo(
-    () =>
-      items.map((item) => (
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 1 }}
-          key={item.id}
-        >
-          <CardGridItem
-            entity={item}
-            selectedEntity={selectedItem}
-            handleCardItemClick={(e) => handleClickItem(e, item)}
-          >
-            <Text lineClamp={2} fz="sm" fw={500}>
-              <Highlight highlight={roomInput}>{`${item.name}`}</Highlight>
-            </Text>
-          </CardGridItem>
-        </motion.div>
-      )),
-    [items, selectedItem]
-  );
-
-  const handleAdd = (e: React.MouseEvent) => {
-    e.preventDefault();
-    if (!isDisabled) {
-      modals.openConfirmModal({
-        title: (
-          <Group>
-            <BsExclamationDiamondFill color="red" size="1.5rem" />{" "}
-            <Title order={5}>
-              {t(Dictionary.Popup.MODIFICATION_NOT_SAVED_TITLE)}
-            </Title>
-          </Group>
-        ),
-        centered: true,
-        children: (
-          <Text fz={14}>
-            {t(Dictionary.Popup.MODIFICATION_NOT_SAVED_DESCRIPTION)}
+  const itemCards = items.map((item) => (
+    <motion.div
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 1 }}
+      key={item.id}
+    >
+      <CardGridItem
+        entity={item}
+        selectedEntity={selectedEntity}
+        onCardClick={(e) => handleClickEntity(e, item)}
+        text={
+          <Text lineClamp={2} fz="sm" fw={500}>
+            <Highlight highlight={filters.query}>{item.name}</Highlight>
           </Text>
-        ),
-        labels: {
-          cancel: t(Dictionary.Button.NO),
-          confirm: t(Dictionary.Button.YES),
-        },
-        confirmProps: { color: "red", size: "xs" },
-        cancelProps: { size: "xs" },
-        onConfirm: () => handleAddNewItemAfterEdit(),
-      });
-      return;
-    }
+        }
+      />
+    </motion.div>
+  ));
 
-    handleAddNewItemAfterEdit();
-  };
-
-  const handleAddNewItemAfterEdit = () => {
-    if (!canAddItem) return;
-
-    setCanAddItem(false);
-
-    createdRoomGuid.current = crypto.randomUUID();
-
-    const newRoom: RoomRowProps = {
-      id: createdRoomGuid.current,
-      name: "",
-      description: "",
-      maxCapacity: 0,
-      isAvailable: false,
-      roomTypeId: "0",
-      amenities: [],
-    };
-
-    setSelectedItem(newRoom);
-
-    handleAddItems(newRoom);
-
-    setIsDisabled(false);
-  };
+  console.log("Item rendered:", items); // DEBUG
 
   return (
-    <Grid justify="center" align="stretch">
-      <Grid.Col span={{ xs: 12, sm: 12, md: 3 }} className={styles.col}>
+    <Grid className={styles.page} align="stretch" gutter="md">
+      <Grid.Col span={3}>
         <CardGrid
-          title={t(Dictionary.Room.CARD_TITLE)}
+          headerTitle={t(Dictionary.Room.CARD_TITLE)}
           cards={itemCards}
-          isLoading={isFetching}
-          searchInput={roomInput}
-          setSearchInput={setRoomInput}
-          isSearching={isFetching}
-          addButton={
+          isFetching={isFetching}
+          searchQuery={filters.query}
+          onSearchChange={changeQuery}
+          headerRightComponent={
             <AddNewItemButton
-              disabled={!canAddItem}
-              handleAdd={(e) => handleAdd(e)}
+              disabled={mode === "create"}
+              handleAdd={(e) => handleAddNewEntity(e)}
             />
           }
-          filterStatus={roomStatus}
-          filterFunction={toggleItemFilter}
-          totalItemCount={0}
+          filterStatus={filters.showActives}
           currentItemCount={items.length}
-          refreshData={refetch}
-          fetchNextPage={fetchNextPage}
+          totalCount={totalRecordCount}
+          onRefresh={refetch}
+          onLoadMore={fetchNextPage}
+          showFilterMenu={false}
+          onFilterToggle={toggleFilter}
         />
       </Grid.Col>
-      <Grid.Col span={{ xs: 12, sm: 12, md: 9 }} className={styles.col}>
-        <div className={styles.panel}>
-          {selectedItem && (
-            <div className={styles.panelBody}>
-              <CardGridDetail>
-                <RoomDetail
-                  key={selectedItem?.id}
-                  selectedRoom={selectedItem}
-                  handleDeleteItem={handleDeleteItems}
-                  handleUpdateItem={handleUpdateItems}
-                  canAddItem={canAddItem}
-                  setCanAddItem={setCanAddItem}
-                  createdItemGuid={createdRoomGuid.current}
-                  disabled={isDisabled}
-                  setDisabled={setIsDisabled}
-                  changeCreatedItemGuid={changeCreatedItemGuid}
-                  handleUpdateItemWithId={handleUpdateItemWithId}
-                  changeSelectedItem={changeSelectedItem}
-                />
-              </CardGridDetail>
-            </div>
+
+      <Grid.Col span={9}>
+        <PageDetail>
+          {selectedEntity ? (
+            <RoomDetail
+              key={selectedEntity.id}
+              selectedRoom={selectedEntity}
+              handleDeleteItem={handleDeleteItems}
+              handleUpdateItem={handleUpdateItems}
+              handleUpdateItemWithId={handleUpdateItemWithId}
+              mode={mode}
+              changeMode={changeMode}
+              changeSelectedItem={changeSelectedEntity}
+            />
+          ) : (
+            <Text c="dimmed" ta="center" py="xl">
+              Lütfen bir oda seçiniz
+            </Text>
           )}
-        </div>
+        </PageDetail>
       </Grid.Col>
     </Grid>
   );

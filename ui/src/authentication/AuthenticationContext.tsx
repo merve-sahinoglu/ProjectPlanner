@@ -3,10 +3,10 @@ import { createContext, useContext } from "react";
 import { jwtDecode } from "jwt-decode";
 import { Navigate, useLocation } from "react-router-dom";
 
+import useRequestManager from "@hooks/useRequestManager";
 import { apiUrl, createRequestUrl } from "../config/app.config";
 import routes from "../constants/routes";
 import RequestType from "../enums/request-type";
-import useRequestHandler from "../hooks/useRequestHandler";
 import {
   useCredentialActions,
   useCurrentUser,
@@ -45,7 +45,7 @@ interface AuthenticationProviderProps {
 }
 
 function AuthenticationProvider({ children }: AuthenticationProviderProps) {
-  const { fetchData, sendData } = useRequestHandler();
+  const { fetchData, sendData } = useRequestManager();
 
   const currentUser = useCurrentUser();
 

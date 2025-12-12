@@ -2,7 +2,6 @@ import React, { useRef, useState } from "react";
 
 import { Card, Flex, Loader, ScrollArea, Text } from "@mantine/core";
 import { useViewportSize } from "@mantine/hooks";
-// eslint-disable-next-line import/no-unresolved
 import { useVirtualizer } from "@tanstack/react-virtual";
 import { motion } from "framer-motion";
 

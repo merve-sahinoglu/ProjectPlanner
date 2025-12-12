@@ -1,6 +1,6 @@
 import { UseFormReturnType } from "@mantine/form";
 
-enum JsonPatchOperationType {
+export enum JsonPatchOperationType {
   Add = "add",
   Replace = "replace",
   Move = "move",
@@ -78,27 +78,30 @@ export function addOperationToJsonPatchRecord(
   ];
 }
 
-export function createJsonPatchDocumentFromDirtyForm<T>(
+function isDate(value: unknown): value is Date {
+  return value instanceof Date;
+}
+
+export function createJsonPatchDocumentFromDirtyForm<
+  T extends Record<string, unknown>
+>(
   form: UseFormReturnType<T>,
   obj: T,
-  ignoredObject: string[] = []
-): JsonPatchKeyValuePair[] {
+  ignoredObject: Array<keyof T & string> = []
+) {
   const jsonPatchList: JsonPatchKeyValuePair[] = [];
 
-  let property: keyof typeof obj;
+  for (const property of Object.keys(obj) as Array<keyof T & string>) {
+    if (ignoredObject.includes(property)) continue;
+    if (!form.isDirty(property)) continue;
 
-  // TODO: Use of Object.keys & Object.values for generic objects
-  // eslint-disable-next-line no-restricted-syntax
-  for (property in obj) {
-    if (form.isDirty(property)) {
-      console.log(obj[property]);
-      const ignored0bj = ignoredObject.find((x) => x === property);
-      if (!ignored0bj) {
-        jsonPatchList.push({ path: property, value: String(obj[property]) });
-      }
-    }
+    const value = obj[property]; // value: unknown
+
+    jsonPatchList.push({
+      path: property,
+      value: isDate(value) ? value.toISOString() : String(value),
+    });
   }
-  console.log(jsonPatchList);
 
   return createJsonPatchDocument(jsonPatchList);
 }
@@ -128,35 +131,35 @@ export function createJsonPatchDocumentFromList<T>(
  * @param form - Mantine useForm hook'undan oluşan object
  * @param obj - Patch isteği oluşturulacak değerleri içeren object
  */
-export function createJsonPatchDocumentFromDirtyFormWithDates<T>(
-  form: UseFormReturnType<T>,
-  obj: T
-): JsonPatchKeyValuePair[] {
-  const jsonPatchList: JsonPatchKeyValuePair[] = [];
+// export function createJsonPatchDocumentFromDirtyFormWithDates<T>(
+//   form: UseFormReturnType<T>,
+//   obj: T
+// ): JsonPatchKeyValuePair[] {
+//   const jsonPatchList: JsonPatchKeyValuePair[] = [];
 
-  let property: keyof typeof obj;
+//   let property: keyof typeof obj;
 
-  // TODO: Use of Object.keys & Object.values for generic objects
-  // eslint-disable-next-line no-restricted-syntax
-  for (property in obj) {
-    if (form.isDirty(property)) {
-      const propertyValue = obj[property];
+//   // TODO: Use of Object.keys & Object.values for generic objects
 
-      if (propertyValue instanceof Date) {
-        jsonPatchList.push({
-          path: property,
-          value: propertyValue.toISOString(),
-        });
-        // eslint-disable-next-line no-continue
-        continue;
-      }
+//   for (property in obj) {
+//     if (form.isDirty(property)) {
+//       const propertyValue = obj[property];
 
-      jsonPatchList.push({ path: property, value: String(obj[property]) });
-    }
-  }
+//       if (propertyValue instanceof Date) {
+//         jsonPatchList.push({
+//           path: property,
+//           value: propertyValue.toISOString(),
+//         });
 
-  return createJsonPatchDocument(jsonPatchList);
-}
+//         continue;
+//       }
+
+//       jsonPatchList.push({ path: property, value: String(obj[property]) });
+//     }
+//   }
+
+//   return createJsonPatchDocument(jsonPatchList);
+// }
 
 /** Patch isteği atılacak form ve değelerin objesi verildikten sonra patch gönderilmesi istenmeyen
  * property değerleri list of olarak içine verilerek kullanılır.
@@ -165,21 +168,19 @@ export function createJsonPatchDocumentFromDirtyFormWithDates<T>(
  * @param obj - Patch isteği oluşturulacak obje
  * @param excludedPropertyList - Gönderilmesi istenmeyen property listesi, örneğin ["id", "isActive"]
  */
-export function createJsonPatchDocumentFromDirtyFormWithExceptions<T>(
+export function createJsonPatchDocumentFromDirtyFormWithExceptions<
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  T extends Record<string, any>
+>(
   form: UseFormReturnType<T>,
   obj: T,
-  excludedPropertyList: Array<keyof T>
-): JsonPatchKeyValuePair[] {
+  excludedPropertyList: Array<keyof T & string>
+): JsonPatchOperation[] {
   const jsonPatchList: JsonPatchKeyValuePair[] = [];
 
-  let property: keyof typeof obj;
+  for (const property of Object.keys(obj) as Array<keyof T & string>) {
+    if (excludedPropertyList.includes(property)) continue;
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (property in obj) {
-    if (excludedPropertyList.includes(property)) {
-      // eslint-disable-next-line no-continue
-      continue;
-    }
     if (form.isDirty(property)) {
       jsonPatchList.push({ path: property, value: String(obj[property]) });
     }

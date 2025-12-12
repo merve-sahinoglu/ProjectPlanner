@@ -1,13 +1,11 @@
 import React, { useState } from "react";
 
-// eslint-disable-next-line import/no-unresolved
-import useCardGrid from "@components/CardGrid/hooks/useCardGrid";
-import { ActionIcon, Grid, Highlight, Text } from "@mantine/core";
+import { Grid, Highlight, Text } from "@mantine/core";
 import { motion } from "framer-motion";
 import { useTranslation } from "react-i18next";
-import { BsXLg } from "react-icons/bs";
 
 import AddNewItemButton from "@components/AddNewItemButton/AddNewItemButton";
+import useCardGrid from "@components/CardGrid/hooks/useCardGrid";
 import CircleDot from "@components/CircleDot/CircleDot";
 import PageDetail from "@components/PageDetail/PageDetail";
 import { PageFilter } from "@shared/types/page.types";
@@ -70,6 +68,9 @@ const UserOverview: React.FC = () => {
     getNewEntity: getNewItem,
   });
 
+  console.log("selectedEntity:", selectedEntity); // DEBUG
+  console.log("mode:", mode); // DEBUG
+
   const itemCards = items.map((item) => (
     <motion.div
       whileHover={{ scale: 1.05 }}
@@ -79,28 +80,17 @@ const UserOverview: React.FC = () => {
       <CardGridItem
         entity={item}
         selectedEntity={selectedEntity}
+        onCardClick={(e) => {
+          console.log("Card clicked:", item); // DEBUG
+          handleClickEntity(e, item);
+        }}
         leftSection={<CircleDot isActive={item.isActive} />}
         text={
-          <>
-            <Text lineClamp={2} fz="sm" fw={500}>
-              <Highlight highlight={filters.query}>{`${item.name}`}</Highlight>
-            </Text>
-            <Text fz="sm" c="dimmed">
-              <Highlight
-                highlight={filters.query}
-              >{`(${item.userName})`}</Highlight>
-            </Text>
-          </>
-        }
-        rightSection={
-          <ActionIcon
-            onClick={(e) => handleClickEntity(e, item)}
-            radius="xl"
-            variant="outline"
-            color="gray"
-          >
-            <BsXLg style={{ marginLeft: "1px" }} size="16px" />
-          </ActionIcon>
+          <Text lineClamp={2} fz="sm" fw={500} component="span">
+            <Highlight highlight={filters.query} component="span" unstyled>
+              {`${item.name}`}
+            </Highlight>
+          </Text>
         }
       />
     </motion.div>
@@ -108,7 +98,6 @@ const UserOverview: React.FC = () => {
 
   return (
     <Grid className={styles.page} align="stretch" gutter="md">
-      {/* SOL SÜTUN */}
       <Grid.Col span={3}>
         <CardGrid
           headerTitle={t(Dictionary.User.CARD_TITLE)}
@@ -133,7 +122,7 @@ const UserOverview: React.FC = () => {
       </Grid.Col>
       <Grid.Col span={9}>
         <PageDetail>
-          {selectedEntity && (
+          {selectedEntity ? (
             <UserDetail
               key={selectedEntity.id}
               selectedUser={selectedEntity}
@@ -144,6 +133,10 @@ const UserOverview: React.FC = () => {
               mode={mode}
               changeMode={changeMode}
             />
+          ) : (
+            <Text c="dimmed" ta="center" py="xl">
+              {"Lütfen bir kullanıcı seçiniz"}
+            </Text>
           )}
         </PageDetail>
       </Grid.Col>

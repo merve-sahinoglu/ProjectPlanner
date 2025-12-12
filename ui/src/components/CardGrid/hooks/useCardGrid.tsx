@@ -43,7 +43,6 @@ function useCardGrid<T extends Entity>({
 
   const handleClickEntity = (event: React.MouseEvent, entity: T) => {
     event.preventDefault();
-
     if (mode === "create") {
       modals.openConfirmModal({
         title: (

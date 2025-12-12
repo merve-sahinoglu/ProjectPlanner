@@ -1,4 +1,6 @@
 // src/features/user-relation/UserRelationManager.tsx
+import { useEffect, useRef, useState } from "react";
+
 import {
   Button,
   Group,
@@ -11,20 +13,20 @@ import {
 } from "@mantine/core";
 import { IconPlus, IconSearch } from "@tabler/icons-react";
 import type { GridApi } from "ag-grid-community";
-import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
+
+import useRequestManager from "@hooks/useRequestManager";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enums/request-type";
 import formatSearchQuery from "../../helpers/trim-search-query";
-import useRequestHandler from "../../hooks/useRequestHandler";
+import UserRelationProps, { UserRelationFormValues } from "./types";
 import UserRelationEditor from "./UserRelationEditor";
 import UserRelationTable from "./UserRelationTable";
-import UserRelationProps, { UserRelationFormValues } from "./types";
 
-let den = 0;
+const den = 0;
 
 export default function UserRelationManager() {
-  const { fetchData, sendData } = useRequestHandler();
+  const { fetchData, sendData } = useRequestManager();
 
   const [rows, setRows] = useState<UserRelationProps[]>([]);
   const [editOpened, setEditOpened] = useState(false);
@@ -36,6 +38,7 @@ export default function UserRelationManager() {
   const loadList = async (searchText?: string) => {
     setIsFetching(true);
     try {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const request: { [key: string]: any } = {
         searchText: searchText ? formatSearchQuery(searchText) : undefined,
       };
@@ -83,6 +86,7 @@ export default function UserRelationManager() {
     const del = await sendData<null, null>(
       createRequestUrl(apiUrl.profileGroupUsersUrl, editingRow.id),
       RequestType.Delete,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       null as any
     );
     if (!del.isSuccess) {
@@ -109,6 +113,7 @@ export default function UserRelationManager() {
     const res = await sendData<null, null>(
       createRequestUrl(apiUrl.profileGroupUsersUrl, id),
       RequestType.Delete,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       null as any
     );
     if (!res.isSuccess) {
@@ -199,6 +204,7 @@ export default function UserRelationManager() {
             setEditingRow(null);
           }}
           onSubmit={(vals) => {
+            // eslint-disable-next-line @typescript-eslint/no-unused-expressions
             editingRow ? handleUpdateSubmit(vals) : handleAddSubmit(vals);
           }}
         />

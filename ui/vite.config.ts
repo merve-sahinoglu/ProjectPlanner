@@ -9,6 +9,32 @@ import svgr from "vite-plugin-svgr";
 import viteTsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
+  build: {
+    sourcemap: true,
+    rollupOptions: {
+      external: [],
+      output: {
+        manualChunks: (id) => {
+          if (id.includes("node_modules/ag-grid")) {
+            return "ag-grid";
+          }
+          if (id.includes("node_modules/@mantine")) {
+            return "mantine";
+          }
+          if (id.includes("node_modules/@tiptap")) {
+            return "tiptap";
+          }
+        },
+      },
+    },
+    chunkSizeWarningLimit: 1000,
+    minify: "terser",
+    terserOptions: {
+      compress: {
+        drop_console: true,
+      },
+    },
+  },
   plugins: [
     react({
       babel: {
@@ -22,12 +48,6 @@ export default defineConfig({
     ViteYaml(),
     basicSsl(),
   ],
-  build: {
-    sourcemap: true,
-    rollupOptions: {
-      external: [],
-    },
-  },
   server: {
     host: "0.0.0.0",
     open: true,

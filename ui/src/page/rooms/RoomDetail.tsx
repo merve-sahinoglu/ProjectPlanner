@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction, useRef } from "react";
+import { useEffect, useRef, type MouseEvent } from "react";
 
 import {
   Card,
@@ -19,6 +19,8 @@ import { useTranslation } from "react-i18next";
 import { RiInformationLine } from "react-icons/ri";
 import { z } from "zod";
 
+import useRequestManager from "@hooks/useRequestManager";
+import { PageState } from "@shared/types/page.types";
 import globalStyles from "../../assets/global.module.css";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
@@ -26,51 +28,35 @@ import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enums/request-type";
 import { nameof } from "../../helpers/name-of";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import useRequestHandler from "../../hooks/useRequestHandler";
 import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
 import { RoomRowProps } from "./props/RoomRowProps";
 import styles from "./RoomDetail.module.css";
 
 interface RoomDetailProps {
   selectedRoom: RoomRowProps;
+  changeSelectedItem(item: RoomRowProps | null): void;
   handleDeleteItem(itemId: string): void;
   handleUpdateItem(item: RoomRowProps): void;
-  canAddItem: boolean;
-  setCanAddItem: Dispatch<SetStateAction<boolean>>;
-  createdItemGuid: string;
-  disabled: boolean;
-  setDisabled: Dispatch<SetStateAction<boolean>>;
-  changeCreatedItemGuid(id: string): void;
-  handleUpdateItemWithId(item: RoomRowProps, id: string): void;
-  changeSelectedItem(item: RoomRowProps | null): void;
+  handleUpdateItemWithId(item: RoomRowProps, id: string): void; // create sonrası temp id -> real id için
+  mode: PageState;
+  changeMode: (value: PageState) => void;
 }
 
 const roomType = [
-  {
-    value: "0",
-    label: "Single",
-  },
-  {
-    value: "1",
-    label: "Double",
-  },
+  { value: "0", label: "Single" },
+  { value: "1", label: "Double" },
 ];
 
 function RoomDetail({
-  canAddItem,
-  setCanAddItem,
+  selectedRoom,
   handleDeleteItem,
   handleUpdateItem,
-  createdItemGuid,
-  disabled,
-  setDisabled,
-  selectedRoom,
-  changeCreatedItemGuid,
   handleUpdateItemWithId,
   changeSelectedItem,
+  mode,
+  changeMode,
 }: RoomDetailProps) {
-  const { fetchData, sendData } = useRequestHandler();
-
+  const { isPending, sendData } = useRequestManager();
   const { t } = useTranslation();
 
   const schema = z.object({
@@ -83,12 +69,27 @@ function RoomDetail({
   const form = useForm<RoomRowProps>({
     initialValues: {
       ...selectedRoom,
-      roomTypeId: selectedRoom.roomTypeId,
+      roomTypeId: selectedRoom.roomTypeId?.toString?.() ?? "0",
     },
     validate: zod4Resolver(schema),
   });
 
-  const initialValues = useRef<RoomRowProps>(form.values);
+  // Cancel için snapshot
+  const initialValuesRef = useRef<RoomRowProps | null>(null);
+
+  // selectedRoom değişince form senkronla + snapshot al
+  useEffect(() => {
+    const normalized: RoomRowProps = {
+      ...selectedRoom,
+      roomTypeId: selectedRoom.roomTypeId?.toString?.() ?? "0",
+    };
+
+    initialValuesRef.current = normalized;
+
+    form.setValues(normalized);
+    form.resetDirty();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRoom]);
 
   const sendPostRequestForCreatedItem = async () => {
     const response = await sendData<RoomRowProps, RoomRowProps>(
@@ -99,25 +100,25 @@ function RoomDetail({
 
     if (!response.isSuccess) return;
 
-    if (response.isSuccess) {
-      setDisabled(true);
+    changeMode("view");
 
-      initialValues.current = response.value;
+    const createdRealId = response.value.id;
 
-      form.setValues(response.value);
+    const retval: RoomRowProps = {
+      ...response.value,
+      roomTypeId: response.value.roomTypeId?.toString?.() ?? "0",
+    };
 
-      form.resetDirty();
+    initialValuesRef.current = retval;
 
-      setCanAddItem(!canAddItem);
+    form.setValues(retval);
+    form.resetDirty();
 
-      handleUpdateItemWithId(response.value, createdItemGuid);
+    // temp id -> real id güncelle
+    handleUpdateItemWithId(retval, createdRealId);
+    changeSelectedItem(retval);
 
-      changeSelectedItem(response.value);
-
-      changeCreatedItemGuid("");
-
-      toast.success(`${t(Dictionary.Success.POSITIVE)}`);
-    }
+    toast.success(`${t(Dictionary.Success.POSITIVE)}`);
   };
 
   const sendPatchRequestForModifiedItem = async () => {
@@ -132,59 +133,60 @@ function RoomDetail({
       patchDocument
     );
 
-    if (response.isSuccess) {
-      setDisabled(true);
+    if (!response.isSuccess) return;
 
-      form.resetDirty();
+    changeMode("view");
 
-      initialValues.current = form.values;
+    form.resetDirty();
+    initialValuesRef.current = form.values;
 
-      setCanAddItem(true);
+    handleUpdateItem(form.values);
 
-      handleUpdateItem(form.values);
-
-      toast.success(`${t(Dictionary.Success.POSITIVE)}`);
-    }
+    toast.success(`${t(Dictionary.Success.POSITIVE)}`);
   };
 
-  const handleSave = async (event: React.MouseEvent) => {
+  const handleSave = async (event: MouseEvent) => {
     event.preventDefault();
 
-    form.validate();
-
-    if (!form.isValid()) return;
+    const result = form.validate();
+    if (result.hasErrors) return;
 
     if (!form.isDirty()) return;
 
-    if (createdItemGuid === form.values.id) {
-      sendPostRequestForCreatedItem();
+    if (mode === "create") {
+      await sendPostRequestForCreatedItem();
       return;
     }
 
-    sendPatchRequestForModifiedItem();
+    await sendPatchRequestForModifiedItem();
   };
 
-  const handleEdit = (event: React.MouseEvent) => {
+  const handleEdit = (event: MouseEvent) => {
     event.preventDefault();
-    setDisabled(false);
+    changeMode("edit");
   };
 
-  const handleCancel = (event: React.MouseEvent) => {
+  const handleCancel = (event: MouseEvent) => {
     event.preventDefault();
 
-    if (createdItemGuid === form.values.id) {
-      setCanAddItem(!canAddItem);
+    changeMode("view");
+
+    if (mode === "create") {
+      // create iptal: temp kaydı listeden kaldır, seçimi temizle
       handleDeleteItem(form.values.id);
-      setDisabled(true);
       form.reset();
       form.setFieldValue(nameof<RoomRowProps>("id"), "");
       changeSelectedItem(null);
       return;
     }
 
-    form.setValues(initialValues.current);
-    setDisabled(true);
+    if (initialValuesRef.current) {
+      form.setValues(initialValuesRef.current);
+      form.resetDirty();
+    }
   };
+
+  const isDisabled = isPending || mode === "view";
 
   return (
     <>
@@ -194,7 +196,9 @@ function RoomDetail({
           {form.values.name}
         </Text>
       </Card.Section>
+
       <Divider mb={20} />
+
       <Tabs keepMounted={false} defaultValue="item">
         <Card.Section inheritPadding>
           <Tabs.List>
@@ -206,42 +210,46 @@ function RoomDetail({
             </Tabs.Tab>
           </Tabs.List>
         </Card.Section>
+
         <Tabs.Panel value="item">
           <Grid grow>
             <Grid.Col span={5}>
               <TextInput
                 className={styles.input}
-                disabled={disabled}
-                label={`${t(Dictionary.Room.NAME)}`}
+                disabled={isDisabled}
+                label={t(Dictionary.Room.NAME)}
                 {...form.getInputProps(nameof<RoomRowProps>("name"))}
               />
+
               <Group grow>
                 <TextInput
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.Room.MAX_CAPACITY)}
                   {...form.getInputProps(nameof<RoomRowProps>("maxCapacity"))}
                 />
                 <Select
                   mt={15}
-                  disabled={disabled}
-                  {...form.getInputProps(nameof<RoomRowProps>("roomTypeId"))}
+                  disabled={isDisabled}
                   label={t(Dictionary.Room.ROOM_TYPE_ID)}
                   data={roomType}
+                  {...form.getInputProps(nameof<RoomRowProps>("roomTypeId"))}
                 />
               </Group>
+
               <Group grow>
                 <Textarea
                   className={styles.input}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   label={t(Dictionary.Room.DESCRIPTION)}
                   {...form.getInputProps(nameof<RoomRowProps>("description"))}
                 />
               </Group>
+
               <Group grow>
                 <Checkbox
                   mt={25}
-                  disabled={disabled}
+                  disabled={isDisabled}
                   className={styles.input}
                   label={t(Dictionary.Room.IS_AVAILABLE)}
                   {...form.getInputProps(nameof<RoomRowProps>("isAvailable"), {
@@ -251,8 +259,9 @@ function RoomDetail({
               </Group>
             </Grid.Col>
           </Grid>
+
           <OperationButtons
-            disabled={disabled}
+            disabled={isDisabled}
             isDirty={form.isDirty()}
             handleSave={handleSave}
             handleEdit={handleEdit}

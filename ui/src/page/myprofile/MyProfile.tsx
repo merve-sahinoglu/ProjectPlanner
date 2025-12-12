@@ -30,12 +30,12 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import useRequestManager from "@hooks/useRequestManager";
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enums/request-type";
 import { nameof } from "../../helpers/name-of";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import useRequestHandler from "../../hooks/useRequestHandler";
 import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
 import { UserResponse, UserRowProps } from "../user/props/UserTypes";
 import styles from "./MyProfile.module.css";
@@ -115,7 +115,7 @@ const readFileAsBase64 = (file: File): Promise<string> =>
 
 export default function MyProfile() {
   const { t } = useTranslation();
-  const { fetchData, sendData } = useRequestHandler();
+  const { fetchData, sendData } = useRequestManager();
   const { currentUser } = useAuthenticationContext();
   const fileRef = useRef<HTMLInputElement | null>(null);
 

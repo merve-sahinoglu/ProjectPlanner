@@ -9,13 +9,13 @@ import moment from "moment";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 
+import useRequestManager from "@hooks/useRequestManager";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import DataTable from "../../components/DataTable/DataTable";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enums/request-type";
 import { nameof } from "../../helpers/name-of";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import useRequestHandler from "../../hooks/useRequestHandler";
 import { SearchSchema } from "../appointment/types/Appointment";
 import AddNoteForm, { AddNoteFormValues } from "./AddNoteForm";
 import EditNoteForm, { EditNoteFormValues } from "./EditNoteFrom";
@@ -48,7 +48,7 @@ export default function NoteBook() {
   const [selectedNote, setSelectedNote] = useState<GridNoteItem | null>(null);
   const [createOpened, setCreateOpened] = useState(false);
   const [editOpened, setEditOpened] = useState(false);
-  const { fetchData, sendData } = useRequestHandler();
+  const { fetchData, sendData } = useRequestManager();
   const { userId: IdFromUrl } = useParams();
   const form = useForm<SearchSchema>({
     initialValues: {

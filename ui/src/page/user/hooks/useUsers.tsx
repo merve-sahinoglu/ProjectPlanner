@@ -3,11 +3,9 @@ import { useEffect, useReducer, useState } from "react";
 import { useDebouncedValue } from "@mantine/hooks";
 import { keepPreviousData, useInfiniteQuery } from "@tanstack/react-query";
 
+import useRequestManager, { SuccessResponse } from "@hooks/useRequestManager";
 import { apiUrl, createRequestUrl } from "../../../config/app.config";
 import ReducerActions from "../../../enums/reducer-action.enum";
-import useRequestHandler, {
-  SuccessResponse,
-} from "../../../hooks/useRequestHandler";
 import customReducer from "../../../services/custom-reducer/customReducer";
 import { UserResponse, UserRowProps } from "../props/UserTypes";
 
@@ -16,7 +14,7 @@ interface UseUserProps {
 }
 
 const useItems = ({ searchQuery = "" }: UseUserProps = {}) => {
-  const { fetchData } = useRequestHandler();
+  const { fetchData } = useRequestManager();
 
   const [debouncedQuery] = useDebouncedValue(searchQuery, 500);
 

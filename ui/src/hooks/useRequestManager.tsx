@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState } from "react";
 
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
-import RequestType from '@helpers/request-handler/request-type';
-import { PaginationMetadata } from '@helpers/request-handler/response-base';
-import parseResponseErrors from '@utils/api-error-parser';
+import RequestType from "@helpers/request-handler/request-type";
+import { PaginationMetadata } from "@helpers/request-handler/response-base";
+import parseResponseErrors from "@utils/api-error-parser";
 
 export interface SuccessResponse<T> {
   isSuccess: true;
@@ -43,20 +43,23 @@ function useRequestManager() {
     setIsPending(true);
     const link = new URL(url);
     if (searchParameters) {
-      Object.entries(searchParameters).forEach(x => {
+      Object.entries(searchParameters).forEach((x) => {
         if (x[1] === undefined) return;
         if (Array.isArray(x[1])) {
-          x[1].forEach(value => {
+          x[1].forEach((value) => {
             link.searchParams.append(x[0], String(value));
           });
         } else link.searchParams.set(x[0], String(x[1]));
       });
     }
 
-    link.searchParams.set('pageSize', '500'); // TODO: ekranlarda kontrol edilecek, ondan sonra kaldırabilir.
+    link.searchParams.set("pageSize", "500");
 
-    return fetch(link, { method: RequestType.Get })
-      .then(async response => {
+    return fetch(link, {
+      method: RequestType.Get,
+      headers: headers, // ← Bu satır EKSİKTİ!
+    })
+      .then(async (response) => {
         const responseJson = await response.json();
         if (!response.ok) {
           if (responseJson.errors !== undefined) {
@@ -80,15 +83,18 @@ function useRequestManager() {
           }
 
           toast.error(
-            typeof responseJson === 'object'
+            typeof responseJson === "object"
               ? JSON.stringify(responseJson, null, 2)
               : String(responseJson)
           );
 
-          return { isSuccess: false, error: responseJson as string } as FailureResponse;
+          return {
+            isSuccess: false,
+            error: responseJson as string,
+          } as FailureResponse;
         }
 
-        let paginationJson = response.headers.get('x-pagination');
+        let paginationJson = response.headers.get("x-pagination");
 
         if (paginationJson) paginationJson = JSON.parse(paginationJson);
 
@@ -98,7 +104,7 @@ function useRequestManager() {
           value: responseJson,
         } as SuccessResponse<T>;
       })
-      .catch(error => {
+      .catch((error) => {
         return {
           isSuccess: false,
           error: error instanceof Error ? error.message : String(error),
@@ -114,32 +120,41 @@ function useRequestManager() {
     type: RequestType,
     data?: T,
     searchParameters?: {
-      [key: string]: string | number | boolean | Array<string | number> | Dictionary | undefined;
-    }
+      [key: string]:
+        | string
+        | number
+        | boolean
+        | Array<string | number>
+        | Dictionary
+        | undefined;
+    },
+    headers?: HeadersInit // ← Parametre ekledim
   ): Promise<ResponseBase<R>> {
     setIsPending(true);
     const link = new URL(url);
 
     if (searchParameters) {
-      Object.entries(searchParameters).forEach(x => {
+      Object.entries(searchParameters).forEach((x) => {
         if (x[1] === undefined) return;
         if (Array.isArray(x[1])) {
-          x[1].forEach(value => {
+          x[1].forEach((value) => {
             link.searchParams.append(x[0], String(value));
           });
         } else link.searchParams.set(x[0], String(x[1]));
       });
     }
 
+    // ✅ DÜZELTME: headers merge edildi
     return fetch(link, {
       headers: {
-        'Content-Type': 'application/json',
-        accept: 'application/json',
+        "Content-Type": "application/json",
+        accept: "application/json",
+        ...headers, // ← Custom headers eklendi
       },
       method: type,
       body: data ? JSON.stringify(data) : undefined,
     })
-      .then(async response => {
+      .then(async (response) => {
         if (response.status === 204) {
           return {
             isSuccess: true,
@@ -173,10 +188,15 @@ function useRequestManager() {
 
           toast.error(responseJson.detail);
 
-          return { isSuccess: false, error: responseJson as string } as FailureResponse;
+          return {
+            isSuccess: false,
+            error: responseJson as string,
+          } as FailureResponse;
         }
 
-        const paginationJson = response.headers.get('x-pagination') as PaginationMetadata | null;
+        const paginationJson = response.headers.get(
+          "x-pagination"
+        ) as PaginationMetadata | null;
 
         return {
           isSuccess: true,
@@ -184,7 +204,7 @@ function useRequestManager() {
           value: responseJson,
         } as SuccessResponse<R>;
       })
-      .catch(error => {
+      .catch((error) => {
         return {
           isSuccess: false,
           error: error instanceof Error ? error.message : String(error),
@@ -196,11 +216,11 @@ function useRequestManager() {
   }
 
   function getFileName(disposition: string): string {
-    // eslint-disable-next-line no-useless-escape
-    const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-\.]+)(?:; ?|$)/i;
+    // ✅ DÜZELTME: \. → . (escape gereksiz)
+    const utf8FilenameRegex = /filename\*=UTF-8''([\w%\-.]+)(?:; ?|$)/i;
     const asciiFilenameRegex = /^filename=(["']?)(.*?[^\\])\1(?:; ?|$)/i;
 
-    let fileName = '';
+    let fileName = "";
 
     if (utf8FilenameRegex.test(disposition)) {
       const regexArray = utf8FilenameRegex.exec(disposition);
@@ -211,7 +231,7 @@ function useRequestManager() {
     }
 
     if (!utf8FilenameRegex.test(disposition)) {
-      const filenameStart = disposition.toLowerCase().indexOf('filename=');
+      const filenameStart = disposition.toLowerCase().indexOf("filename=");
       if (filenameStart >= 0) {
         const partialDisposition = disposition.slice(filenameStart);
         const matches = asciiFilenameRegex.exec(partialDisposition);
@@ -244,21 +264,23 @@ function useRequestManager() {
     const link = new URL(url);
 
     if (searchParameters) {
-      Object.entries(searchParameters).forEach(x => {
+      Object.entries(searchParameters).forEach((x) => {
         if (x[1] === undefined) return;
         if (Array.isArray(x[1])) {
-          x[1].forEach(value => {
+          x[1].forEach((value) => {
             link.searchParams.append(x[0], String(value));
           });
         } else link.searchParams.set(x[0], String(x[1]));
       });
     }
 
+    // ✅ DÜZELTME: headers eklendi
     return fetch(link, {
       method: type,
+      headers: headers, // ← Bu satır EKSİKTİ!
       body: data ? JSON.stringify(data) : undefined,
     })
-      .then(async response => {
+      .then(async (response) => {
         if (!response.ok) {
           const responseJson = await response.json();
           if (responseJson.errors !== undefined) {
@@ -283,19 +305,22 @@ function useRequestManager() {
 
           toast.error(responseJson);
 
-          return { isSuccess: false, error: responseJson as string } as FailureResponse;
+          return {
+            isSuccess: false,
+            error: responseJson as string,
+          } as FailureResponse;
         }
 
-        const link = document.createElement('a');
-        const contentHeader = response.headers.get('Content-Disposition');
+        const link = document.createElement("a");
+        const contentHeader = response.headers.get("Content-Disposition");
 
-        let fileName = '';
+        let fileName = "";
 
         if (contentHeader) {
           fileName = getFileName(contentHeader);
         }
 
-        link.target = '_blank';
+        link.target = "_blank";
         link.download = fileName;
 
         const blob = await response.blob();
@@ -310,7 +335,7 @@ function useRequestManager() {
           metadata: undefined,
         } as SuccessResponse<void>;
       })
-      .catch(error => {
+      .catch((error) => {
         return {
           isSuccess: false,
           error: error instanceof Error ? error.message : String(error),

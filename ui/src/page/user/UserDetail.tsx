@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState, type MouseEvent } from "react";
 
 import {
   Avatar,
   Card,
   Divider,
   FileInput,
+  Flex,
   Grid,
   Group,
   PasswordInput,
@@ -23,8 +24,9 @@ import { useTranslation } from "react-i18next";
 import { RiInformationLine } from "react-icons/ri";
 import { z } from "zod";
 
+import { FLEX_GAP_XS, LEFT_SECTION_FLEX_GAP } from "@constants/constants";
+import useRequestManager from "@hooks/useRequestManager";
 import { PageState } from "@shared/types/page.types";
-import globalStyles from "../../assets/global.module.css";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
@@ -32,8 +34,10 @@ import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enums/request-type";
 import { nameof } from "../../helpers/name-of";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import useRequestHandler from "../../hooks/useRequestHandler";
-import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
+import {
+  createJsonPatchDocumentFromDirtyForm,
+  JsonPatchOperationType,
+} from "../../services/json-patch-handler/json-patch-document";
 import { UserResponse, UserRowProps } from "./props/UserTypes";
 import styles from "./UserDetail.module.css";
 
@@ -48,22 +52,16 @@ interface ItemDetailProps {
 }
 
 const genders = [
-  {
-    value: "0",
-    label: "Unknown",
-  },
-  {
-    value: "1",
-    label: "Male",
-  },
-  {
-    value: "2",
-    label: "Female",
-  },
-  {
-    value: "3",
-    label: "Other",
-  },
+  { value: "0", label: "Unknown" },
+  { value: "1", label: "Male" },
+  { value: "2", label: "Female" },
+  { value: "3", label: "Other" },
+];
+
+const userType = [
+  { value: "0", label: "Teacher" },
+  { value: "1", label: "Chield" },
+  { value: "2", label: "Relative" },
 ];
 
 function UserDetail({
@@ -75,15 +73,8 @@ function UserDetail({
   mode,
   changeMode,
 }: ItemDetailProps) {
-  const { isPending, sendData } = useRequestHandler();
-
+  const { isPending, sendData } = useRequestManager();
   const { t } = useTranslation();
-
-  const [preview, setPreview] = useState<string | null>(
-    selectedUser.profilePicture
-      ? URL.createObjectURL(selectedUser.profilePicture as File)
-      : null
-  );
 
   const schema = z.object({
     userName: z
@@ -108,99 +99,104 @@ function UserDetail({
   });
 
   const form = useForm<UserRowProps>({
-    initialValues: { ...selectedUser, gender: selectedUser.gender.toString() },
+    initialValues: {
+      ...selectedUser,
+      gender: selectedUser.gender?.toString?.() ?? "0",
+    },
     validate: zod4Resolver(schema),
   });
 
-  const initialValues = useRef<UserRowProps>(form.values);
+  // Cancel'da geri dönmek için snapshot
+  const initialValuesRef = useRef<UserRowProps | null>(null);
 
-  const userType = [
-    {
-      value: "0",
-      label: "Teacher",
-    },
-    {
-      value: "1",
-      label: "Chield",
-    },
-    {
-      value: "2",
-      label: "Relative",
-    },
-  ];
+  // Autocomplete initialData render'da ref okumadan üretmek için state
+  const [initialRelative, setInitialRelative] = useState<{
+    value: string;
+    label: string;
+  }>({ value: "", label: "" });
+
+  // Avatar preview
+  const [preview, setPreview] = useState<string | null>(null);
+
+  // preview objectUrl cleanup için
+  const previewObjectUrlRef = useRef<string | null>(null);
+
+  // selectedUser değişince form + initial snapshot + initialData + preview güncelle
+  useEffect(() => {
+    const normalized: UserRowProps = {
+      ...selectedUser,
+      gender: selectedUser.gender?.toString?.() ?? "0",
+    };
+
+    // initial snapshot
+    initialValuesRef.current = normalized;
+
+    // form değerlerini selectedUser'a senkronla
+    form.setValues(normalized);
+    form.resetDirty();
+
+    // autocomplete initial data
+    setInitialRelative({
+      value: selectedUser.relativeId ?? "",
+      label: selectedUser.relativeName ? `${selectedUser.relativeName}` : "",
+    });
+
+    // preview cleanup
+    if (previewObjectUrlRef.current) {
+      URL.revokeObjectURL(previewObjectUrlRef.current);
+      previewObjectUrlRef.current = null;
+    }
+
+    const pp = selectedUser.profilePicture as unknown;
+
+    // File/Blob ise objectUrl
+    if (pp instanceof Blob) {
+      const url = URL.createObjectURL(pp);
+      previewObjectUrlRef.current = url;
+      setPreview(url);
+      return;
+    }
+
+    // string ise (url veya data url)
+    if (typeof pp === "string" && pp.length > 0) {
+      // Elindeki format "raw base64" ise istersen: `data:image/jpeg;base64,${pp}`
+      setPreview(pp.startsWith("data:") ? pp : pp);
+      return;
+    }
+
+    setPreview(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedUser]);
+
+  // Unmount'ta cleanup
+  useEffect(() => {
+    return () => {
+      if (previewObjectUrlRef.current) {
+        URL.revokeObjectURL(previewObjectUrlRef.current);
+        previewObjectUrlRef.current = null;
+      }
+    };
+  }, []);
 
   function base64ToBlob(
     base64: string,
     mimeType: "image/jpeg" | "image/png"
-  ): Blob {
-    // Check if base64 contains the data URL prefix
-    if (!base64) {
-      return new Blob(); // Return an empty Blob if base64 is empty
-    }
-    const base64Data = base64.split(",")[1] || base64; // Take part after the comma or the entire string if no comma
+  ): File {
+    if (!base64) return new File([], "image.jpeg", { type: mimeType });
 
-    const byteCharacters = atob(base64Data); // Decode the base64 string
+    const base64Data = base64.split(",")[1] || base64;
+    const byteCharacters = atob(base64Data);
     const byteNumbers = new Array(byteCharacters.length);
 
     for (let i = 0; i < byteCharacters.length; i++) {
-      byteNumbers[i] = byteCharacters.charCodeAt(i); // Convert characters to byte values
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
     }
 
-    const byteArray = new Uint8Array(byteNumbers); // Create Uint8Array from byte numbers
-    const blob = new Blob([byteArray], { type: mimeType }); // Create a blob with the correct mime type
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: mimeType });
 
-    return new File([blob], "image.jpeg", { type: mimeType }); // Return as File
+    return new File([blob], "image.jpeg", { type: mimeType });
   }
-
-  const sendPostRequestForCreatedItem = async () => {
-    if (
-      form.values["profilePicture"] !== null &&
-      form.values["profilePicture"] !== undefined
-    ) {
-      const base64 = await readFileAsBase64(
-        form.values["profilePicture"] as File
-      );
-
-      // eslint-disable-next-line react-hooks/immutability
-      form.values.profilePicture = base64ToByteArray(base64);
-    }
-
-    const response = await sendData<UserRowProps, UserResponse>(
-      createRequestUrl(apiUrl.userUrl),
-      RequestType.Post,
-      form.values
-    );
-
-    if (!response.isSuccess) return;
-
-    changeMode("view");
-    const createdItemGuid = response.value.id;
-
-    if (response.isSuccess) {
-      const retval = {
-        ...response.value,
-        birthDate: response.value.birthDate
-          ? new Date(response.value.birthDate)
-          : null,
-        typeId: response.value.typeId.toString(),
-        profilePicture:
-          response.value &&
-          base64ToBlob(response.value.profilePicture as string, "image/jpeg"),
-      };
-
-      initialValues.current = retval;
-
-      form.setValues(retval);
-
-      form.resetDirty();
-
-      handleUpdateItemWithId(retval, createdItemGuid);
-
-      changeSelectedItem(retval);
-
-      toast.success(`${t(Dictionary.Success.POSITIVE)}`);
-    }
-  };
 
   const readFileAsBase64 = (file: File): Promise<string> => {
     return new Promise((resolve, reject) => {
@@ -210,7 +206,7 @@ function UserDetail({
       reader.onloadend = () => {
         if (reader.result) {
           const data = reader.result as string;
-          const base64 = data.split(",")[1]; // Base64 verisini al
+          const base64 = data.split(",")[1];
           resolve(base64);
         } else {
           reject(new Error("FileReader failed to load the file"));
@@ -225,9 +221,59 @@ function UserDetail({
     const cleanedBase64 = base64String.includes(",")
       ? base64String.split(",")[1]
       : base64String;
+
     const binaryString = atob(cleanedBase64);
-    return Array.from(binaryString, (char) => char.charCodeAt(0)); // Uint8Array yerine number[]
+    return Array.from(binaryString, (char) => char.charCodeAt(0));
   }
+
+  const sendPostRequestForCreatedItem = async () => {
+    if (
+      form.values.profilePicture !== null &&
+      form.values.profilePicture !== undefined
+    ) {
+      const file = form.values.profilePicture as unknown;
+
+      if (file instanceof File) {
+        const base64 = await readFileAsBase64(file);
+
+        form.values.profilePicture = base64ToByteArray(base64);
+      }
+    }
+
+    const response = await sendData<UserRowProps, UserResponse>(
+      createRequestUrl(apiUrl.userUrl),
+      RequestType.Post,
+      form.values
+    );
+
+    if (!response.isSuccess) return;
+
+    changeMode("view");
+
+    const createdItemGuid = response.value.id;
+
+    const retval: UserRowProps = {
+      ...response.value,
+      birthDate: response.value.birthDate
+        ? new Date(response.value.birthDate)
+        : null,
+      typeId: response.value.typeId.toString(),
+      gender: response.value.gender?.toString?.() ?? "0",
+      profilePicture: response.value?.profilePicture
+        ? base64ToBlob(response.value.profilePicture as string, "image/jpeg")
+        : null,
+    } as unknown as UserRowProps;
+
+    initialValuesRef.current = retval;
+
+    form.setValues(retval);
+    form.resetDirty();
+
+    handleUpdateItemWithId(retval, createdItemGuid);
+    changeSelectedItem(retval);
+
+    toast.success(`${t(Dictionary.Success.POSITIVE)}`);
+  };
 
   const sendPatchRequestForModifiedItem = async () => {
     const patchDocument = createJsonPatchDocumentFromDirtyForm<UserRowProps>(
@@ -237,19 +283,19 @@ function UserDetail({
     );
 
     if (
-      form.values["profilePicture"] !== null &&
-      form.values["profilePicture"] !== undefined
+      form.values.profilePicture !== null &&
+      form.values.profilePicture !== undefined
     ) {
-      const base64 = await readFileAsBase64(
-        form.values["profilePicture"] as File
-      );
-      const picture = {
-        op: "replace",
-        path: "/profilePicture",
-        value: base64ToByteArray(base64), // Binary olarak saklamak istersen
-      };
+      const file = form.values.profilePicture as unknown;
 
-      patchDocument.push(picture);
+      if (file instanceof File) {
+        const base64 = await readFileAsBase64(file);
+        patchDocument.push({
+          op: JsonPatchOperationType.Replace,
+          path: "/profilePicture",
+          value: base64,
+        });
+      }
     }
 
     const response = await sendData(
@@ -263,7 +309,7 @@ function UserDetail({
 
       form.resetDirty();
 
-      initialValues.current = form.values;
+      initialValuesRef.current = form.values;
 
       handleUpdateItem(form.values);
 
@@ -271,14 +317,13 @@ function UserDetail({
     }
   };
 
-  const handleSave = async (event: React.MouseEvent) => {
+  const handleSave = async (event: MouseEvent) => {
     event.preventDefault();
 
-    form.validate();
+    const result = form.validate();
+    if (result.hasErrors) return;
 
-    if (!form.isValid() || !form.isDirty()) {
-      return;
-    }
+    if (!form.isDirty()) return;
 
     if (mode === "create") {
       await sendPostRequestForCreatedItem();
@@ -288,13 +333,12 @@ function UserDetail({
     await sendPatchRequestForModifiedItem();
   };
 
-  const handleEdit = (event: React.MouseEvent) => {
+  const handleEdit = (event: MouseEvent) => {
     event.preventDefault();
-
     changeMode("edit");
   };
 
-  const handleCancel = (event: React.MouseEvent) => {
+  const handleCancel = (event: MouseEvent) => {
     event.preventDefault();
 
     changeMode("view");
@@ -307,7 +351,10 @@ function UserDetail({
       return;
     }
 
-    form.setValues(initialValues.current);
+    if (initialValuesRef.current) {
+      form.setValues(initialValuesRef.current);
+      form.resetDirty();
+    }
   };
 
   const clearRelativeId = () => {
@@ -318,13 +365,15 @@ function UserDetail({
 
   return (
     <>
-      <Card.Section className={globalStyles.detailHeader} inheritPadding>
+      <Flex align="center" gap={LEFT_SECTION_FLEX_GAP}>
         <CircleDot isActive={form.values.isActive} />
-        <Text lineClamp={1} fw={400} fz={20}>
+        <Text lineClamp={1} fw={400} fz={20} component="span">
           ({form.values.userName}) - {form.values.name} {form.values.surname}
         </Text>
-      </Card.Section>
-      <Divider mb={20} />
+      </Flex>
+
+      <Divider mb={FLEX_GAP_XS} />
+
       <Tabs keepMounted={false} defaultValue="item">
         <Card.Section pb={0}>
           <Tabs.List>
@@ -336,26 +385,36 @@ function UserDetail({
             </Tabs.Tab>
           </Tabs.List>
         </Card.Section>
+
         <Tabs.Panel value="item">
           <Grid grow>
             <Grid.Col span={5}>
               <Group style={{ alignItems: "space-between" }}>
                 <Avatar src={preview} size={90} />
+
                 <FileInput
                   clearable={!isDisabled}
                   disabled={isDisabled}
                   accept="image/jpeg"
                   label="Attach your picture"
+                  placeholder={`${t(Dictionary.User.SELECT_FILE)}`}
                   {...form.getInputProps(
                     nameof<UserRowProps>("profilePicture")
                   )}
-                  placeholder={`${t(Dictionary.User.SELECT_FILE)}`}
                   onChange={(file) => {
                     form.setFieldValue("profilePicture", file);
+
+                    // preview cleanup
+                    if (previewObjectUrlRef.current) {
+                      URL.revokeObjectURL(previewObjectUrlRef.current);
+                      previewObjectUrlRef.current = null;
+                    }
+
                     if (file) {
-                      const reader = new FileReader();
-                      reader.onload = () => setPreview(reader.result as string);
-                      reader.readAsDataURL(file);
+                      // File ise objectUrl ile hızlı preview
+                      const url = URL.createObjectURL(file);
+                      previewObjectUrlRef.current = url;
+                      setPreview(url);
                     } else {
                       setPreview(null);
                     }
@@ -386,12 +445,14 @@ function UserDetail({
                 label={`${t(Dictionary.User.USERNAME)}`}
                 {...form.getInputProps(nameof<UserRowProps>("userName"))}
               />
+
               <PasswordInput
                 disabled={isDisabled}
                 mt={15}
                 label={t(Dictionary.Login.PASSWORD)}
                 {...form.getInputProps(nameof<UserRowProps>("password"))}
               />
+
               <Group grow>
                 <TextInput
                   className={styles.input}
@@ -406,14 +467,16 @@ function UserDetail({
                   {...form.getInputProps(nameof<UserRowProps>("surname"))}
                 />
               </Group>
+
               <Group grow>
                 <Select
                   className={styles.input}
                   disabled={isDisabled}
-                  {...form.getInputProps(nameof<UserRowProps>("typeId"))}
                   label={t(Dictionary.User.USER_TITLE)}
                   data={userType}
+                  {...form.getInputProps(nameof<UserRowProps>("typeId"))}
                 />
+
                 <FormAutocomplete
                   marginTop={15}
                   searchInputLabel={t(Dictionary.User.RELATIVE)}
@@ -425,22 +488,10 @@ function UserDetail({
                   clearValue={clearRelativeId}
                   formInputProperty="relativeId"
                   additionalParameters={{ typeId: 2, isActive: true }}
-                  initialData={[
-                    {
-                      value:
-                        initialValues.current &&
-                        initialValues.current.relativeId
-                          ? initialValues.current.relativeId
-                          : "",
-                      label:
-                        initialValues.current &&
-                        initialValues.current.relativeName
-                          ? `${initialValues.current.relativeName}`
-                          : "",
-                    },
-                  ]}
+                  initialData={[initialRelative]}
                   {...form.getInputProps(nameof<UserRowProps>("relativeId"))}
                 />
+
                 <DateInput
                   className={styles.input}
                   disabled={isDisabled}
@@ -449,14 +500,16 @@ function UserDetail({
                   {...form.getInputProps(nameof<UserRowProps>("birthDate"))}
                 />
               </Group>
+
               <Group grow>
                 <Select
                   mt={15}
                   disabled={isDisabled}
-                  {...form.getInputProps(nameof<UserRowProps>("gender"))}
                   label={t(Dictionary.User.GENDER)}
                   data={genders}
+                  {...form.getInputProps(nameof<UserRowProps>("gender"))}
                 />
+
                 <TextInput
                   className={styles.input}
                   disabled={isDisabled}
@@ -464,6 +517,7 @@ function UserDetail({
                   {...form.getInputProps(nameof<UserRowProps>("email"))}
                 />
               </Group>
+
               <Group grow>
                 <TextInput
                   className={styles.input}
@@ -471,17 +525,10 @@ function UserDetail({
                   label={t(Dictionary.User.CARD_NUMBER)}
                   {...form.getInputProps(nameof<UserRowProps>("cardNumber"))}
                 />
-
-                {/* <Checkbox
-                  mt={25}
-                  disabled={disabled}
-                  className={styles.input}
-                  label={t(Dictionary.General.STATUS)}
-                  {...form.getInputProps("isActive", { type: "checkbox" })}
-                /> */}
               </Group>
             </Grid.Col>
           </Grid>
+
           <OperationButtons
             disabled={isDisabled}
             isDirty={form.isDirty()}

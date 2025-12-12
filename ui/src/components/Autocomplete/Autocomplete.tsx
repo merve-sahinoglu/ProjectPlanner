@@ -36,7 +36,6 @@ function AutocompleteInput({
   description = "",
   apiUrl,
   isDisabled = false,
-  optionalRefetch,
   maw,
   mt,
   ml,

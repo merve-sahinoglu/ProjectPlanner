@@ -19,6 +19,7 @@ import { useTranslation } from "react-i18next";
 import { RiInformationLine } from "react-icons/ri";
 import { z } from "zod";
 
+import useRequestManager from "@hooks/useRequestManager";
 import globalStyles from "../../assets/global.module.css";
 import CircleDot from "../../components/CircleDot/CircleDot";
 import OperationButtons from "../../components/OperationButtons/OperationButtons";
@@ -26,8 +27,10 @@ import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enums/request-type";
 import { nameof } from "../../helpers/name-of";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import useRequestHandler from "../../hooks/useRequestHandler";
-import { createJsonPatchDocumentFromDirtyForm } from "../../services/json-patch-handler/json-patch-document";
+import {
+  createJsonPatchDocumentFromDirtyForm,
+  JsonPatchOperationType,
+} from "../../services/json-patch-handler/json-patch-document";
 import ExecutiveAutocomplete from "./ExecutiveAutocomplete";
 import styles from "./PlayGroupDetail.module.css";
 import {
@@ -62,7 +65,7 @@ function PlayGroupDetail({
   handleUpdateItemWithId,
   changeSelectedItem,
 }: PlayGroupDetailProps) {
-  const { fetchData, sendData } = useRequestHandler();
+  const { fetchData, sendData } = useRequestManager();
 
   const { t } = useTranslation();
 
@@ -132,7 +135,7 @@ function PlayGroupDetail({
       );
 
       const playGroup = {
-        op: "replace",
+        op: JsonPatchOperationType.Replace,
         path: "/playgroupTherapistsId",
         value: updatedTherapists, // Binary olarak saklamak istersen
       };

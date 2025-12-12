@@ -14,7 +14,6 @@ import { apiUrl, createRequestUrl } from "../../config/app.config";
 import RequestType from "../../enums/request-type";
 import { nameof } from "../../helpers/name-of";
 import Dictionary from "../../helpers/translation/dictionary/dictionary";
-import useRequestHandler from "../../hooks/useRequestHandler";
 // eslint-disable-next-line import/order
 import {
   Appointment,
@@ -22,6 +21,7 @@ import {
   SelectedDates,
 } from "./types/Appointment";
 // eslint-disable-next-line import/order
+import useRequestManager from "@hooks/useRequestManager";
 import styles from "./Appointment.module.css";
 
 const appointmentStatus = [
@@ -61,7 +61,7 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
   setDisabled,
   handleDeleteItem,
 }) => {
-  const { sendData } = useRequestHandler();
+  const { sendData } = useRequestManager();
 
   const { t } = useTranslation();
 

@@ -1,11 +1,11 @@
+import { useEffect, useReducer, useState } from "react";
+
 import { useDebouncedValue } from "@mantine/hooks";
 import { useInfiniteQuery } from "@tanstack/react-query";
-import { useEffect, useReducer, useState } from "react";
+
+import useRequestManager, { SuccessResponse } from "@hooks/useRequestManager";
 import { apiUrl, createRequestUrl } from "../../../config/app.config";
 import ReducerActions from "../../../enums/reducer-action.enum";
-import useRequestHandler, {
-  SuccessResponse,
-} from "../../../hooks/useRequestHandler";
 import customReducer from "../../../services/custom-reducer/customReducer";
 import PaginationMetadata from "../../../types/pagination-metadata";
 import {
@@ -24,7 +24,7 @@ const usePlayGroup = ({
   isActive,
   changeMetadata,
 }: UsePlayGroupProps) => {
-  const { fetchData, sendData } = useRequestHandler();
+  const { fetchData } = useRequestManager();
 
   const [playGroups, dispatch] = useReducer(
     customReducer<PlayGroupRowProps>,
@@ -51,7 +51,6 @@ const usePlayGroup = ({
     });
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   function handleDeleteItems(itemId: string) {
     dispatch({
       type: ReducerActions.Delete,
@@ -67,6 +66,7 @@ const usePlayGroup = ({
   }
 
   const fetchItems = async ({ pageParam = 1 }) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const request: { [key: string]: any } = {
       page: pageParam,
       searchText: searchQuery,

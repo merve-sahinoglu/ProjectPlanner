@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { z } from "zod";
 
+import useRequestManager from "@hooks/useRequestManager";
 import FormAutocomplete from "../../../components/Autocomplete/FormAutocomplete";
 import DateTimeSelector from "../../../components/DateTimeSelector/DateTimeSelector";
 import OperationButtons from "../../../components/OperationButtons/OperationButtons";
@@ -14,8 +15,6 @@ import { apiUrl, createRequestUrl } from "../../../config/app.config";
 import RequestType from "../../../enums/request-type";
 import { nameof } from "../../../helpers/name-of";
 import Dictionary from "../../../helpers/translation/dictionary/dictionary";
-import useRequestHandler from "../../../hooks/useRequestHandler";
-import styles from ".././Appointment.module.css";
 import {
   Appointment,
   AppointmentType,
@@ -46,7 +45,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
   handleUpdateItem,
   appointment,
 }) => {
-  const { sendData } = useRequestHandler();
+  const { sendData } = useRequestManager();
   const { t } = useTranslation();
 
   const schema = z.object({
@@ -207,7 +206,7 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
         <Grid.Col span={5}>
           <Group grow>
             <TextInput
-              className={styles.input}
+              // className={styles.input}
               disabled={disabled}
               label={`${t(Dictionary.Appointment.TITLE)}`}
               {...form.getInputProps(nameof<Appointment>("name"))}
