@@ -51,6 +51,7 @@ const useCredentialStore = create<CurrentUserState>()(
       name: "current-user",
       partialize: (state) => ({
         currentUser: state.currentUser,
+        currentUserFunctions: state.currentUserFunctions,
       }),
       storage: createJSONStorage(() => sessionStorage),
     }

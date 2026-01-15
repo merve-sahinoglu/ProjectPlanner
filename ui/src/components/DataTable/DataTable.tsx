@@ -17,7 +17,7 @@ import {
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 
-import Language from "@enums/language.enum";
+import Language from "@enums/language";
 import useUserPreferences from "@hooks/useUserPreferenceStore";
 import "./DataTable.css";
 import { TableEntity } from "./types/table-entity";

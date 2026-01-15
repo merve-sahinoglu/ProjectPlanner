@@ -2,7 +2,7 @@ import { i18n } from "i18next";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
-import Language from "@enums/language.enum";
+import Language from "@enums/language";
 
 enum UserInterfaceType {
   Classic = 0,
