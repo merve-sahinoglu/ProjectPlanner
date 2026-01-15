@@ -13,7 +13,7 @@ function Main({ children }: MainProps) {
   return (
     <>
       <AppShell
-        header={{ height: 50 }}
+        header={{ height: 70 }}
         navbar={{
           width: 300,
           breakpoint: "sm",

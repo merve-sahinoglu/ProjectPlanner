@@ -1,13 +1,14 @@
 import {
   Avatar,
   Burger,
-  Container,
   Group,
-  Text,
+  Text
 } from "@mantine/core";
+import { useTranslation } from "react-i18next";
+import KIDS_IMG from "../../assets/images.jpeg";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
 import classes from "./AppHeader.module.css";
 import UserProfileDropdown from "./UserProfileDropdown";
-import KIDS_IMG from "../../assets/images.jpeg";
 
 interface HeaderMenuProps {
   mobileOpened: boolean;
@@ -22,6 +23,7 @@ export function AppHeader({
   toggleMobile,
   toggleDesktop,
 }: HeaderMenuProps) {
+  const { t } = useTranslation();
   return (
     <header className={classes.header}>
       <div className={classes.ribbon} />
@@ -33,16 +35,16 @@ export function AppHeader({
                 <Burger
                   opened={mobileOpened}
                   onClick={toggleMobile}
-                  hiddenFrom="sm"
+                   hiddenFrom="sm"
                   size="sm"
-                  aria-label="Open mobile navigation"
+                  aria-label={t(Dictionary.Header.OPEN_MOBILE_NAV)}
                 />
                 <Burger
                   opened={desktopOpened}
                   onClick={toggleDesktop}
                   visibleFrom="sm"
                   size="sm"
-                  aria-label="Toggle sidebar"
+                  aria-label={t(Dictionary.Header.TOGGLE_SIDEBAR)}
                 />
               </Group>
 
@@ -52,7 +54,7 @@ export function AppHeader({
                     src={KIDS_IMG}
                     size={36}
                     radius="xl"
-                    alt="Çocuk Eğitim Merkezi"
+                    alt={t(Dictionary.Header.LOGO_ALT)}
                     className={classes.logoAvatar}
                   />
                 </div>
@@ -60,7 +62,7 @@ export function AppHeader({
                 <div className={classes.brandText}>
                   <Group gap={6}>
                     <Text fw={900} className={classes.title}>
-                      Dilde Eğitim Merkezi
+                      {t(Dictionary.Header.APP_TITLE)}
                     </Text>
                   </Group>
                 </div>

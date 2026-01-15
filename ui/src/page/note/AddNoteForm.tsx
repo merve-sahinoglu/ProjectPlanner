@@ -6,9 +6,11 @@ import Link from "@tiptap/extension-link";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
+import { useTranslation } from "react-i18next";
 import FormAutocomplete from "../../components/Autocomplete/FormAutocomplete";
 import { apiUrl, createRequestUrl } from "../../config/app.config";
 import { nameof } from "../../helpers/name-of";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
 
 // Projendeki gerçek import yoluna göre düzelt:
 
@@ -32,6 +34,7 @@ export default function AddNoteForm({
   therapistId,
   childId,
 }: Props) {
+  const { t } = useTranslation();
   const form = useForm<AddNoteFormValues>({
     initialValues: {
       date: new Date(),
@@ -40,10 +43,10 @@ export default function AddNoteForm({
       noteHtml: "",
     },
     validate: {
-      date: (v) => (v ? null : "Tarih seçiniz"),
-      childId: (v) => (v.trim() ? null : "Child ID zorunlu"),
-      therapistId: (v) => (v.trim() ? null : "Therapist ID zorunlu"),
-      noteHtml: (v) => (v.trim() ? null : "Not boş olamaz"),
+      date: (v) => (v ? null : t(Dictionary.Validation.Input.MIN)),
+      childId: (v) => (v.trim() ? null : t(Dictionary.Validation.Input.MIN)),
+      therapistId: (v) => (v.trim() ? null : t(Dictionary.Validation.Input.MIN)),
+      noteHtml: (v) => (v.trim() ? null : t(Dictionary.Validation.Input.MIN)),
     },
   });
 
@@ -68,16 +71,16 @@ export default function AddNoteForm({
     <Stack gap="md">
       <Group align="flex-end" wrap="wrap" gap="md">
         <DateInput
-          label="Date"
-          placeholder="Pick date"
+          label={t(Dictionary.Note.Notebook.DATE)}
+          placeholder={t(Dictionary.Note.Notebook.DATE)}
           value={form.values.date}
           {...form.getInputProps(nameof<AddNoteFormValues>("date"))}
           w={220}
         />
 
         <FormAutocomplete
-          searchInputLabel="Child"
-          placeholder="Child"
+          searchInputLabel={t(Dictionary.Appointment.CHILD_ID)}
+          placeholder={t(Dictionary.Appointment.CHILD_ID)}
           description=""
           apiUrl={createRequestUrl(apiUrl.userUrl)}
           form={form}
@@ -124,10 +127,10 @@ export default function AddNoteForm({
 
       <Group justify="flex-end" gap="sm">
         <Button variant="light" onClick={onCancel} type="button">
-          Cancel
+          {t(Dictionary.Button.CANCEL)}
         </Button>
         <Button onClick={handleSaveClick} type="button">
-          Save
+          {t(Dictionary.Button.SAVE)}
         </Button>
       </Group>
     </Stack>

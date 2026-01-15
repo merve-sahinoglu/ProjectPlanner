@@ -1,6 +1,9 @@
-import { ColDef } from "@ag-grid-community/core";
-import { Instructor } from "../types/instructer-types";
 import DataTable from "../../../components/DataTable/DataTable";
+import { Instructor } from "../types/instructer-types";
+
+import { ColDef } from "ag-grid-community";
+import { useTranslation } from "react-i18next";
+import Dictionary from "../../../helpers/translation/dictionary/dictionary";
 
 interface InstructorTableProps {
   records: Instructor[];
@@ -17,12 +20,13 @@ function InstructorTable({
   onRowClicked,
   hasPagination = true,
 }: InstructorTableProps) {
+  const { t } = useTranslation();
   const columns: ColDef<Instructor>[] = [
-    { field: "name", headerName: "Ad" },
-    { field: "surname", headerName: "Soyad" },
-    { field: "email", headerName: "E-posta" },
-    { field: "phone", headerName: "Telefon" },
-    { field: "type", headerName: "Tip" },
+    { field: "name", headerName: t(Dictionary.Instructor.Table.NAME) },
+    { field: "surname", headerName: t(Dictionary.Instructor.Table.SURNAME) },
+    { field: "email", headerName: t(Dictionary.Instructor.Table.EMAIL) },
+    { field: "phone", headerName: t(Dictionary.Instructor.Table.PHONE) },
+    { field: "type", headerName: t(Dictionary.Instructor.Table.TYPE) },
   ];
 
   return (

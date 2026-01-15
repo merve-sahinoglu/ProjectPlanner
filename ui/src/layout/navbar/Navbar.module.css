@@ -1,14 +1,10 @@
 .navbar {
-  width: 280px;
-  height: 100dvh;
   display: flex;
   flex-direction: column;
   background:
     linear-gradient(180deg, rgba(139, 92, 246, 0.06), transparent 120px),
     light-dark(var(--mantine-color-white), var(--mantine-color-dark-6));
   border-right: 1px solid light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
-  position: sticky;
-  top: 0;
 }
 
 .ribbon {
@@ -19,7 +15,7 @@
 
 .links {
   flex: 1;
-  padding: var(--mantine-spacing-sm); 
+  padding: var(--mantine-spacing-sm);
 }
 
 .linksInner {

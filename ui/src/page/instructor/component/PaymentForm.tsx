@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
+import Dictionary from "../../../helpers/translation/dictionary/dictionary";
 import { Payment } from "../types/payment";
 
 interface PaymentFormProps {
@@ -8,6 +10,7 @@ interface PaymentFormProps {
 }
 
 const PaymentForm: React.FC<PaymentFormProps> = ({ instructorId, onSave, onCancel }) => {
+  const { t } = useTranslation();
   const [amount, setAmount] = useState(0);
 
   const handleSubmit = () => {
@@ -22,15 +25,15 @@ const PaymentForm: React.FC<PaymentFormProps> = ({ instructorId, onSave, onCance
 
   return (
     <div>
-      <h2>Make Payment</h2>
+      <h2>{t(Dictionary.Instructor.Payment.DESCRIPTION)}</h2>
       <input
         type="number"
         value={amount}
         onChange={(e) => setAmount(Number(e.target.value))}
-        placeholder="Amount"
+        placeholder={t(Dictionary.Instructor.Payment.AMOUNT)}
       />
-      <button onClick={handleSubmit}>Save</button>
-      <button onClick={onCancel}>Cancel</button>
+      <button onClick={handleSubmit}>{t(Dictionary.Button.SAVE)}</button>
+      <button onClick={onCancel}>{t(Dictionary.Button.CANCEL)}</button>
     </div>
   );
 };

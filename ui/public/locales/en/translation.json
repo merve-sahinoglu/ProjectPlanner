@@ -45,6 +45,54 @@
     "relative": "Relative",
     "executive": "Executive"
   },
+  "instructor": {
+    "title": "Instructor",
+    "table": {
+      "name": "Name",
+      "surname": "Surname",
+      "email": "E-mail",
+      "phone": "Phone",
+      "type": "Type"
+    },
+    "edit": {
+      "name": "Name",
+      "surname": "Surname",
+      "title": "Title",
+      "bio": "Bio"
+    },
+    "payment": {
+      "amount": "Amount",
+      "date": "Date",
+      "description": "Description"
+    }
+  },
+  "contact": {
+    "title": "Contact Us",
+    "name": "Your Name",
+    "email": "Your Email",
+    "subject": "Subject",
+    "message": "Message",
+    "send": "Send Message"
+  },
+  "note": {
+    "notebook": {
+      "title": "Title",
+      "date": "Date",
+      "category": "Category",
+      "content": "Content"
+    },
+    "add": {
+       "title": "Title",
+       "content": "Content",
+       "category": "Category"
+    }
+  },
+  "userRelation": {
+     "table": {
+        "userName": "User Name",
+        "relationType": "Relation Type"
+     }
+  },
   "dataGrid": {
     "lastRefreshed": "Last refreshed: {{date}}",
     "pagination": "Showing {{pageSize}} record of {{totalPageSize}}",
@@ -154,7 +202,27 @@
     "warehouseLocationMatch": "Match a warehouse with location"
   },
   "header": {
-    "searchLabel": "Search.."
+    "searchLabel": "Search..",
+    "openMobileNav": "Open mobile navigation",
+    "toggleSidebar": "Toggle sidebar",
+    "logoAlt": "Child Education Center",
+    "appTitle": "Language Education Center"
+  },
+  "navbar": {
+    "myPage": "My Page",
+    "myProfile": "My Profile",
+    "myNotes": "My Notes",
+    "myAppointment": "My Appointment",
+    "appointment": "Appointment",
+    "note": "Note",
+    "settings": "Settings",
+    "user": "User",
+    "userRelation": "User Relation",
+    "room": "Room",
+    "playGroups": "Play Groups",
+    "open": "Open",
+    "close": "Close",
+    "linkCount": "{{count}} link"
   },
   "error": {
     "notFound": {
@@ -176,7 +244,14 @@
     "userName": "Username",
     "password": "Password",
     "facility": "Facility",
-    "login": "Login"
+    "login": "Login",
+    "forgotPassword": "Forgot Password",
+    "contactAdmin": "Contact administrator for system access.",
+    "error": {
+        "authFailed": "Username or password incorrect.",
+        "generic": "An error occurred during login.",
+        "loginFailed": "Login Failed"
+    }
   },
   "success": {
     "positive": "Process successfully completed.",
@@ -188,7 +263,9 @@
     "dateOfBirth": "Date of Birth",
     "all": "All",
     "passive": "Passive",
-    "active": "Active"
+    "active": "Active",
+    "english": "English",
+    "turkish": "Turkish"
   },
   "authorization": {
     "cantAccess": "You do not have permission to do this action."

@@ -10,8 +10,10 @@ import {
 import { useForm } from "@mantine/form";
 import { zod4Resolver } from "mantine-form-zod-resolver";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { BsSave, BsTrash } from "react-icons/bs";
 import { z } from "zod";
+import Dictionary from "../../../helpers/translation/dictionary/dictionary";
 import { Instructor } from "../types/instructer-types";
 
 const InstructorSchema = z.object({
@@ -32,7 +34,6 @@ interface InstructorFormProps {
   instructor: Instructor;
 
   onClose: () => void;
-
   onSave: (instructor: Instructor) => void;
   onDelete: (id: string) => void;
 }
@@ -43,6 +44,7 @@ export default function InstructorEdit({
   onSave,
   onDelete,
 }: InstructorFormProps) {
+  const { t } = useTranslation();
   const [preview, setPreview] = useState<string | null>(
     instructor.profilePicture
       ? URL.createObjectURL(instructor.profilePicture)
@@ -102,28 +104,28 @@ export default function InstructorEdit({
           />
         )}
         <TextInput
-          label="Ad"
-          placeholder="Adınızı girin"
+          label={t(Dictionary.Instructor.Edit.NAME)}
+          placeholder={t(Dictionary.Instructor.Edit.NAME)}
           {...form.getInputProps("name")}
         />
         <TextInput
-          label="Soyad"
-          placeholder="Soyadınızı girin"
+          label={t(Dictionary.Instructor.Edit.SURNAME)}
+          placeholder={t(Dictionary.Instructor.Edit.SURNAME)}
           {...form.getInputProps("surname")}
         />
         <TextInput
-          label="E-posta"
-          placeholder="E-posta adresi"
+          label={t(Dictionary.Instructor.Table.EMAIL)}
+          placeholder={t(Dictionary.Instructor.Table.EMAIL)}
           {...form.getInputProps("email")}
         />
         <TextInput
-          label="Telefon"
-          placeholder="Telefon numarası"
+          label={t(Dictionary.Instructor.Table.PHONE)}
+          placeholder={t(Dictionary.Instructor.Table.PHONE)}
           {...form.getInputProps("phone")}
         />
         <Select
-          label="Tip"
-          placeholder="Eğitim türünü seçin"
+          label={t(Dictionary.Instructor.Table.TYPE)}
+          placeholder={t(Dictionary.Instructor.Table.TYPE)}
           data={["dil terapisi", "müzik terapisi", "özel eğitim"]}
           {...form.getInputProps("type")}
           required

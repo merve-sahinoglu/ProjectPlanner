@@ -1,4 +1,3 @@
-import { useId, useState } from "react";
 import {
   Box,
   Collapse,
@@ -8,6 +7,9 @@ import {
   UnstyledButton,
 } from "@mantine/core";
 import { IconChevronRight } from "@tabler/icons-react";
+import { useId, useState } from "react";
+import { useTranslation } from "react-i18next";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
 import classes from "./NavbarLinksGroup.module.css";
 
 interface Link {
@@ -47,6 +49,7 @@ export function LinksGroup({
   const hasLinks = Array.isArray(links) && links.length > 0;
   const [opened, setOpened] = useState(initiallyOpened || false);
   const collapseId = useId();
+  const { t } = useTranslation();
 
   // parent & leaf aktiflik
   const isParentActive = activeParent === label;
@@ -104,7 +107,10 @@ export function LinksGroup({
               </Text>
               {hasLinks && (
                 <Text fz={11} c="dimmed" className={classes.subhint}>
-                  {opened ? "Kapat" : "Aç"} • {links!.length} link
+                  {opened
+                    ? t(Dictionary.Navbar.CLOSE)
+                    : t(Dictionary.Navbar.OPEN)}{" "}
+                  • {t(Dictionary.Navbar.LINK_COUNT, { count: links!.length })}
                 </Text>
               )}
             </Box>

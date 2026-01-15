@@ -1,19 +1,19 @@
 import { useRef } from "react";
 
 import {
-  AG_GRID_LOCALE_EN,
-  AG_GRID_LOCALE_TR,
+    AG_GRID_LOCALE_EN,
+    AG_GRID_LOCALE_TR,
 } from "@ag-grid-community/locale";
 import {
-  AllCommunityModule,
-  ClientSideRowModelModule,
-  ColDef,
-  ColGroupDef,
-  colorSchemeDark,
-  GetRowIdParams,
-  ModuleRegistry,
-  RowClickedEvent,
-  themeQuartz,
+    AllCommunityModule,
+    ClientSideRowModelModule,
+    ColDef,
+    ColGroupDef,
+    colorSchemeDark,
+    GetRowIdParams,
+    ModuleRegistry,
+    RowClickedEvent,
+    themeQuartz,
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 
@@ -28,9 +28,13 @@ interface DataTableProps<T extends TableEntity> {
   records: T[];
   columns: (ColDef<T> | ColGroupDef<T>)[];
   isFetching: boolean;
-  h?: number;
+  h?: number | string;
   onRowClicked?(data: T): void;
   hasPagination?: boolean;
+  rowHeight?: number;
+  className?: string;
+  quickFilterText?: string;
+  onApiReady?: (api: unknown) => void;
 }
 function DataTable<T extends TableEntity>({
   records,
@@ -39,6 +43,10 @@ function DataTable<T extends TableEntity>({
   isFetching,
   onRowClicked,
   hasPagination = true,
+  rowHeight,
+  className,
+  quickFilterText,
+  onApiReady,
 }: DataTableProps<T>) {
   const gridRef = useRef<AgGridReact<T>>(null);
 
@@ -75,8 +83,13 @@ function DataTable<T extends TableEntity>({
         rowData={records}
         columnDefs={columns}
         rowModelType="clientSide"
+
         pagination={hasPagination}
         getRowId={getRowId}
+        rowHeight={rowHeight}
+        quickFilterText={quickFilterText}
+        onGridReady={onApiReady ? (p) => onApiReady(p.api) : undefined}
+        className={className}
         gridOptions={{
           columnDefs: [
             {

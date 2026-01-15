@@ -398,6 +398,27 @@ abstract class Dictionary {
 
   static Header = class {
     static readonly SEARCH_LABEL = "header.searchLabel";
+    static readonly OPEN_MOBILE_NAV = "header.openMobileNav";
+    static readonly TOGGLE_SIDEBAR = "header.toggleSidebar";
+    static readonly LOGO_ALT = "header.logoAlt";
+    static readonly APP_TITLE = "header.appTitle";
+  };
+
+  static Navbar = class {
+    static readonly MY_PAGE = "navbar.myPage";
+    static readonly MY_PROFILE = "navbar.myProfile";
+    static readonly MY_NOTES = "navbar.myNotes";
+    static readonly MY_APPOINTMENT = "navbar.myAppointment";
+    static readonly APPOINTMENT = "navbar.appointment";
+    static readonly NOTE = "navbar.note";
+    static readonly SETTINGS = "navbar.settings";
+    static readonly USER = "navbar.user";
+    static readonly USER_RELATION = "navbar.userRelation";
+    static readonly ROOM = "navbar.room";
+    static readonly PLAY_GROUPS = "navbar.playGroups";
+    static readonly OPEN = "navbar.open";
+    static readonly CLOSE = "navbar.close";
+    static readonly LINK_COUNT = "navbar.linkCount";
   };
 
   static Login = class {
@@ -408,6 +429,14 @@ abstract class Dictionary {
     static readonly FACILITY = "login.facility";
 
     static readonly LOGIN = "login.login";
+    static readonly FORGOT_PASSWORD = "login.forgotPassword";
+    static readonly CONTACT_ADMIN = "login.contactAdmin";
+
+    static readonly Error = class {
+        static readonly AUTH_FAILED = "login.error.authFailed";
+        static readonly GENERIC = "login.error.generic";
+        static readonly LOGIN_FAILED = "login.error.loginFailed";
+    };
 
     static Validation = class {
       static readonly NAME_MIN = "validation.login.nameMinimum";
@@ -478,6 +507,10 @@ abstract class Dictionary {
     static readonly PASSIVE = "general.passive";
 
     static readonly ACTIVE = "general.active";
+
+    static readonly ENGLISH = "general.english";
+
+    static readonly TURKISH = "general.turkish";
   };
 
   static Authorization = class {
@@ -652,7 +685,7 @@ abstract class Dictionary {
     static readonly ID = "appointment.id";
     static readonly DESCRIPTION = "appointment.description";
     static readonly APPOINTMENT_ID = "appointment.appointmentId";
-    static readonly CHIELD_ID = "appointment.childId";
+    static readonly CHILD_ID = "appointment.childId";
     static readonly PLAYGROUP_ID = "appointment.playgroupId";
     static readonly ROOM_ID = "appointment.roomId";
     static readonly THERAPIST_ID = "appointment.therapistId";
@@ -688,6 +721,58 @@ abstract class Dictionary {
     static readonly PSYCHOLOGICAL_THERAPY =
       "appointmentType.psychologicalTherapy";
     static readonly GAME_GROUPS = "appointmentType.gameGroups";
+  };
+
+  static Instructor = class {
+    static readonly TITLE = "instructor.title";
+    static readonly Table = class {
+      static readonly NAME = "instructor.table.name";
+      static readonly SURNAME = "instructor.table.surname";
+      static readonly EMAIL = "instructor.table.email";
+      static readonly PHONE = "instructor.table.phone";
+      static readonly TYPE = "instructor.table.type";
+    };
+    static readonly Edit = class {
+      static readonly NAME = "instructor.edit.name";
+      static readonly SURNAME = "instructor.edit.surname";
+      static readonly TITLE = "instructor.edit.title";
+      static readonly BIO = "instructor.edit.bio";
+    };
+    static readonly Payment = class {
+      static readonly AMOUNT = "instructor.payment.amount";
+      static readonly DATE = "instructor.payment.date";
+      static readonly DESCRIPTION = "instructor.payment.description";
+    };
+  };
+
+  static Contact = class {
+    static readonly TITLE = "contact.title";
+    static readonly NAME = "contact.name";
+    static readonly EMAIL = "contact.email";
+    static readonly SUBJECT = "contact.subject";
+    static readonly MESSAGE = "contact.message";
+    static readonly SEND = "contact.send";
+  };
+
+  static Note = class {
+    static readonly Notebook = class {
+        static readonly TITLE = "note.notebook.title";
+        static readonly DATE = "note.notebook.date";
+        static readonly CATEGORY = "note.notebook.category";
+        static readonly CONTENT = "note.notebook.content";
+    };
+    static readonly Add = class {
+        static readonly TITLE = "note.add.title";
+        static readonly CONTENT = "note.add.content";
+        static readonly CATEGORY = "note.add.category";
+    };
+  };
+
+  static UserRelation = class {
+      static readonly Table = class {
+          static readonly USER_NAME = "userRelation.table.userName";
+          static readonly RELATION_TYPE = "userRelation.table.relationType";
+      };
   };
 }
 export default Dictionary;

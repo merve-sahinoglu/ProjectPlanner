@@ -62,7 +62,7 @@ export default function NoteBook() {
   const columns = useMemo<ColDef<GridNoteItem>[]>(
     () => [
       {
-        headerName: "Date",
+        headerName: t(Dictionary.Note.Notebook.DATE),
         field: "date",
         valueFormatter: (p: {
           value: string | number | Date | dayjs.Dayjs | null | undefined;
@@ -71,7 +71,7 @@ export default function NoteBook() {
         sortable: true,
       },
       {
-        headerName: "Child",
+        headerName: t(Dictionary.Appointment.CHILD_ID),
         field: "childProfilePicture",
         flex: 1,
         sortable: true,
@@ -83,7 +83,7 @@ export default function NoteBook() {
         },
       },
       {
-        headerName: "Therapist",
+        headerName: t(Dictionary.Appointment.THERAPIST_ID),
         field: "therapistProfilePicture",
         flex: 1,
         sortable: true,
@@ -210,8 +210,8 @@ export default function NoteBook() {
             <Group grow mt={40}>
               <>
                 <FormAutocomplete
-                  searchInputLabel={t(Dictionary.Appointment.CHIELD_ID)}
-                  placeholder={t(Dictionary.Appointment.CHIELD_ID)}
+                  searchInputLabel={t(Dictionary.Appointment.CHILD_ID)}
+                  placeholder={t(Dictionary.Appointment.CHILD_ID)}
                   description=""
                   apiUrl={createRequestUrl(apiUrl.userUrl)}
                   form={form}
@@ -236,7 +236,7 @@ export default function NoteBook() {
         <Grid.Col span={{ xs: IdFromUrl === undefined ? 10 : 12 }}>
           {IdFromUrl !== undefined && (
             <Group justify="end" p="md">
-              <Button onClick={() => setCreateOpened(true)}>Add note</Button>
+              <Button onClick={() => setCreateOpened(true)}>{t(Dictionary.Button.ADD)}</Button>
             </Group>
           )}
 
@@ -256,7 +256,7 @@ export default function NoteBook() {
           <Modal
             opened={createOpened}
             onClose={() => setCreateOpened(false)}
-            title="Add note"
+            title={t(Dictionary.Note.Add.TITLE)}
             size="xl"
           >
             <AddNoteForm

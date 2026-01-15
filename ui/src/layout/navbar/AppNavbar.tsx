@@ -1,20 +1,25 @@
-import { useState, useMemo } from "react";
+import { ScrollArea } from "@mantine/core";
 import {
   IconCalendarStats,
   IconHome2,
   IconNotebook,
   IconSettings,
 } from "@tabler/icons-react";
-import { ScrollArea } from "@mantine/core";
-import classes from "./Navbar.module.css";
-import routes from "../../constants/routes";
+import { useMemo, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
-import { LinksGroup } from "./LinksGroup";
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
 import { useCredentialActions } from "../../authentication/store/useCredentialsStore";
+import routes from "../../constants/routes";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+import { LinksGroup } from "./LinksGroup";
+import classes from "./Navbar.module.css";
 
 export function AppNavbar() {
-  const [activeParent, setActiveParent] = useState<string>("My Page");
+  const { t } = useTranslation();
+  const [activeParent, setActiveParent] = useState<string>(
+    t(Dictionary.Navbar.MY_PAGE)
+  );
   const [activePath, setActivePath] = useState<string>("");
   const auth = useAuthenticationContext();
   const navigate = useNavigate();
@@ -34,20 +39,20 @@ export function AppNavbar() {
     () => [
       {
         icon: IconHome2,
-        label: "My Page",
+        label: t(Dictionary.Navbar.MY_PAGE),
         initiallyOpened: true,
         links: [
           {
-            label: "My Profile",
-            link: routes.profile
+            label: t(Dictionary.Navbar.MY_PROFILE),
+            link: routes.profile,
           },
           {
-            label: "My Notes",
+            label: t(Dictionary.Navbar.MY_NOTES),
             link: routes.notes,
             additionalInfo: auth.currentUser?.userId,
           },
           {
-            label: "My Appointment",
+            label: t(Dictionary.Navbar.MY_APPOINTMENT),
             link: routes.appointment,
             additionalInfo: auth.currentUser?.userId,
           },
@@ -55,25 +60,25 @@ export function AppNavbar() {
       },
       {
         icon: IconCalendarStats,
-        label: "Appointment",
+        label: t(Dictionary.Navbar.APPOINTMENT),
         link: routes.appointment,
         hidden: !checkIfUserHasFunctionAuthorization("Randevu"),
       },
       {
         icon: IconNotebook,
-        label: "Note",
+        label: t(Dictionary.Navbar.NOTE),
         link: routes.notes,
         hidden: !checkIfUserHasFunctionAuthorization("Not"),
       },
       {
         icon: IconSettings,
-        label: "Settings",
+        label: t(Dictionary.Navbar.SETTINGS),
         hidden: !checkIfUserHasFunctionAuthorization("Ayarlar"),
         links: [
-          { label: "User", link: routes.user },
-          { label: "User Relation", link: routes.userRelation },
-          { label: "Room", link: routes.room },
-          { label: "Play Groups", link: routes.playGroups },
+          { label: t(Dictionary.Navbar.USER), link: routes.user },
+          { label: t(Dictionary.Navbar.USER_RELATION), link: routes.userRelation },
+          { label: t(Dictionary.Navbar.ROOM), link: routes.room },
+          { label: t(Dictionary.Navbar.PLAY_GROUPS), link: routes.playGroups },
         ],
       },
     ],

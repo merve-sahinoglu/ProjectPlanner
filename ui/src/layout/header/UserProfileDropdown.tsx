@@ -4,21 +4,22 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
 import Language from "../../enums/language";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
 import useUserPreferences from "../../hooks/useUserPreferenceStore";
 
-const languages = [
-  {
-    label: "English",
-    value: Language.English,
-  },
-  {
-    label: "Türkçe",
-    value: Language.Turkish,
-  },
-];
-
 function UserProfileDropdown() {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
+
+  const languages = [
+    {
+      label: t(Dictionary.General.ENGLISH),
+      value: Language.English,
+    },
+    {
+      label: t(Dictionary.General.TURKISH),
+      value: Language.Turkish,
+    },
+  ];
 
   const [showMenu, setShowMenu] = useState<boolean>(false);
 
@@ -55,7 +56,7 @@ function UserProfileDropdown() {
         </Menu.Target>
         <Menu.Dropdown>
           <Menu.Item>
-            <Menu.Label>Language</Menu.Label>
+            <Menu.Label>{t(Dictionary.User.LANGUAGE)}</Menu.Label>
             <Select
               allowDeselect={false}
               value={language}
@@ -67,7 +68,7 @@ function UserProfileDropdown() {
           </Menu.Item>
           <Divider m={5} />
           <Menu.Item onClick={(event) => handleLogout(event)} color="red">
-            Logout
+            {t(Dictionary.User.LOGOUT)}
           </Menu.Item>
         </Menu.Dropdown>
       </Menu>

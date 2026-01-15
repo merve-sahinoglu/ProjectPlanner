@@ -27,7 +27,11 @@ import KIDS_IMG from "../../assets/images.jpeg";
 import { useAuthenticationContext } from "../../authentication/AuthenticationContext";
 import { AuthenticationRequest } from "../../authentication/types/authentication-types";
 
+import { useTranslation } from "react-i18next";
+import Dictionary from "../../helpers/translation/dictionary/dictionary";
+
 export default function Login() {
+  const { t } = useTranslation();
   const auth = useAuthenticationContext();
   const navigate = useNavigate();
 
@@ -128,11 +132,12 @@ export default function Login() {
               </Alert>
             )}
 
+
             <Stack gap="md">
               <TextInput
                 size="lg"
                 radius="md"
-                label="Kullanıcı adı"
+                label={t(Dictionary.Login.USERNAME)}
                 placeholder="xxx.xxx"
                 withAsterisk
                 leftSection={<IconFaceId size={18} />}
@@ -141,14 +146,14 @@ export default function Login() {
               <PasswordInput
                 size="lg"
                 radius="md"
-                label="Şifre"
+                label={t(Dictionary.Login.PASSWORD)}
                 placeholder="••••••••"
                 withAsterisk
                 {...form.getInputProps("password")}
               />
               <Group justify="end">
                 <Anchor size="sm" onClick={(e) => e.preventDefault()}>
-                  Şifremi unuttum
+                  {t(Dictionary.Login.FORGOT_PASSWORD)}
                 </Anchor>
               </Group>
 
@@ -162,12 +167,12 @@ export default function Login() {
                   gradient={{ from: "pink", to: "violet" }}
                   onClick={handleSubmit}
                 >
-                  Giriş yap
+                  {t(Dictionary.Login.LOGIN)}
                 </Button>
               </Group>
               <Divider label="veya" labelPosition="center" my="sm" />
               <Text c="dimmed" size="sm">
-                Sisteme erişim için yönetici ile iletişime geçin.
+                {t(Dictionary.Login.CONTACT_ADMIN)}
               </Text>
             </Stack>
           </Box>

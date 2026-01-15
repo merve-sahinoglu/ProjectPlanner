@@ -46,6 +46,54 @@
     "relative": "Yakini",
     "executive": "Yönetenler"
   },
+  "instructor": {
+    "title": "Eğitmen",
+    "table": {
+      "name": "Ad",
+      "surname": "Soyad",
+      "email": "E-posta",
+      "phone": "Telefon",
+      "type": "Tip"
+    },
+    "edit": {
+      "name": "Ad",
+      "surname": "Soyad",
+      "title": "Ünvan",
+      "bio": "Hakkında"
+    },
+    "payment": {
+      "amount": "Tutar",
+      "date": "Tarih",
+      "description": "Açıklama"
+    }
+  },
+  "contact": {
+    "title": "İletişim",
+    "name": "Adınız",
+    "email": "E-postanız",
+    "subject": "Konu",
+    "message": "Mesajınız",
+    "send": "Gönder"
+  },
+  "note": {
+    "notebook": {
+      "title": "Başlık",
+      "date": "Tarih",
+      "category": "Kategori",
+      "content": "İçerik"
+    },
+    "add": {
+       "title": "Başlık",
+       "content": "İçerik",
+       "category": "Kategori"
+    }
+  },
+  "userRelation": {
+     "table": {
+        "userName": "Kullanıcı Adı",
+        "relationType": "İlişki Tipi"
+     }
+  },
   "actionBar": {
     "define": "Tanımla",
     "delete": "Sil",
@@ -130,7 +178,27 @@
     "warehouseLocationMatch": "Depo ile konum eşleyin"
   },
   "header": {
-    "searchLabel": "Ara.."
+    "searchLabel": "Ara..",
+    "openMobileNav": "Mobil navigasyonu aç",
+    "toggleSidebar": "Kenar çubuğunu aç/kapat",
+    "logoAlt": "Çocuk Eğitim Merkezi",
+    "appTitle": "Dilde Eğitim Merkezi"
+  },
+  "navbar": {
+    "myPage": "Sayfam",
+    "myProfile": "Profilim",
+    "myNotes": "Notlarım",
+    "myAppointment": "Randevularım",
+    "appointment": "Randevu",
+    "note": "Not",
+    "settings": "Ayarlar",
+    "user": "Kullanıcı",
+    "userRelation": "Kullanıcı İlişkileri",
+    "room": "Oda",
+    "playGroups": "Oyun Grupları",
+    "open": "Aç",
+    "close": "Kapat",
+    "linkCount": "{{count}} link"
   },
   "error": {
     "notFound": {
@@ -152,7 +220,14 @@
     "userName": "Kullanıcı Adı",
     "password": "Parola",
     "facility": "Şube",
-    "login": "Giriş"
+    "login": "Giriş",
+    "forgotPassword": "Şifremi unuttum",
+    "contactAdmin": "Sisteme erişim için yönetici ile iletişime geçin.",
+    "error": {
+        "authFailed": "Kullanıcı adı veya şifre hatalı.",
+        "generic": "Giriş sırasında bir hata oluştu.",
+        "loginFailed": "Giriş başarısız"
+    }
   },
   "success": {
     "positive": "İşlem başarıyla tamamlandı.",
@@ -164,7 +239,9 @@
     "dateOfBirth": "Doğum Tarihi",
     "all": "Hepsi",
     "passive": "Pasif",
-    "active": "Aktif"
+    "active": "Aktif",
+    "english": "English",
+    "turkish": "Türkçe"
   },
   "authorization": {
     "cantAccess": "Bu işlemi yapmak için yetkiniz yoktur."

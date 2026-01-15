@@ -1,12 +1,15 @@
 // src/features/user-relation/UserRelationTable.tsx
-import { useMemo } from "react";
+import Dictionary from "@helpers/translation/dictionary/dictionary";
 import { ActionIcon, Avatar, Badge, Group, Tooltip } from "@mantine/core";
 import { IconEdit, IconTrash } from "@tabler/icons-react";
 import type {
   ICellRendererParams,
 } from "ag-grid-community";
-import UserRelationProps from "./types";
+import { t } from "i18next";
+import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
 import DataTable from "../../components/DataTable/DataTable";
+import UserRelationProps from "./types";
 
 type Props = {
   records: UserRelationProps[];
@@ -56,12 +59,12 @@ const ActionsRenderer: React.FC<ActionParams> = (p) => {
   if (!data) return null;
   return (
     <Group gap="xs" justify="flex-end" w="100%">
-      <Tooltip label="Düzenle" withArrow>
+      <Tooltip label={t(Dictionary.Button.EDIT)} withArrow>
         <ActionIcon variant="light" color="grape" onClick={() => onEdit(data)}>
           <IconEdit size={16} />
         </ActionIcon>
       </Tooltip>
-      <Tooltip label="Sil" color="red" withArrow>
+      <Tooltip label={t(Dictionary.Button.DELETE)} color="red" withArrow>
         <ActionIcon
           variant="light"
           color="red"
@@ -84,22 +87,23 @@ export default function UserRelationTable({
   quickFilter,
   onApiReady,
 }: Props) {
+  const { t } = useTranslation();
   const columns = useMemo(
     () => [
       {
-        headerName: "User",
+        headerName: t(Dictionary.UserRelation.Table.USER_NAME),
         field: "userFullName" as keyof UserRelationProps,
         minWidth: 180,
         cellRenderer: UserCell as unknown,
       },
       {
-        headerName: "Profile Group",
+        headerName: t(Dictionary.ProfileGroup.PROFILE_NAME),
         field: "profileGroupName" as keyof UserRelationProps,
         minWidth: 160,
         cellRenderer: GroupCell as unknown,
       },
       {
-        headerName: "Actions",
+        headerName: t(Dictionary.DataGrid.ACTIONS),
         field: "id" as keyof UserRelationProps,
         cellRenderer: ActionsRenderer as unknown,
         cellRendererParams: { onEdit, onDelete },
