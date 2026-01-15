@@ -332,6 +332,9 @@
     "start": "Start Date",
     "end": "End Date",
     "allDay": "All Day",
+    "monthly": "Monthly",
+    "weekly": "Weekly",
+    "daily": "Daily",
     "validation": {
       "appointmentIdRequired": "Appointment  is required.",
       "childIdRequired": "Child  is required.",

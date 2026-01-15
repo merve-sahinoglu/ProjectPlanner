@@ -306,6 +306,9 @@
     "start": "Başlangıç Tarihi",
     "end": "Bitiş Tarihi",
     "allDay": "Tüm Gün",
+    "monthly": "Aylık",
+    "weekly": "Haftalık",
+    "daily": "Günlük",
     "validation": {
       "appointmentIdRequired": "Randevu  gereklidir.",
       "childIdRequired": "Çocuk  gereklidir.",

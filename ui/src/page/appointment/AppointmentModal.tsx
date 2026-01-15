@@ -208,8 +208,8 @@ const AppointmentModal: React.FC<AppointmentFormProps> = ({
           </Group>
           <Group grow>
             <FormAutocomplete
-              searchInputLabel={t(Dictionary.Appointment.CHIELD_ID)}
-              placeholder={t(Dictionary.Appointment.CHIELD_ID)}
+              searchInputLabel={t(Dictionary.Appointment.CHILD_ID)}
+              placeholder={t(Dictionary.Appointment.CHILD_ID)}
               description=""
               disabled={disabled}
               apiUrl={createRequestUrl(apiUrl.userUrl)}

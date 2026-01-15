@@ -16,7 +16,7 @@ import { LinksGroup } from "./LinksGroup";
 import classes from "./Navbar.module.css";
 
 export function AppNavbar() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [activeParent, setActiveParent] = useState<string>(
     t(Dictionary.Navbar.MY_PAGE)
   );
@@ -82,7 +82,7 @@ export function AppNavbar() {
         ],
       },
     ],
-    [auth.currentUser?.userId]
+    [auth.currentUser?.userId, i18n.language]
   );
 
   return (

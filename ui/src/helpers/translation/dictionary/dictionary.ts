@@ -695,6 +695,9 @@ abstract class Dictionary {
     static readonly START = "appointment.start";
     static readonly END = "appointment.end";
     static readonly ALL_DAY = "appointment.allDay";
+    static readonly MONTHLY = "appointment.monthly";
+    static readonly WEEKLY = "appointment.weekly";
+    static readonly DAILY = "appointment.daily";
 
     static Validation = class {
       static readonly APPOINTMENT_ID_REQUIRED =

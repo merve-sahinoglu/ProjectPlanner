@@ -2,6 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { CalendarApi } from "@fullcalendar/core/index.js";
+import trLocale from "@fullcalendar/core/locales/tr";
 import dayGridPlugin from "@fullcalendar/daygrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import FullCalendar from "@fullcalendar/react";
@@ -92,7 +93,7 @@ function pickTextColor(bgHex: string) {
 
 const CalendarComponent = () => {
   const calendarApiRef = useRef<CalendarApi | null>(null);
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const [agendas, setAgendas] = useState<CallenderProps[]>([]);
   const [agendaListView, setAgendaListView] = useState<Appointment[]>([]);
@@ -423,9 +424,9 @@ const CalendarComponent = () => {
   };
 
   const agendaViewHandler = (e: string) => {
-    if (e === "1") handleMonth();
-    else if (e === "2") handleWeek();
-    else if (e === "3") handleToday();
+    if (e === "dayGridMonth") handleMonth();
+    else if (e === "timeGridWeek") handleWeek();
+    else if (e === "timeGridDay") handleToday();
   };
 
   const refreshAgentasAfterEdite = () => {
@@ -458,8 +459,8 @@ const CalendarComponent = () => {
           <Group grow mt={40}>
             <>
               <FormAutocomplete
-                searchInputLabel={t(Dictionary.Appointment.CHIELD_ID)}
-                placeholder={t(Dictionary.Appointment.CHIELD_ID)}
+                searchInputLabel={t(Dictionary.Appointment.CHILD_ID)}
+                placeholder={t(Dictionary.Appointment.CHILD_ID)}
                 description=""
                 apiUrl={createRequestUrl(apiUrl.userUrl)}
                 form={form}
@@ -490,9 +491,9 @@ const CalendarComponent = () => {
             withAsterisk
           >
             <Group mt="xs">
-              <Radio value="1" label="monthly" />
-              <Radio value="2" label="weekly" />
-              <Radio value="3" label="daily" />
+              <Radio value="dayGridMonth" label={t(Dictionary.Appointment.MONTHLY)} />
+              <Radio value="timeGridWeek" label={t(Dictionary.Appointment.WEEKLY)} />
+              <Radio value="timeGridDay" label={t(Dictionary.Appointment.DAILY)} />
             </Group>
           </Radio.Group>
         </Group>
@@ -509,6 +510,8 @@ const CalendarComponent = () => {
                 }
               }}
               plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+              locales={[trLocale]}
+              locale={i18n.language}
               headerToolbar={{
                 left: "",
                 center: "",

@@ -245,8 +245,8 @@ const EditAppointmentModal: React.FC<EditAppointmentFormProps> = ({
 
           <Group grow>
             <FormAutocomplete
-              searchInputLabel={t(Dictionary.Appointment.CHIELD_ID)}
-              placeholder={t(Dictionary.Appointment.CHIELD_ID)}
+              searchInputLabel={t(Dictionary.Appointment.CHILD_ID)}
+              placeholder={t(Dictionary.Appointment.CHILD_ID)}
               description=""
               initialSearchValue={appointment?.chieldName || ""}
               disabled={true}
