@@ -17,12 +17,6 @@ i18next
     nonExplicitSupportedLngs: true,
     fallbackLng: "en",
     interpolation: {
-      escapeValue: false,
-      format(value, format, lng) {
-        if (format === "date") {
-          return new Intl.DateTimeFormat(lng).format(value);
-        }
-        return value;
-      },
+      escapeValue: false, // react already safes from xss
     },
   });

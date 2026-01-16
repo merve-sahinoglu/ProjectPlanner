@@ -166,11 +166,11 @@ const CalendarComponent = () => {
       endDate: endDate,
     };
 
-    if (request.chieldId === undefined) {
+    if (request.chieldId === undefined || request.chieldId === "" || request.chieldId === "undefined") {
       delete request.chieldId;
     }
 
-    if (request.therapistId === undefined) {
+    if (request.therapistId === undefined || request.therapistId === "" || request.therapistId === "undefined") {
       delete request.therapistId;
     }
 

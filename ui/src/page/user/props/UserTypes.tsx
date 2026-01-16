@@ -32,12 +32,14 @@ const getNewItem = (): UserRowProps => {
     name: "",
     surname: "",
     birthDate: null,
-    gender: "",
+    gender: "0",
     isActive: true,
     relativeId: "",
+    typeId: "0",
   };
 };
 
 export type { UserResponse, UserRowProps };
 
-export { getNewItem };
+    export { getNewItem };
+

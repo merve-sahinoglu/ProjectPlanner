@@ -49,12 +49,12 @@ export function AppNavbar() {
           {
             label: t(Dictionary.Navbar.MY_NOTES),
             link: routes.notes,
-            additionalInfo: auth.currentUser?.userId,
+            additionalInfo: auth?.currentUser?.userId,
           },
           {
             label: t(Dictionary.Navbar.MY_APPOINTMENT),
             link: routes.appointment,
-            additionalInfo: auth.currentUser?.userId,
+            additionalInfo: auth?.currentUser?.userId,
           },
         ],
       },
@@ -82,7 +82,7 @@ export function AppNavbar() {
         ],
       },
     ],
-    [auth.currentUser?.userId, i18n.language]
+    [auth?.currentUser?.userId, i18n.language]
   );
 
   return (

@@ -89,10 +89,9 @@ function UserDetail({
       .string()
       .min(1, { message: `${t(Dictionary.User.Validation.SURNAME_MIN)}` })
       .max(128, { message: `${t(Dictionary.User.Validation.SURNAME_MAX)}` }),
-    title: z
+    typeId: z
       .string()
-      .min(1, { message: `${t(Dictionary.User.Validation.TITLE_MIN)}` })
-      .max(128, { message: `${t(Dictionary.User.Validation.TITLE_MAX)}` }),
+      .min(1, { message: `${t(Dictionary.User.Validation.TITLE_MIN)}` }),
     gender: z
       .string()
       .min(1, { message: `${t(Dictionary.User.Validation.GENDER_MIN)}` }),
@@ -102,6 +101,7 @@ function UserDetail({
     initialValues: {
       ...selectedUser,
       gender: selectedUser.gender?.toString?.() ?? "0",
+      typeId: selectedUser.typeId?.toString?.() ?? "0",
     },
     validate: zod4Resolver(schema),
   });
@@ -126,6 +126,7 @@ function UserDetail({
     const normalized: UserRowProps = {
       ...selectedUser,
       gender: selectedUser.gender?.toString?.() ?? "0",
+      typeId: selectedUser.typeId?.toString?.() ?? "0",
     };
 
     // initial snapshot

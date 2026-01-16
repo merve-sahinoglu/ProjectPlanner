@@ -118,64 +118,69 @@ export default function Login() {
           </Stack>
 
           {/* SAĞ: Form */}
-          <Box p={{ base: "sm", md: "lg" }}>
-            {error && (
-              <Alert
-                icon={<IconAlertTriangle size={16} />}
-                color="red"
-                mb="md"
-                variant="light"
-                title="Giriş başarısız"
-                radius="md"
-              >
-                {error}
-              </Alert>
-            )}
-
-
-            <Stack gap="md">
-              <TextInput
-                size="lg"
-                radius="md"
-                label={t(Dictionary.Login.USERNAME)}
-                placeholder="xxx.xxx"
-                withAsterisk
-                leftSection={<IconFaceId size={18} />}
-                {...form.getInputProps("username")}
-              />
-              <PasswordInput
-                size="lg"
-                radius="md"
-                label={t(Dictionary.Login.PASSWORD)}
-                placeholder="••••••••"
-                withAsterisk
-                {...form.getInputProps("password")}
-              />
-              <Group justify="end">
-                <Anchor size="sm" onClick={(e) => e.preventDefault()}>
-                  {t(Dictionary.Login.FORGOT_PASSWORD)}
-                </Anchor>
-              </Group>
-
-              <Group grow mt="xs">
-                <Button
-                  type="submit"
-                  size="lg"
+            <Box p={{ base: "sm", md: "lg" }}>
+              {error && (
+                <Alert
+                  icon={<IconAlertTriangle size={16} />}
+                  color="red"
+                  mb="md"
+                  variant="light"
+                  title="Giriş başarısız"
                   radius="md"
-                  rightSection={<IconArrowRight size={18} />}
-                  variant="gradient"
-                  gradient={{ from: "pink", to: "violet" }}
-                  onClick={handleSubmit}
                 >
-                  {t(Dictionary.Login.LOGIN)}
-                </Button>
-              </Group>
-              <Divider label="veya" labelPosition="center" my="sm" />
-              <Text c="dimmed" size="sm">
-                {t(Dictionary.Login.CONTACT_ADMIN)}
-              </Text>
-            </Stack>
-          </Box>
+                  {error}
+                </Alert>
+              )}
+
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleSubmit();
+                }}
+              >
+                <Stack gap="md">
+                  <TextInput
+                    size="lg"
+                    radius="md"
+                    label={t(Dictionary.Login.USERNAME)}
+                    placeholder="xxx.xxx"
+                    withAsterisk
+                    leftSection={<IconFaceId size={18} />}
+                    {...form.getInputProps("username")}
+                  />
+                  <PasswordInput
+                    size="lg"
+                    radius="md"
+                    label={t(Dictionary.Login.PASSWORD)}
+                    placeholder="••••••••"
+                    withAsterisk
+                    {...form.getInputProps("password")}
+                  />
+                  <Group justify="end">
+                    <Anchor size="sm" onClick={(e) => e.preventDefault()}>
+                      {t(Dictionary.Login.FORGOT_PASSWORD)}
+                    </Anchor>
+                  </Group>
+
+                  <Group grow mt="xs">
+                    <Button
+                      type="submit"
+                      size="lg"
+                      radius="md"
+                      rightSection={<IconArrowRight size={18} />}
+                      variant="gradient"
+                      gradient={{ from: "pink", to: "violet" }}
+                    >
+                      {t(Dictionary.Login.LOGIN)}
+                    </Button>
+                  </Group>
+                  <Divider label="veya" labelPosition="center" my="sm" />
+                  <Text c="dimmed" size="sm">
+                    {t(Dictionary.Login.CONTACT_ADMIN)}
+                  </Text>
+                </Stack>
+              </form>
+            </Box>
         </Box>
       </Paper>
     </Box>

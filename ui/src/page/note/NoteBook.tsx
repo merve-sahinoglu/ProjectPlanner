@@ -96,7 +96,7 @@ export default function NoteBook() {
         },
       },
     ],
-    [IdFromUrl] // ✅ eklendi
+    [IdFromUrl, t] // ✅ eklendi
   );
 
   const handleCreate = async (values: AddNoteFormValues) => {
@@ -166,11 +166,11 @@ export default function NoteBook() {
       dateTo: undefined,
     };
 
-    if (request.chieldId === undefined) {
-      delete request.chieldId;
+    if (request.childId === undefined || request.childId === "" || request.childId === "undefined") {
+      delete request.childId;
     }
 
-    if (request.therapistId === undefined) {
+    if (request.therapistId === undefined || request.therapistId === "" || request.therapistId === "undefined") {
       delete request.therapistId;
     }
     if (request.dateFrom === undefined) {

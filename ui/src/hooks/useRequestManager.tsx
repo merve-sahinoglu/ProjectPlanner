@@ -44,12 +44,23 @@ function useRequestManager() {
     const link = new URL(url);
     if (searchParameters) {
       Object.entries(searchParameters).forEach((x) => {
-        if (x[1] === undefined) return;
-        if (Array.isArray(x[1])) {
-          x[1].forEach((value) => {
-            link.searchParams.append(x[0], String(value));
+        const key = x[0];
+        const value = x[1];
+
+        // Skip if value is effectively empty or literal "undefined" string
+        if (value === undefined || value === null || value === "" || value === "undefined") {
+          return;
+        }
+
+        if (Array.isArray(value)) {
+          value.forEach((v) => {
+            if (v !== undefined && v !== null && v !== "" && v !== "undefined") {
+              link.searchParams.append(key, String(v));
+            }
           });
-        } else link.searchParams.set(x[0], String(x[1]));
+        } else {
+          link.searchParams.set(key, String(value));
+        }
       });
     }
 
@@ -60,7 +71,12 @@ function useRequestManager() {
       headers: headers, // ← Bu satır EKSİKTİ!
     })
       .then(async (response) => {
-        const responseJson = await response.json();
+        const contentType = response.headers.get("content-type");
+        const responseJson =
+          contentType && contentType.includes("application/json")
+            ? await response.json()
+            : await response.text();
+
         if (!response.ok) {
           if (responseJson.errors !== undefined) {
             const validationErrors = parseResponseErrors(responseJson.errors);
@@ -82,15 +98,18 @@ function useRequestManager() {
             } as FailureResponse;
           }
 
-          toast.error(
+          const errorMessage =
             typeof responseJson === "object"
-              ? JSON.stringify(responseJson, null, 2)
-              : String(responseJson)
-          );
+              ? responseJson.detail ||
+                responseJson.title ||
+                JSON.stringify(responseJson, null, 2)
+              : String(responseJson);
+
+          toast.error(errorMessage);
 
           return {
             isSuccess: false,
-            error: responseJson as string,
+            error: errorMessage,
           } as FailureResponse;
         }
 
@@ -105,9 +124,12 @@ function useRequestManager() {
         } as SuccessResponse<T>;
       })
       .catch((error) => {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        toast.error(errorMessage);
         return {
           isSuccess: false,
-          error: error instanceof Error ? error.message : String(error),
+          error: errorMessage,
         } as FailureResponse;
       })
       .finally(() => {
@@ -163,7 +185,11 @@ function useRequestManager() {
           } as SuccessResponse<R>;
         }
 
-        const responseJson = await response.json();
+        const contentType = response.headers.get("content-type");
+        const responseJson =
+          contentType && contentType.includes("application/json")
+            ? await response.json()
+            : await response.text();
 
         if (!response.ok) {
           if (responseJson.errors !== undefined) {
@@ -186,11 +212,18 @@ function useRequestManager() {
             } as FailureResponse;
           }
 
-          toast.error(responseJson.detail);
+          const errorMessage =
+            typeof responseJson === "object"
+              ? responseJson.detail ||
+                responseJson.title ||
+                JSON.stringify(responseJson, null, 2)
+              : String(responseJson);
+
+          toast.error(errorMessage);
 
           return {
             isSuccess: false,
-            error: responseJson as string,
+            error: errorMessage,
           } as FailureResponse;
         }
 
@@ -205,9 +238,12 @@ function useRequestManager() {
         } as SuccessResponse<R>;
       })
       .catch((error) => {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        toast.error(errorMessage);
         return {
           isSuccess: false,
-          error: error instanceof Error ? error.message : String(error),
+          error: errorMessage,
         } as FailureResponse;
       })
       .finally(() => {
@@ -282,7 +318,12 @@ function useRequestManager() {
     })
       .then(async (response) => {
         if (!response.ok) {
-          const responseJson = await response.json();
+          const contentType = response.headers.get("content-type");
+          const responseJson =
+            contentType && contentType.includes("application/json")
+              ? await response.json()
+              : await response.text();
+
           if (responseJson.errors !== undefined) {
             const validationErrors = parseResponseErrors(responseJson.errors);
 
@@ -294,20 +335,18 @@ function useRequestManager() {
             } as FailureResponse;
           }
 
-          if (responseJson.detail !== undefined) {
-            toast.error(responseJson.detail);
+          const errorMessage =
+            typeof responseJson === "object"
+              ? responseJson.detail ||
+                responseJson.title ||
+                JSON.stringify(responseJson, null, 2)
+              : String(responseJson);
 
-            return {
-              isSuccess: false,
-              error: responseJson.detail,
-            } as FailureResponse;
-          }
-
-          toast.error(responseJson);
+          toast.error(errorMessage);
 
           return {
             isSuccess: false,
-            error: responseJson as string,
+            error: errorMessage,
           } as FailureResponse;
         }
 
@@ -336,9 +375,12 @@ function useRequestManager() {
         } as SuccessResponse<void>;
       })
       .catch((error) => {
+        const errorMessage =
+          error instanceof Error ? error.message : String(error);
+        toast.error(errorMessage);
         return {
           isSuccess: false,
-          error: error instanceof Error ? error.message : String(error),
+          error: errorMessage,
         } as FailureResponse;
       })
       .finally(() => {

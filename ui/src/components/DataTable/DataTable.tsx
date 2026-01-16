@@ -1,19 +1,19 @@
 import { useRef } from "react";
 
 import {
-    AG_GRID_LOCALE_EN,
-    AG_GRID_LOCALE_TR,
+  AG_GRID_LOCALE_EN,
+  AG_GRID_LOCALE_TR,
 } from "@ag-grid-community/locale";
 import {
-    AllCommunityModule,
-    ClientSideRowModelModule,
-    ColDef,
-    ColGroupDef,
-    colorSchemeDark,
-    GetRowIdParams,
-    ModuleRegistry,
-    RowClickedEvent,
-    themeQuartz,
+  AllCommunityModule,
+  ClientSideRowModelModule,
+  ColDef,
+  ColGroupDef,
+  colorSchemeDark,
+  GetRowIdParams,
+  ModuleRegistry,
+  RowClickedEvent,
+  themeQuartz,
 } from "ag-grid-community";
 import { AgGridReact } from "ag-grid-react";
 
@@ -110,6 +110,7 @@ function DataTable<T extends TableEntity>({
         enableCellTextSelection
         tooltipShowDelay={0}
         loading={isFetching}
+        key={language}
         localeText={
           language === Language.Turkish ? AG_GRID_LOCALE_TR : AG_GRID_LOCALE_EN
         }

@@ -108,14 +108,20 @@ function AuthenticationProvider({ children }: AuthenticationProviderProps) {
 }
 
 function useAuthenticationContext() {
-  return useContext(AuthenticationContext);
+  const context = useContext(AuthenticationContext);
+  if (context === undefined || context === null) {
+    throw new Error(
+      "useAuthenticationContext must be used within an AuthenticationProvider"
+    );
+  }
+  return context;
 }
 
 function RequireAuthentication({ children }: AuthenticationProviderProps) {
-  const auth = useContext(AuthenticationContext);
+  const auth = useAuthenticationContext();
   const location = useLocation();
 
-  if (!auth.currentUser) {
+  if (!auth || !auth.currentUser) {
     return <Navigate to={routes.login} state={{ from: location }} replace />;
   }
 
@@ -126,5 +132,6 @@ export {
   AuthenticationProvider,
   RequireAuthentication,
   // eslint-disable-next-line react-refresh/only-export-components
-  useAuthenticationContext,
+  useAuthenticationContext
 };
+
