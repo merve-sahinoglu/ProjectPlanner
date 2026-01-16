@@ -84,8 +84,10 @@ const RoomOverview: React.FC = () => {
         selectedEntity={selectedEntity}
         onCardClick={(e) => handleClickEntity(e, item)}
         text={
-          <Text lineClamp={2} fz="sm" fw={500}>
-            <Highlight highlight={filters.query}>{item.name}</Highlight>
+          <Text lineClamp={2} fz="sm" fw={500} component="span">
+            <Highlight highlight={filters.query} component="span">
+              {item.name}
+            </Highlight>
           </Text>
         }
       />
